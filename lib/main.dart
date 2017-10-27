@@ -5,6 +5,7 @@ import "home/card_contas.dart";
 import "home/card_cartoes.dart";
 import "home/card_alertas.dart";
 import "conta/conta.dart";
+import "categoria/categoria.dart";
 import 'package:flutter/animation.dart';
 import 'dart:ui' as ui;
 import 'dart:async';
@@ -38,6 +39,8 @@ class ControlleApp extends StatelessWidget {
       home: new HomePage(),
       routes: <String, WidgetBuilder> {
         '/home': (BuildContext context) => new HomePage(),
+        '/categoria': (BuildContext context) => new CategoriaPage(),
+        //'/novacategoria': (BuildContext context) => new NovaCategoriaPage(),
         //'/conta': (BuildContext context) => new ContaPage()
       },
     );
@@ -52,7 +55,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-    static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
+  static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
     testDevices: testDevice != null ? <String>[testDevice] : null,
     keywords: <String>['foo', 'bar'],
     contentUrl: 'http://foo.com/bar.html',
@@ -90,9 +93,7 @@ class HomePageState extends State<HomePage> {
     FirebaseAdMob.instance.initialize(appId: appId);
     _bannerAd = createBannerAd()..load();
     _bannerAd ??= createBannerAd();
-    _bannerAd
-      ..load()
-      ..show();
+    _bannerAd..load()..show();
   }
 
   @override
@@ -112,7 +113,7 @@ class HomePageState extends State<HomePage> {
         backgroundColor: azulAppbar,
         actions: <Widget>[
           new IconButton(
-            icon: const Icon(Icons.add_circle_outline),
+            icon: const Icon(Icons.add_circle),
             color: new Color(0xFFFFFFFF),
             onPressed: () {
               showDialog(
@@ -139,11 +140,11 @@ class HomePageState extends State<HomePage> {
                           )
                         ],
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         _bannerAd?.dispose();
                         _bannerAd = null;
                         Navigator.pop(context);
-                        Navigator.of(context).push(new PageRouteBuilder(
+                        bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
                           opaque: false,
                           pageBuilder: (BuildContext context, _, __) {
                             return new ContaPage(new Color(0xFF9E9E9E));
@@ -155,6 +156,10 @@ class HomePageState extends State<HomePage> {
                             );
                           }
                         ));
+                        if (isLoggedIn) {
+                          _bannerAd ??= createBannerAd();
+                          _bannerAd..load()..show();
+                        }
                       },
                     ),
                     new FlatButton(
@@ -177,11 +182,11 @@ class HomePageState extends State<HomePage> {
                           )
                         ],
                       ),                
-                      onPressed: () {
+                      onPressed: () async {
                         _bannerAd?.dispose();
                         _bannerAd = null;
                         Navigator.pop(context);
-                        Navigator.of(context).push(new PageRouteBuilder(
+                        bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
                           opaque: false,
                           pageBuilder: (BuildContext context, _, __) {
                             return new ContaPage(new Color(0xFF00BFA5));
@@ -193,6 +198,10 @@ class HomePageState extends State<HomePage> {
                             );
                           }
                         ));
+                        if (isLoggedIn) {
+                          _bannerAd ??= createBannerAd();
+                          _bannerAd..load()..show();
+                        }
                       },
                     ),
                     new FlatButton(
@@ -215,11 +224,11 @@ class HomePageState extends State<HomePage> {
                           )
                         ],
                       ),                
-                      onPressed: () {
+                      onPressed: () async {
                         _bannerAd?.dispose();
                         _bannerAd = null;
                         Navigator.pop(context);
-                        Navigator.of(context).push(new PageRouteBuilder(
+                        bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
                           opaque: false,
                           pageBuilder: (BuildContext context, _, __) {
                             return new ContaPage(new Color(0xFFE57373));
@@ -231,6 +240,10 @@ class HomePageState extends State<HomePage> {
                             );
                           }
                         ));
+                        if (isLoggedIn) {
+                          _bannerAd ??= createBannerAd();
+                          _bannerAd..load()..show();
+                        }
                       },
                     ),
                   ],
@@ -278,6 +291,22 @@ class HomePageState extends State<HomePage> {
               )
             ),
             new ListTile(
+              onTap: (){
+                //Navigator.popAndPushNamed(context, '/categoria');
+                Navigator.pop(context);
+                Navigator.of(context).push(new PageRouteBuilder(
+                  opaque: false,
+                  pageBuilder: (BuildContext context, _, __) {
+                    return new CategoriaPage();
+                  },
+                  transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
+                    return new FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  }
+                ));            
+              },
               leading: new Icon(
                 Icons.folder,
                 color: cinzaDrawer,

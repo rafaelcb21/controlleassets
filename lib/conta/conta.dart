@@ -1212,7 +1212,7 @@ class FormularioState extends State<Formulario> {
                 var valor = this.numeroUSA(this.numeros.value);
                 this.formSubmit['valor'] = valor;
                 print(this.formSubmit);
-                Navigator.pop(context);
+                Navigator.pop(context, true);
               }
             ),
           )
