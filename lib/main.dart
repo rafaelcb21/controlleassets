@@ -149,9 +149,17 @@ class HomePageState extends State<HomePage> {
                           pageBuilder: (BuildContext context, _, __) {
                             return new ContaPage(new Color(0xFF9E9E9E));
                           },
-                          transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
-                            return new FadeTransition(
-                              opacity: animation,
+                          transitionsBuilder: (
+                            BuildContext context,
+                            Animation<double> animation,
+                            Animation<double> secondaryAnimation,
+                            Widget child,
+                          ) {
+                            return new SlideTransition(
+                              position: new Tween<Offset>(
+                                begin:  const Offset(1.0, 0.0),
+                                end: Offset.zero,
+                              ).animate(animation),
                               child: child,
                             );
                           }
@@ -191,9 +199,17 @@ class HomePageState extends State<HomePage> {
                           pageBuilder: (BuildContext context, _, __) {
                             return new ContaPage(new Color(0xFF00BFA5));
                           },
-                          transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
-                            return new FadeTransition(
-                              opacity: animation,
+                          transitionsBuilder: (
+                            BuildContext context,
+                            Animation<double> animation,
+                            Animation<double> secondaryAnimation,
+                            Widget child,
+                          ) {
+                            return new SlideTransition(
+                              position: new Tween<Offset>(
+                                begin:  const Offset(1.0, 0.0),
+                                end: Offset.zero,
+                              ).animate(animation),
                               child: child,
                             );
                           }
@@ -233,9 +249,17 @@ class HomePageState extends State<HomePage> {
                           pageBuilder: (BuildContext context, _, __) {
                             return new ContaPage(new Color(0xFFE57373));
                           },
-                          transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
-                            return new FadeTransition(
-                              opacity: animation,
+                          transitionsBuilder: (
+                            BuildContext context,
+                            Animation<double> animation,
+                            Animation<double> secondaryAnimation,
+                            Widget child,
+                          ) {
+                            return new SlideTransition(
+                              position: new Tween<Offset>(
+                                begin:  const Offset(1.0, 0.0),
+                                end: Offset.zero,
+                              ).animate(animation),
                               child: child,
                             );
                           }
@@ -299,9 +323,17 @@ class HomePageState extends State<HomePage> {
                   pageBuilder: (BuildContext context, _, __) {
                     return new CategoriaPage();
                   },
-                  transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
-                    return new FadeTransition(
-                      opacity: animation,
+                  transitionsBuilder: (
+                      BuildContext context,
+                      Animation<double> animation,
+                      Animation<double> secondaryAnimation,
+                      Widget child,
+                  ) {
+                    return new SlideTransition(
+                      position: new Tween<Offset>(
+                        begin:  const Offset(1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation),
                       child: child,
                     );
                   }

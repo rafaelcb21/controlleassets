@@ -18,12 +18,26 @@ class CategoriaPage extends StatelessWidget {
                 pageBuilder: (BuildContext context, _, __) {
                   return new NovaCategoriaPage();
                 },
-                transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
-                  return new FadeTransition(
-                    opacity: animation,
+                transitionsBuilder: (
+                  BuildContext context,
+                  Animation<double> animation,
+                  Animation<double> secondaryAnimation,
+                  Widget child,
+                ) {
+                  return new SlideTransition(
+                    position: new Tween<Offset>(
+                      begin:  const Offset(1.0, 0.0),
+                      end: Offset.zero,
+                    ).animate(animation),
                     child: child,
                   );
                 }
+                //transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
+                //  return new FadeTransition(
+                //    opacity: animation,
+                //    child: child,
+                //  );
+                //}
               ));
             }
           )
