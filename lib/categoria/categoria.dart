@@ -47,14 +47,77 @@ class CategoriaPage extends StatelessWidget {
   }
 }
 
-class NovaCategoriaPage extends StatelessWidget{
+class NovaCategoriaPage extends StatefulWidget {
+  @override
+  NovaCategoriaPageState createState() => new NovaCategoriaPageState();
+}
+
+class NovaCategoriaPageState extends State<NovaCategoriaPage>{
   Color azulAppbar = new Color(0xFF26C6DA);
+  String value = "Categoria principal";
   @override
   Widget build(BuildContext context) {
     return new Scaffold( 
       appBar: new AppBar(
         title: new Text('Nova Categoria'),
         backgroundColor: azulAppbar,
+      ),
+      body: new Container(
+        child: new Column(
+          children: <Widget>[
+            new Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new Radio(
+                  groupValue: value,
+                  onChanged: (value) => setState(() => this.value = value),
+                  value: "Categoria principal",
+                ),
+                const Text("Categoria principal"),
+                new Radio(
+                  groupValue: value,
+                  onChanged: (value) => setState(() => this.value = value),
+                  value: "Subcategoria",
+                ),
+                const Text("Subcategoria"),
+              ],
+            ),
+            new Row(
+              children: <Widget>[
+                new Icon(
+                  Icons.description,
+                  size: 24.0
+                ),
+                new TextField(
+                  maxLines: 1,
+                  decoration: const InputDecoration(
+                    labelText: "Nome",
+                    isDense: true,
+                  ),
+                  style: Theme.of(context).textTheme.title,
+                )
+              ],
+            ),
+            new Row(
+              children: <Widget>[
+                new Icon(
+                  Icons.palette,
+                  size: 24.0
+                ),
+                new TextField(
+                  maxLines: 1,
+                  decoration: const InputDecoration(
+                    labelText: "Nome",
+                    isDense: true,
+                  ),
+                  style: Theme.of(context).textTheme.title,
+                )
+              ],
+            ),
+            //this.value == "Categoria principal" ?
+
+          ],
+        ),
       )
     );
   }

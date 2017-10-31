@@ -164,10 +164,10 @@ class HomePageState extends State<HomePage> {
                             );
                           }
                         ));
-                        if (isLoggedIn) {
+                        
                           _bannerAd ??= createBannerAd();
                           _bannerAd..load()..show();
-                        }
+                        
                       },
                     ),
                     new FlatButton(
@@ -214,10 +214,10 @@ class HomePageState extends State<HomePage> {
                             );
                           }
                         ));
-                        if (isLoggedIn) {
+                        
                           _bannerAd ??= createBannerAd();
                           _bannerAd..load()..show();
-                        }
+                        
                       },
                     ),
                     new FlatButton(
@@ -264,10 +264,10 @@ class HomePageState extends State<HomePage> {
                             );
                           }
                         ));
-                        if (isLoggedIn) {
+                        
                           _bannerAd ??= createBannerAd();
                           _bannerAd..load()..show();
-                        }
+                        
                       },
                     ),
                   ],
