@@ -98,6 +98,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                 )
               ],
             ),
+            this.value == "Categoria principal" ?
             new Row(
               children: <Widget>[
                 new Icon(
@@ -107,14 +108,16 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                 new TextField(
                   maxLines: 1,
                   decoration: const InputDecoration(
-                    labelText: "Nome",
+                    labelText: "Cor",
                     isDense: true,
                   ),
                   style: Theme.of(context).textTheme.title,
-                )
+                ),
+
               ],
-            ),
-            //this.value == "Categoria principal" ?
+            ):
+            
+              
 
           ],
         ),
