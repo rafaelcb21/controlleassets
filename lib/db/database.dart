@@ -21,6 +21,7 @@ class DatabaseClient {
               id INTEGER PRIMARY KEY,
               categoria TEXT NOT NULL UNIQUE,
               idcategoriapai INTEGER NOT NULL,
+              cor INTEGER NOT NULL,
               ativada INTEGER NOT NULL
             )"""); //se nao for uma subcategoria a coluna idcategoriapai terao valor 0
 
@@ -99,16 +100,18 @@ class Categoria {
   int id;
   String categoria;
   int idcategoriapai;
+  int cor;
   int ativada;
 
   String categoriaTable = "categoria";
 
-  static final columns = ["id", "categoria", "idcategoriapai", "ativada"];
+  static final columns = ["id", "categoria", "idcategoriapai", "cor","ativada"];
 
   Map toMap() {
     Map map = {
       "categoria": categoria,
       "idcategoriapai": idcategoriapai,
+      "cor": cor,
       "ativada": ativada
     };
 
@@ -122,6 +125,7 @@ class Categoria {
     categoriaTable.id = map["id"];
     categoriaTable.categoria = map["categoria"];
     categoriaTable.idcategoriapai = map["idcategoria"];
+    categoriaTable.cor = map["cor"];
     categoriaTable.ativada = map["ativada"];
 
     return categoriaTable;

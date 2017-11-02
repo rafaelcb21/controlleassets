@@ -184,7 +184,7 @@ class ContaPageStatus extends State<ContaPage> with TickerProviderStateMixin{
           //),
           
           new Positioned(
-            bottom: 16.0,
+            bottom: 36.0,
             left: (_width / 2) - 44,
             child: new ScaleTransition(
               scale: _animation,
