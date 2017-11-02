@@ -98,74 +98,183 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                 const Text("Subcategoria"),
               ],
             ),
-            //new Row(
-            //  children: <Widget>[
-                new TextField(
-                  maxLines: 1,
-                  decoration: const InputDecoration(
-                    icon: const Icon(Icons.description),
-                    labelText: "Nome",
-                  ),
-                  style: Theme.of(context).textTheme.title,
-                ),
-            //  ],
-            //),
             
-            new Row(
-              children: <Widget>[
-                new Icon(
-                  Icons.palette,
-                  size: 24.0,
-                  color: Colors.black45,
+            new Container(
+              margin: new EdgeInsets.only(right: 16.0),
+              child: new TextField(
+                maxLines: 1,
+                decoration: const InputDecoration(
+                  icon: const Icon(Icons.description),
+                  labelText: "Nome",
                 ),
-                new Text('Cor', style: new TextStyle(color: Colors.black38, fontSize: 20.0)),
-                new IconButton(
-                  icon: const Icon(Icons.lens),
-                  onPressed: () {
-                    showCorDialog<String>(
-                      context: context,
-                      child: new SimpleDialog(
-                        title: const Text('Selecione uma cor'),
-                        children: <Widget>[
-                          new Container(
-                            //margin: new EdgeInsets.only(left: 16.0, right: 16.0),
-                            child: new Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Container(
-                                  color: new Color(0xFFd10841),
-                                  height: 56.0,
-                                  width: 56.0,
+                style: Theme.of(context).textTheme.title,
+              ),
+            ),
+            this.value == "Categoria principal" ?
+            new Container(
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 16.0),
+              child: new Row(
+                children: <Widget>[
+                  new Icon(
+                    Icons.palette,
+                    size: 24.0,
+                    color: Colors.black45,
+                  ),
+                  new Expanded(
+                    child: new InkWell(
+                      onTap: (){
+                        showCorDialog<String>(
+                          context: context,
+                          child: new SimpleDialog(
+                            title: const Text('Selecione uma cor'),
+                            children: <Widget>[
+                              new Container(
+                                //margin: new EdgeInsets.only(left: 16.0, right: 16.0),
+                                child: new Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    new Container(
+                                      color: new Color(0xFFd10841),
+                                      height: 46.0,
+                                      width: 46.0,
+                                    ),
+                                    new Container(
+                                      color: new Color(0xFFcdd399),
+                                      height: 46.0,
+                                      width: 46.0,
+                                    ),
+                                    new Container(
+                                      color: new Color(0xFF87c0ec),
+                                      height: 46.0,
+                                      width: 46.0,
+                                    ),
+                                    new Container(
+                                      color: new Color(0xFF5aaeae),
+                                      height: 46.0,
+                                      width: 46.0,
+                                    )
+                                  ],
                                 ),
-                                new Container(
-                                  color: new Color(0xFFcdd399),
-                                  height: 56.0,
-                                  width: 56.0,
-                                ),
-                                new Container(
-                                  color: new Color(0xFF87c0ec),
-                                  height: 56.0,
-                                  width: 56.0,
-                                ),
-                                new Container(
-                                  color: new Color(0xFF5aaeae),
-                                  height: 56.0,
-                                  width: 56.0,
-                                )                                
-                              ],
-                            ),    
+                              )
+                            ]
                           )
-                        ]
+                        );
+                      },
+                      child: new Container(
+                        margin: new EdgeInsets.only(left: 12.0),
+                        padding: new EdgeInsets.only(bottom: 2.0),
+                        decoration: new BoxDecoration(
+                          border: new Border(
+                            bottom: new BorderSide(
+                              style: BorderStyle.solid,
+                              color: Colors.black26,
+                            )
+                          )
+                        ),
+                        child: new Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            new Container(
+                              child: new Text(
+                                'Cor',
+                                style: new TextStyle(
+                                  color: Colors.black26,
+                                  fontSize: 20.0,
+                                  fontFamily: "Roboto",
+                                  fontWeight: FontWeight.w500,
+                                )
+                              ),
+                            ),
+                            new Icon(Icons.lens)
+                          ],
+                        ),
                       )
-                    );
-                  },
-                )
-                //new Icon(
-                //  Icons.lens,
-                //  size: 24.0,
-                //  color: this.colorEscolhida,
-                //),
-              ],
+                    ),
+                  ),
+                ],
+              ),
+            ) :
+
+            new Container(
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 16.0),
+              child: new Row(
+                children: <Widget>[
+                  new Icon(
+                    Icons.label,
+                    size: 24.0,
+                    color: Colors.black45,
+                  ),
+                  new Expanded(
+                    child: new InkWell(
+                      onTap: (){
+                        showCorDialog<String>(
+                          context: context,
+                          child: new SimpleDialog(
+                            title: const Text('Categorias'),
+                            children: <Widget>[
+                              new Container(
+                                child: new Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    new Container(
+                                      color: new Color(0xFFd10841),
+                                      height: 46.0,
+                                      width: 46.0,
+                                    ),
+                                    new Container(
+                                      color: new Color(0xFFcdd399),
+                                      height: 46.0,
+                                      width: 46.0,
+                                    ),
+                                    new Container(
+                                      color: new Color(0xFF87c0ec),
+                                      height: 46.0,
+                                      width: 46.0,
+                                    ),
+                                    new Container(
+                                      color: new Color(0xFF5aaeae),
+                                      height: 46.0,
+                                      width: 46.0,
+                                    )
+                                  ],
+                                ),
+                              )
+                            ]
+                          )
+                        );
+                      },
+                      child: new Container(
+                        margin: new EdgeInsets.only(left: 12.0),
+                        padding: new EdgeInsets.only(bottom: 2.0),
+                        decoration: new BoxDecoration(
+                          border: new Border(
+                            bottom: new BorderSide(
+                              style: BorderStyle.solid,
+                              color: Colors.black26,
+                            )
+                          )
+                        ),
+                        child: new Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            new Container(
+                              child: new Text(
+                                'Categoria pai',
+                                style: new TextStyle(
+                                  color: Colors.black26,
+                                  fontSize: 20.0,
+                                  fontFamily: "Roboto",
+                                  fontWeight: FontWeight.w500,
+                                )
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ),
+                  ),
+                ],
+              ),
             )
           ],
         ),
