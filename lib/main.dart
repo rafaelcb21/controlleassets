@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 
+import './db/database.dart';
 import "home/card_saldo.dart";
 import "home/card_contas.dart";
 import "home/card_cartoes.dart";
@@ -31,9 +32,11 @@ void main() {
   runApp(new ControlleApp());
 }
 
-class ControlleApp extends StatelessWidget {  
+class ControlleApp extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
+    
     return new MaterialApp(
       title: "Controlle Financeiro",
       home: new HomePage(),
@@ -55,6 +58,12 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  DatabaseClient db = new DatabaseClient();
+  createdb() async {
+    await db.create();
+  }
+
+
   static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
     testDevices: testDevice != null ? <String>[testDevice] : null,
     keywords: <String>['foo', 'bar'],
@@ -94,6 +103,7 @@ class HomePageState extends State<HomePage> {
     _bannerAd = createBannerAd()..load();
     _bannerAd ??= createBannerAd();
     _bannerAd..load()..show();
+    createdb();
   }
 
   @override

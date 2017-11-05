@@ -11,7 +11,6 @@ class DatabaseClient {
   Future create() async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
-
     _db = await openDatabase(dbPath, version: 1, onCreate: this._create);
   }
 
@@ -19,7 +18,7 @@ class DatabaseClient {
     await db.execute("""
             CREATE TABLE categoria (
               id INTEGER PRIMARY KEY,
-              categoria TEXT NOT NULL UNIQUE,
+              categoria TEXT NOT NULL,
               idcategoriapai INTEGER NOT NULL,
               cor INTEGER NOT NULL,
               ativada INTEGER NOT NULL
@@ -28,14 +27,14 @@ class DatabaseClient {
     await db.execute("""
             CREATE TABLE tag (
               id INTEGER PRIMARY KEY, 
-              tag TEXT NOT NULL UNIQUE,
+              tag TEXT NOT NULL,
               ativada INTEGER NOT NULL
             )""");
 
     await db.execute("""
             CREATE TABLE conta (
               id INTEGER PRIMARY KEY, 
-              conta TEXT NOT NULL UNIQUE,
+              conta TEXT NOT NULL,
               saldoinicial REAL NOT NULL,
               ativada INTEGER NOT NULL
             )""");
@@ -43,7 +42,7 @@ class DatabaseClient {
     await db.execute("""
             CREATE TABLE cartao (
               id INTEGER PRIMARY KEY, 
-              cartao TEXT NOT NULL UNIQUE,
+              cartao TEXT NOT NULL,
               limite REAL,
               vencimento TEXT NOT NULL,
               fechamento TEXT NOT NULL,
@@ -67,16 +66,16 @@ class DatabaseClient {
               descricao TEXT NOT NULL,
               fixoparcelado TEXT,
               tiporepeticao TEXT,
-              quantidaderepeticao INTEGER
+              quantidaderepeticao INTEGER,
 
               FOREIGN KEY (idcategoria) REFERENCES categoria (id) 
-                ON DELETE NO ACTION ON UPDATE NO ACTION
+                ON DELETE NO ACTION ON UPDATE NO ACTION,
               FOREIGN KEY (idtag) REFERENCES tag (id) 
-                ON DELETE NO ACTION ON UPDATE NO ACTION
+                ON DELETE NO ACTION ON UPDATE NO ACTION,
               FOREIGN KEY (idconta) REFERENCES conta (id) 
-                ON DELETE NO ACTION ON UPDATE NO ACTION
+                ON DELETE NO ACTION ON UPDATE NO ACTION,
               FOREIGN KEY (idcontadestino) REFERENCES conta (id) 
-                ON DELETE NO ACTION ON UPDATE NO ACTION
+                ON DELETE NO ACTION ON UPDATE NO ACTION,
               FOREIGN KEY (idcartao) REFERENCES cartao (id) 
                 ON DELETE NO ACTION ON UPDATE NO ACTION
             )""");
@@ -87,15 +86,14 @@ class DatabaseClient {
 }
 
 class Categoria {
+  Categoria();
+  Database db;
 
   //Future openDB() async {
   //  Directory path = await getApplicationDocumentsDirectory();
-  //  String dbPath = join(path.path, "database.db");
+  //  String dbPath = join(path.path, "../../assets/database.db");
   //  Database db = await openDatabase(dbPath);
-  //}
-
-  Categoria();
-  Database db;
+  //}  
 
   int id;
   String categoria;
@@ -137,21 +135,64 @@ class Categoria {
   //}
 
   Future upsertCategoria(Categoria categoria) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
     if (categoria.id == null) {
       categoria.id = await db.insert(categoriaTable, categoria.toMap());
     } else {
       await db.update(categoriaTable, categoria.toMap(),
         where: "id = ?", whereArgs: [categoria.id]);
     }
+
+    await db.close();
+
     return categoria;
   }
 
+  Future getCategoriaByName(String name) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    List results = await db.query(categoriaTable,
+      columns: Categoria.columns, where: "categoria = ?", whereArgs: [name]);
+    
+    Categoria categoria = Categoria.fromMap(results[0]);
+    print(categoria);
+    print(results[0]);
+    await db.close();     
+    return categoria;
+
+  }
+
   Future getCategoria(int id) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
     List results = await db.query(categoriaTable,
       columns: Categoria.columns, where: "id = ?", whereArgs: [id]);
     Categoria categoria = Categoria.fromMap(results[0]);
+
+    await db.close();
+
     return categoria;
   }
+
+  Future getAllCategoria() async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+    //List<Map> list = await db.rawQuery('SELECT * FROM Test');
+    List<Map> list = await db.query(categoriaTable, columns: Categoria.columns);
+    await db.close();
+
+    return list;
+    
+  }
+
 
   //Future<int> delete(int id) async {
   //  return await db.delete(categoriaTable, where: "id = ?", whereArgs: [id]);

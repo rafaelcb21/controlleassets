@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'dart:async';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import '../db/database.dart';
 
-class CategoriaPage extends StatelessWidget {
+class CategoriaPage extends StatefulWidget {
+  @override
+  CategoriaPageState createState() => new CategoriaPageState();
+}
+
+class CategoriaPageState extends State<CategoriaPage>{
   Color azulAppbar = new Color(0xFF26C6DA);
+  Categoria categoriaDB = new Categoria();
+
+  @override
+  void initState() {
+    categoriaDB.getAllCategoria();
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold( 
@@ -12,8 +29,8 @@ class CategoriaPage extends StatelessWidget {
           new IconButton(
             icon: const Icon(Icons.add),
             color: new Color(0xFFFFFFFF),
-            onPressed: () {
-              Navigator.of(context).push(new PageRouteBuilder(
+            onPressed: () async {
+              await Navigator.of(context).push(new PageRouteBuilder(
                 opaque: false,
                 pageBuilder: (BuildContext context, _, __) {
                   return new NovaCategoriaPage();
@@ -32,13 +49,8 @@ class CategoriaPage extends StatelessWidget {
                     child: child,
                   );
                 }
-                //transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
-                //  return new FadeTransition(
-                //    opacity: animation,
-                //    child: child,
-                //  );
-                //}
               ));
+              categoriaDB.getAllCategoria();
             }
           )
         ]
@@ -57,7 +69,9 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
   String value = "Categoria principal";
   String categoriaPai = "Categoria pai";
   Color colorEscolhida = new Color(0xFF000000);
-
+  final TextEditingController _controller = new TextEditingController();
+  Categoria categoriaDB = new Categoria();
+  
   List cores = [
     const Color(0xFF000000),
     const Color(0xFFd10841),
@@ -65,7 +79,12 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
     const Color(0xFF87c0ec),
     const Color(0xFF5aaeae)
   ];
- 
+
+  @override
+  void initState() {
+    categoriaDB.cor = 0;
+  }
+
   void showCorDialog<T>({ BuildContext context, Widget child }) {
     showDialog<T>(
       context: context,
@@ -74,7 +93,21 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
     .then<Null>((T value) { // The value passed to Navigator.pop() or null.
       if (value != null) {
         setState(() {
-          print(value);
+          
+        });
+      }
+    });
+  }
+
+  void showCategoriaDialog<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) { // The value passed to Navigator.pop() or null.
+      if (value != null) {
+        setState(() {
+          
         });
       }
     });
@@ -98,14 +131,20 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                   groupValue: value,
                   onChanged: (value) => setState(() {
                     this.value = value;
-                    this.categoriaPai = 'Categoria pai';                
+                    this.categoriaPai = 'Categoria pai';
+                    categoriaDB.idcategoriapai = 0;
                   }),
                   value: "Categoria principal",
                 ),
                 const Text("Categoria principal"),
                 new Radio(
                   groupValue: value,
-                  onChanged: (value) => setState(() => this.value = value),
+                  //onChanged: (value) => setState(() => this.value = value),
+                  onChanged: (value) => setState(() {
+                    this.value = value;
+                    categoriaDB.getAllCategoria();
+                  }),
+
                   value: "Subcategoria",
                 ),
                 const Text("Subcategoria"),
@@ -115,6 +154,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
             new Container(
               margin: new EdgeInsets.only(right: 16.0),
               child: new TextField(
+                controller: _controller,
                 maxLines: 1,
                 decoration: const InputDecoration(
                   icon: const Icon(Icons.description),
@@ -153,6 +193,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                                       child: new InkWell(
                                         onTap: (){
                                           this.colorEscolhida = cores[1];
+                                          categoriaDB.cor = 1;
                                           Navigator.pop(context, 1);
                                         },
                                       ),
@@ -164,6 +205,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                                       child: new InkWell(
                                         onTap: (){
                                           this.colorEscolhida = cores[2];
+                                          categoriaDB.cor = 2;
                                           Navigator.pop(context, 2);
                                         },
                                       ),
@@ -175,6 +217,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                                       child: new InkWell(
                                         onTap: (){
                                           this.colorEscolhida = cores[3];
+                                          categoriaDB.cor = 3;
                                           Navigator.pop(context, 3);
                                         },
                                       ),
@@ -186,6 +229,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                                       child: new InkWell(
                                         onTap: (){
                                           this.colorEscolhida = cores[4];
+                                          categoriaDB.cor = 4;
                                           Navigator.pop(context, 4);
                                         },
                                       ),
@@ -332,8 +376,40 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                         fontSize: 24.0
                       ),  
                     ),
-                    onPressed: (){
-                      Navigator.pop(context);
+                    onPressed: (){                      
+                      categoriaDB.categoria = _controller.text;
+                      categoriaDB.ativada = 1;
+                      this.categoriaPai == 'Categoria pai' ?
+                        categoriaDB.idcategoriapai = 0 : categoriaDB.idcategoriapai = 1;
+                      var result = categoriaDB.getCategoriaByName(categoriaDB.categoria);
+                      print("oiiiiiiiiiiiii");
+                      print(result);
+                      print("oiiiiiiiiiiiii");
+                      if(result == true) {
+                        showCategoriaDialog<String>(
+                          context: context,
+                          child: new SimpleDialog(
+                            title: const Text('Erro'),
+                            children: <Widget>[
+                              new Container(
+                                child: new Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    new Icon(Icons.error, color: const Color(0xFFE57373)),
+                                    new Text("Essa categoria já existe")
+
+                                  ],
+                                ),
+                              )
+                            ]
+                          )
+                        );
+                      } else {
+                        categoriaDB.upsertCategoria(categoriaDB);
+                        //categoriaDB.getAllCategoria();
+                      
+                        Navigator.pop(context);
+                      }
                     }
                   ),
                 ],

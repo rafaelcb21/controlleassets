@@ -43,6 +43,7 @@ flutter:
   - lib/images/mastercard.png
   - lib/images/cartao.png
   - lib/images/amex.png
+  #- assets/database.db
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
