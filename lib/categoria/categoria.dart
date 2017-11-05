@@ -139,10 +139,9 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                 const Text("Categoria principal"),
                 new Radio(
                   groupValue: value,
-                  //onChanged: (value) => setState(() => this.value = value),
                   onChanged: (value) => setState(() {
                     this.value = value;
-                    categoriaDB.getAllCategoria();
+                    categoriaDB.getAllCategoria(); //inutil
                   }),
 
                   value: "Subcategoria",
@@ -182,7 +181,6 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                             title: const Text('Selecione uma cor'),
                             children: <Widget>[
                               new Container(
-                                //margin: new EdgeInsets.only(left: 16.0, right: 16.0),
                                 child: new Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
@@ -287,7 +285,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                   ),
                   new Expanded(
                     child: new InkWell(
-                      onTap: (){
+                      onTap: () {
                         showCorDialog<String>(
                           context: context,
                           child: new SimpleDialog(
@@ -376,7 +374,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                         fontSize: 24.0
                       ),  
                     ),
-                    onPressed: (){                      
+                    onPressed: () {                      
                       categoriaDB.categoria = _controller.text;
                       categoriaDB.ativada = 1;
                       this.categoriaPai == 'Categoria pai' ?

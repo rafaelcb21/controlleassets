@@ -188,7 +188,7 @@ class Categoria {
     //List<Map> list = await db.rawQuery('SELECT * FROM Test');
     List<Map> list = await db.query(categoriaTable, columns: Categoria.columns);
     await db.close();
-
+    //print(list);
     return list;
     
   }
