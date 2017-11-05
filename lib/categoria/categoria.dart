@@ -381,35 +381,47 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                       categoriaDB.ativada = 1;
                       this.categoriaPai == 'Categoria pai' ?
                         categoriaDB.idcategoriapai = 0 : categoriaDB.idcategoriapai = 1;
-                      var result = categoriaDB.getCategoriaByName(categoriaDB.categoria);
-                      print("oiiiiiiiiiiiii");
-                      print(result);
-                      print("oiiiiiiiiiiiii");
-                      if(result == true) {
-                        showCategoriaDialog<String>(
-                          context: context,
-                          child: new SimpleDialog(
-                            title: const Text('Erro'),
-                            children: <Widget>[
-                              new Container(
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    new Icon(Icons.error, color: const Color(0xFFE57373)),
-                                    new Text("Essa categoria já existe")
+                      //var result = categoriaDB.getCategoriaByName(categoriaDB.categoria);
 
-                                  ],
-                                ),
-                              )
-                            ]
-                          )
-                        );
-                      } else {
-                        categoriaDB.upsertCategoria(categoriaDB);
-                        //categoriaDB.getAllCategoria();
+                      var result = categoriaDB.countCategoria(categoriaDB.categoria);
                       
-                        Navigator.pop(context);
-                      }
+                      result.then((data) {
+                        if(data) {
+                          showCategoriaDialog<String>(
+                            context: context,
+                            child: new SimpleDialog(
+                              title: const Text('Erro'),
+                              children: <Widget>[
+                                new Container(
+                                  margin: new EdgeInsets.only(left: 24.0),
+                                  child: new Row(
+                                    children: <Widget>[
+                                      new Container(
+                                        margin: new EdgeInsets.only(right: 10.0),
+                                        child: new Icon(
+                                          Icons.error,
+                                          color: const Color(0xFFE57373)),
+                                      ),                                      
+                                      new Text(
+                                        "Essa categoria já existe",
+                                        style: new TextStyle(
+                                          color: Colors.black26,
+                                          fontSize: 16.0,
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500,
+                                        )
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ]
+                            )
+                          );
+                        } else {
+                          categoriaDB.upsertCategoria(categoriaDB);                      
+                          Navigator.pop(context);
+                        }
+                      });
                     }
                   ),
                 ],
