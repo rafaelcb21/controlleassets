@@ -12,7 +12,12 @@ class CategoriaPageState extends State<CategoriaPage>{
 
   @override
   void initState() {
-    categoriaDB.getAllCategoria();
+    categoriaDB.getAllCategoria().then(
+      (list) {
+        print(list);
+        
+      }
+    );
   }
 
   @override

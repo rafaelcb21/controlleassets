@@ -159,8 +159,7 @@ class Categoria {
       columns: Categoria.columns, where: "categoria = ?", whereArgs: [name]);
     
     Categoria categoria = Categoria.fromMap(results[0]);
-    print(categoria);
-    print(results[0]);
+
     await db.close();     
     return categoria;
 
@@ -184,22 +183,34 @@ class Categoria {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
-    //List<Map> list = await db.rawQuery('SELECT * FROM Test');
-    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria");
-    List<Map> list = await db.query(categoriaTable, columns: Categoria.columns);
+
+    List<Map> listaPais = await db.query(categoriaTable, columns: Categoria.columns,
+      where: "idcategoriapai = 0", orderBy: "categoria ASC");    
+    List listaTotal = [];
+    List<Map> listaFilhos;
+    
+    for(var i in listaPais) {
+      var id = i["id"];
+      listaFilhos = await db.rawQuery("SELECT * FROM categoria WHERE ? = idcategoriapai ORDER BY categoria ASC", [id]);
+      listaTotal.add([i,listaFilhos]);
+    }
+
     await db.close();
-    return [count, list];    
+
+    return listaTotal; 
   }
 
   Future getOnlyCategoriaPai() async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
-    //List<Map> list = await db.rawQuery('SELECT * FROM Test');
+
     var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE idcategoriapai = 0");
     List<Map> list = await db.query(categoriaTable, columns: Categoria.columns,
-      where: "idcategoriapai = 0");
+      where: "idcategoriapai = 0", orderBy: "categoria ASC");
+
     await db.close();
+    
     return [count, list];    
   }
 
