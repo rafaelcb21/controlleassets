@@ -392,7 +392,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                         fontSize: 24.0
                       ),  
                     ),
-                    onPressed: () {                      
+                    onPressed: () {
                       categoriaDB.categoria = _controller.text;
                       categoriaDB.ativada = 1;
                       this.categoriaPai == 'Categoria pai' ?
@@ -427,7 +427,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                                           child: new Icon(
                                             Icons.error,
                                             color: const Color(0xFFE57373)),
-                                        ),                                      
+                                        ),
                                         new Text(
                                           "Essa categoria já existe",
                                           softWrap: true,
@@ -464,7 +464,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                                       child: new Icon(
                                         Icons.error,
                                         color: const Color(0xFFE57373)),
-                                    ),                                      
+                                    ),
                                     new Text(
                                       "Preencha os campos",
                                       softWrap: true,
@@ -512,12 +512,12 @@ class DialogItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            new Container(              
+            new Container(
               child: new Container(
                 margin: size == 16.0 ? new EdgeInsets.only(left: 7.0) : null,
                 child: new Icon(icon, size: size, color: color),
-              )                
-            ),        
+              )
+            ),
             new Padding(
               padding: size == 16.0 ? const EdgeInsets.only(left: 17.0) : const EdgeInsets.only(left: 16.0),
               child: new Text(text),
