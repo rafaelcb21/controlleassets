@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
-import 'dart:async';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import '../db/database.dart';
 
 class CategoriaPage extends StatefulWidget {
