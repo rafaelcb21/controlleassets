@@ -54,7 +54,21 @@ class CategoriaPageState extends State<CategoriaPage>{
               categoriaDB.getAllCategoria();
             }
           )
-        ]
+        ],
+      ),
+      body: new ListView(
+        padding: new EdgeInsets.only(top: 8.0),
+        children: <Widget>[
+          new ItemCategoria(false),
+          new ItemCategoria(true),
+          new ItemCategoria(true),
+          new ItemCategoria(false),
+          new ItemCategoria(false),
+          new ItemCategoria(true),
+          new ItemCategoria(false),
+          new ItemCategoria(false),
+          new ItemCategoria(false),
+        ],
       )
     );
   }
@@ -526,6 +540,87 @@ class DialogItem extends StatelessWidget {
           ],
         ),
       )
+    );
+  }
+}
+
+class ItemCategoria extends StatefulWidget {
+  bool filho;
+  ItemCategoria(this.filho);
+
+  @override
+  ItemCategoriaState createState() => new ItemCategoriaState(this.filho);
+}
+
+class ItemCategoriaState extends State<ItemCategoria>  {
+  bool filho;
+  ItemCategoriaState(this.filho);
+
+  @override
+  Widget build(BuildContext context) {
+
+    return new Container(
+      decoration: new BoxDecoration(
+        border: new Border(
+          top: this.filho ? new BorderSide(style: BorderStyle.none) : new BorderSide(style: BorderStyle.solid, color: Colors.black26),
+        )
+      ),
+      margin: new EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0, bottom: 0.0),
+      child: new Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[          
+          new Expanded(
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                new InkWell(
+                  onTap: () {},
+                  child: new Container(
+                    padding: this.filho ? new EdgeInsets.only(right: 60.0, top: 15.0, bottom: 15.0) : new EdgeInsets.only(right: 60.0),
+                    child: new Row(
+                      children: <Widget>[
+                        new Container(
+                          margin: this.filho ? new EdgeInsets.only(right: 15.0, left: 16.0) : new EdgeInsets.only(right: 16.0),
+                          child: new Icon(
+                            this.filho ? Icons.subdirectory_arrow_right : Icons.brightness_1,
+                            color: this.filho ? Colors.black54 : const Color(0xFF26C6DA),
+                            size: this.filho ? 20 : 35.0,
+                          ),  
+                        ),
+                        new Text(
+                          "Investimento",
+                          style: new TextStyle(
+                            color: Colors.black87,
+                            fontSize: 14.0,
+                            fontFamily: "Roboto",
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),                                             
+                      ],
+                    )
+                  ),
+                ),
+                new InkWell(
+                  onTap: () {},
+                  child: new Container(
+                    padding: new EdgeInsets.only(top: 15.0, bottom: 15.0, left: 10.0),
+                    child: new Text(
+                      "+ subcategoria",
+                      style: new TextStyle(
+                        color: Colors.black26,
+                        fontSize: 12.0,
+                        fontFamily: "Roboto",
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                )                
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 }
