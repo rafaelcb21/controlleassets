@@ -68,9 +68,14 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
   Color azulAppbar = new Color(0xFF26C6DA);
   String value = "Categoria principal";
   String categoriaPai = "Categoria pai";
+  int categoriaPaiId;
   Color colorEscolhida = new Color(0xFF000000);
   final TextEditingController _controller = new TextEditingController();
   Categoria categoriaDB = new Categoria();
+  List listaCategoria;
+  int number;
+  List<Widget> tiles;
+  bool x, y;
   
   List cores = [
     const Color(0xFF000000),
@@ -83,6 +88,14 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
   @override
   void initState() {
     categoriaDB.cor = 0;
+    categoriaDB.getOnlyCategoriaPai().then((list) {
+      setState(() {
+        if(list.length > 0 && list != null) {
+          this.number = list[0][0]['COUNT(*)'];
+          this.listaCategoria = list[1];
+        }
+      }); 
+    });
   }
 
   void showCorDialog<T>({ BuildContext context, Widget child }) {
@@ -91,6 +104,20 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
       child: child,
     )
     .then<Null>((T value) { // The value passed to Navigator.pop() or null.
+      if (value != null) {
+        setState(() {
+          
+        });
+      }
+    });
+  }
+
+  void showChoseDialog<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) {
       if (value != null) {
         setState(() {
           
@@ -115,6 +142,32 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
 
   @override
   Widget build(BuildContext context) {
+
+    List<Widget> buildTile(int counter) {
+      this.tiles = [];
+      if(counter != null) {
+        for(var i = 0; i < counter; i++) {
+          this.tiles.add(
+            new DialogItem(
+              icon: Icons.brightness_1,
+              color: this.cores[
+                this.listaCategoria[i]['cor']
+              ],
+              text: this.listaCategoria[i]['categoria'],
+              onPressed: () {
+                setState((){
+                  this.categoriaPai = this.listaCategoria[i]['categoria'];
+                  this.categoriaPaiId = this.listaCategoria[i]['id'];
+                });
+                Navigator.pop(context, this.listaCategoria[i]['categoria']);
+              }
+            )
+          );
+        }
+      }
+      return this.tiles;
+    }
+
     return new Scaffold( 
       appBar: new AppBar(
         title: new Text('Nova Categoria'),
@@ -141,7 +194,6 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                   groupValue: value,
                   onChanged: (value) => setState(() {
                     this.value = value;
-                    categoriaDB.getAllCategoria(); //inutil
                   }),
 
                   value: "Subcategoria",
@@ -286,45 +338,11 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                   new Expanded(
                     child: new InkWell(
                       onTap: () {
-                        showCorDialog<String>(
+                        showChoseDialog<String>(
                           context: context,
                           child: new SimpleDialog(
                             title: const Text('Categorias'),
-                            children: <Widget>[
-                              new DialogItem(
-                                icon: Icons.brightness_1,
-                                color: new Color(0xFFFFA500),
-                                text: 'Alimentação',
-                                onPressed: () {
-                                  setState((){
-                                    this.categoriaPai = 'Alimentação';
-                                  });
-                                  Navigator.pop(context, 'Alimentação');
-                                }
-                              ),
-                              new DialogItem(
-                                icon: Icons.brightness_1,
-                                color: new Color(0xFF279605),
-                                text: 'Cartão',
-                                onPressed: () {
-                                  setState((){
-                                    this.categoriaPai = 'Cartão';
-                                  });
-                                  Navigator.pop(context, 'Cartão');
-                                }
-                              ),
-                              new DialogItem(
-                                icon: Icons.brightness_1,
-                                color: new Color(0xFF005959),
-                                text: 'Educação',
-                                onPressed: () {
-                                  setState((){
-                                    this.categoriaPai = 'Educação';
-                                  });                                  
-                                  Navigator.pop(context);
-                                }
-                              )                              
-                            ]
+                            children: buildTile(this.number)
                           )
                         );
                       },
@@ -378,48 +396,92 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                       categoriaDB.categoria = _controller.text;
                       categoriaDB.ativada = 1;
                       this.categoriaPai == 'Categoria pai' ?
-                        categoriaDB.idcategoriapai = 0 : categoriaDB.idcategoriapai = 1;
+                        categoriaDB.idcategoriapai = 0 : categoriaDB.idcategoriapai = this.categoriaPaiId;
                       //var result = categoriaDB.getCategoriaByName(categoriaDB.categoria);
 
-                      var result = categoriaDB.countCategoria(categoriaDB.categoria);
-                      
-                      result.then((data) {
-                        if(data) {
-                          showCategoriaDialog<String>(
-                            context: context,
-                            child: new SimpleDialog(
-                              title: const Text('Erro'),
-                              children: <Widget>[
-                                new Container(
-                                  margin: new EdgeInsets.only(left: 24.0),
-                                  child: new Row(
-                                    children: <Widget>[
-                                      new Container(
-                                        margin: new EdgeInsets.only(right: 10.0),
-                                        child: new Icon(
-                                          Icons.error,
-                                          color: const Color(0xFFE57373)),
-                                      ),                                      
-                                      new Text(
-                                        "Essa categoria já existe",
-                                        style: new TextStyle(
-                                          color: Colors.black26,
-                                          fontSize: 16.0,
-                                          fontFamily: "Roboto",
-                                          fontWeight: FontWeight.w500,
+                      if(categoriaDB.categoria.length > 0) {
+                        this.x = true;
+                      } else { this.x = false; }
+
+                      if(this.value == "Subcategoria" && categoriaDB.idcategoriapai != 0) {
+                        this.y = true;
+                      } else if(this.value == "Categoria principal" && categoriaDB.idcategoriapai == 0) {
+                        this.y = true;
+                      } else { this.y = false; }
+
+                      if(this.x == true && this.y == true) {
+                        var result = categoriaDB.countCategoria(categoriaDB.categoria);
+                        result.then((data) {
+                          if(data) {
+                            showCategoriaDialog<String>(
+                              context: context,
+                              child: new SimpleDialog(
+                                title: const Text('Erro'),
+                                children: <Widget>[
+                                  new Container(
+                                    margin: new EdgeInsets.only(left: 24.0),
+                                    child: new Row(
+                                      children: <Widget>[
+                                        new Container(
+                                          margin: new EdgeInsets.only(right: 10.0),
+                                          child: new Icon(
+                                            Icons.error,
+                                            color: const Color(0xFFE57373)),
+                                        ),                                      
+                                        new Text(
+                                          "Essa categoria já existe",
+                                          softWrap: true,
+                                          style: new TextStyle(
+                                            color: Colors.black26,
+                                            fontSize: 16.0,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.w500,
+                                          )
                                         )
+                                      ],
+                                    ),
+                                  )
+                                ]
+                              )
+                            );
+                          } else {
+                            categoriaDB.upsertCategoria(categoriaDB);
+                            Navigator.pop(context);
+                          }
+                        });
+                      } else {
+                        showCategoriaDialog<String>(
+                          context: context,
+                          child: new SimpleDialog(
+                            title: const Text('Erro'),
+                            children: <Widget>[
+                              new Container(
+                                margin: new EdgeInsets.only(left: 24.0),
+                                child: new Row(
+                                  children: <Widget>[
+                                    new Container(
+                                      margin: new EdgeInsets.only(right: 10.0),
+                                      child: new Icon(
+                                        Icons.error,
+                                        color: const Color(0xFFE57373)),
+                                    ),                                      
+                                    new Text(
+                                      "Preencha os campos",
+                                      softWrap: true,
+                                      style: new TextStyle(
+                                        color: Colors.black26,
+                                        fontSize: 16.0,
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w500,
                                       )
-                                    ],
-                                  ),
-                                )
-                              ]
-                            )
-                          );
-                        } else {
-                          categoriaDB.upsertCategoria(categoriaDB);                      
-                          Navigator.pop(context);
-                        }
-                      });
+                                    )
+                                  ],
+                                ),
+                              )
+                            ]
+                          )
+                        );
+                      }
                     }
                   ),
                 ],

@@ -186,11 +186,22 @@ class Categoria {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
     //List<Map> list = await db.rawQuery('SELECT * FROM Test');
+    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria");
     List<Map> list = await db.query(categoriaTable, columns: Categoria.columns);
     await db.close();
-    //print(list);
-    return list;
-    
+    return [count, list];    
+  }
+
+  Future getOnlyCategoriaPai() async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+    //List<Map> list = await db.rawQuery('SELECT * FROM Test');
+    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE idcategoriapai = 0");
+    List<Map> list = await db.query(categoriaTable, columns: Categoria.columns,
+      where: "idcategoriapai = 0");
+    await db.close();
+    return [count, list];    
   }
 
   Future countCategoria(String name) async {
