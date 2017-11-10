@@ -176,7 +176,7 @@ class Categoria {
 
     await db.close();
 
-    return categoria;
+    return categoria.categoria;
   }
 
   Future getAllCategoria() async {
@@ -214,15 +214,16 @@ class Categoria {
     return [count, list];    
   }
 
-  Future countCategoria(String name) async {
+  Future countCategoria(String name, bool editar) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
-    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE categoria = ?", [name]);
 
-    if(count[0]["COUNT(*)"] > 0){
-      return true;
-    }
+    if(editar) { return false; }
+
+    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE categoria = ?", [name]);
+    if(count[0]["COUNT(*)"] > 0){ return true; }
+    
     await db.close();
 
     return false;

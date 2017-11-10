@@ -26,6 +26,7 @@ class CategoriaPageState extends State<CategoriaPage>{
       (list) {
         setState(() {
           this.listaDB = list;
+          print(list);
         });
       }
     );
@@ -41,11 +42,12 @@ class CategoriaPageState extends State<CategoriaPage>{
         var id = i[0]['id'];
         var categoria = i[0]['categoria'];
         var cor = this.cores[i[0]['cor']];
+        var numeroCor = i[0]['cor'];
         var idcategoriapai = i[0]['idcategoriapai'];
         var ativada = i[0]['ativada'];
 
         this.listaCategorias.add(
-          new ItemCategoria(false, id, categoria, cor, idcategoriapai, ativada)
+          new ItemCategoria(false, id, categoria, cor, numeroCor, idcategoriapai, ativada)
         );  
 
         if(i[1].length > 0) {
@@ -53,11 +55,12 @@ class CategoriaPageState extends State<CategoriaPage>{
             var id2 = y['id'];
             var categoria2 = y['categoria'];
             var cor2 = this.cores[y['cor']];
+            var numeroCor2 = y['cor'];
             var idcategoriapai2 = y['idcategoriapai'];
             var ativada2 = y['ativada'];
 
             this.listaCategorias.add(
-              new ItemCategoria(true, id2, categoria2, cor2, idcategoriapai2, ativada2)
+              new ItemCategoria(true, id2, categoria2, cor2, numeroCor2, idcategoriapai2, ativada2)
             );
           }
         }      
@@ -77,7 +80,7 @@ class CategoriaPageState extends State<CategoriaPage>{
               await Navigator.of(context).push(new PageRouteBuilder(
                 opaque: false,
                 pageBuilder: (BuildContext context, _, __) {
-                  return new NovaCategoriaPage();
+                  return new NovaCategoriaPage(false, new Categoria());
                 },
                 transitionsBuilder: (
                   BuildContext context,
@@ -114,18 +117,27 @@ class CategoriaPageState extends State<CategoriaPage>{
 }
 
 class NovaCategoriaPage extends StatefulWidget {
+  NovaCategoriaPage(this.editar, this.categoriaDBEditar);
+
+  bool editar;
+  Categoria categoriaDBEditar;
+
   @override
-  NovaCategoriaPageState createState() => new NovaCategoriaPageState();
+  NovaCategoriaPageState createState() => new NovaCategoriaPageState(this.editar, this.categoriaDBEditar);
 }
 
 class NovaCategoriaPageState extends State<NovaCategoriaPage>{
+  NovaCategoriaPageState(this.editar, this.categoriaDBEditar);
+
+  bool editar;
   Color azulAppbar = new Color(0xFF26C6DA);
-  String value = "Categoria principal";
+  String value;
   String categoriaPai = "Categoria pai";
   int categoriaPaiId;
-  Color colorEscolhida = new Color(0xFF000000);
+  Color colorEscolhida;
   final TextEditingController _controller = new TextEditingController();
   Categoria categoriaDB = new Categoria();
+  Categoria categoriaDBEditar;
   List listaCategoria;
   int number;
   List<Widget> tiles;
@@ -141,7 +153,37 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
 
   @override
   void initState() {
-    categoriaDB.cor = 0;
+
+    setState(() {
+      if(editar) {
+        categoriaDB.id = categoriaDBEditar.id;
+        categoriaDB.categoria = categoriaDBEditar.categoria;
+        _controller.text = categoriaDBEditar.categoria;
+
+        categoriaDB.ativada = categoriaDBEditar.ativada;
+        categoriaDB.cor = categoriaDBEditar.cor;
+        this.colorEscolhida = this.cores[categoriaDBEditar.cor];
+        categoriaDB.idcategoriapai = categoriaDBEditar.idcategoriapai;
+
+        if(categoriaDB.idcategoriapai == 0) {
+          this.value = "Categoria principal";
+        } else {
+          this.value = "Subcategoria";
+          categoriaDB.getCategoria(categoriaDBEditar.idcategoriapai).then(
+            (data) {
+              print(data);
+              this.categoriaPai = data;
+            }
+          );
+        }
+
+      } else {
+        this.value = "Categoria principal";
+        categoriaDB.cor = 0;
+        this.colorEscolhida = new Color(0xFF000000);
+      }
+    });
+
     categoriaDB.getOnlyCategoriaPai().then((list) {
       setState(() {
         if(list.length > 0 && list != null) {
@@ -239,7 +281,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                   onChanged: (value) => setState(() {
                     this.value = value;
                     this.categoriaPai = 'Categoria pai';
-                    categoriaDB.idcategoriapai = 0;
+                    categoriaDB.idcategoriapai = editar ? categoriaDBEditar.idcategoriapai : 0;
                   }),
                   value: "Categoria principal",
                 ),
@@ -464,7 +506,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                       } else { this.y = false; }
 
                       if(this.x == true && this.y == true) {
-                        var result = categoriaDB.countCategoria(categoriaDB.categoria);
+                        var result = categoriaDB.countCategoria(categoriaDB.categoria, editar);
                         result.then((data) {
                           if(data) {
                             showCategoriaDialog<String>(
@@ -584,21 +626,24 @@ class DialogItem extends StatelessWidget {
 }
 
 class ItemCategoria extends StatefulWidget {
+   
   bool filho;
   int id;
   String categoria;
+  int numeroCor;
   Color cor;
   int idcategoriapai;
   int ativada;
 
-  ItemCategoria(
+  ItemCategoria({
+    Key key,
     this.filho,
     this.id,
     this.categoria,
     this.cor,
+    this.numeroCor,
     this.idcategoriapai,
-    this.ativada
-  );  
+    this.ativada}) : super(key: key);  
 
   @override
   ItemCategoriaState createState() => new ItemCategoriaState(
@@ -606,16 +651,20 @@ class ItemCategoria extends StatefulWidget {
     this.id,
     this.categoria,
     this.cor,
+    this.numeroCor,
     this.idcategoriapai,
     this.ativada
   );
 }
 
 class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMixin {
+  Categoria categoriaDB = new Categoria();
+
   bool filho;
   int id;
   String categoria;
   Color cor;
+  int numeroCor;
   int idcategoriapai;
   int ativada;
 
@@ -624,6 +673,7 @@ class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMi
     this.id,
     this.categoria,
     this.cor,
+    this.numeroCor,
     this.idcategoriapai,
     this.ativada
   );
@@ -647,7 +697,45 @@ class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMi
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 new InkWell(
-                  onTap: () {},
+                  onTap: () async {
+    
+                    Categoria categoriaEditar = new Categoria();
+                    categoriaEditar.id = this.id;
+                    categoriaEditar.categoria = this.categoria;
+                    categoriaEditar.idcategoriapai = this.idcategoriapai;
+                    categoriaEditar.cor = this.numeroCor;
+                    categoriaEditar.ativada = this.ativada;
+
+                    await Navigator.of(context).push(new PageRouteBuilder(
+                      opaque: false,
+                      pageBuilder: (BuildContext context, _, __) {
+                        return new NovaCategoriaPage(true, categoriaEditar);
+                      },
+                      transitionsBuilder: (
+                        BuildContext context,
+                        Animation<double> animation,
+                        Animation<double> secondaryAnimation,
+                        Widget child,
+                      ) {
+                        return new SlideTransition(
+                          position: new Tween<Offset>(
+                            begin:  const Offset(1.0, 0.0),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        );
+                      }
+                    ));
+                    categoriaDB.getAllCategoria().then(
+                      (list) {
+                        setState(() {
+
+                          print(list);
+                        });
+                      }
+                    );
+                  },
+
                   child: new Container(
                     margin: new EdgeInsets.only(left: 16.0),
                     padding: this.filho ? new EdgeInsets.only(right: 40.0, top: 11.5, bottom: 11.5) : new EdgeInsets.only(right: 40.0, top: 4.5, bottom: 4.5),
