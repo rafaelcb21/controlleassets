@@ -214,6 +214,20 @@ class Categoria {
     return [count, list];    
   }
 
+  Future getOnlyCategoriaPaiLess(id) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE idcategoriapai = 0");
+
+    List<Map> list = await db.rawQuery("SELECT * FROM categoria WHERE idcategoriapai = 0 AND id != ? ORDER BY categoria ASC", [id]);
+
+    await db.close();
+    
+    return [count, list];    
+  }
+
   Future countCategoria(String name, bool editar) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");

@@ -26,7 +26,7 @@ class CategoriaPageState extends State<CategoriaPage>{
       (list) {
         setState(() {
           this.listaDB = list;
-          print(list);
+          //print(list);
         });
       }
     );
@@ -47,7 +47,86 @@ class CategoriaPageState extends State<CategoriaPage>{
         var ativada = i[0]['ativada'];
 
         this.listaCategorias.add(
-          new ItemCategoria(false, id, categoria, cor, numeroCor, idcategoriapai, ativada)
+          new ItemCategoria(
+            filho: false,
+            id: id,
+            categoria: categoria,
+            cor: cor,
+            numeroCor: numeroCor,
+            idcategoriapai: idcategoriapai,
+            ativada: ativada,
+            onPressed: () async {
+              Categoria categoriaEditar = new Categoria();
+              categoriaEditar.id = id;
+              categoriaEditar.categoria = categoria;
+              categoriaEditar.idcategoriapai = idcategoriapai;
+              categoriaEditar.cor = numeroCor;
+              categoriaEditar.ativada = ativada;
+
+              await Navigator.of(context).push(new PageRouteBuilder(
+                opaque: false,
+                pageBuilder: (BuildContext context, _, __) {
+                  return new NovaCategoriaPage(true, categoriaEditar);
+                },
+                transitionsBuilder: (
+                  BuildContext context,
+                  Animation<double> animation,
+                  Animation<double> secondaryAnimation,
+                  Widget child,
+                ) {
+                  return new SlideTransition(
+                    position: new Tween<Offset>(
+                      begin:  const Offset(1.0, 0.0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  );
+                }
+              ));
+              categoriaDB.getAllCategoria().then(
+                (list) {
+                  setState(() {
+                    print(list);
+                    this.listaDB = list;
+                  });
+                }
+              );
+            },
+
+            onPressed2: () async {
+              Categoria categoriaAddSubcategoria = new Categoria();
+              categoriaAddSubcategoria.idcategoriapai = id;
+
+              await Navigator.of(context).push(new PageRouteBuilder(
+                opaque: false,
+                pageBuilder: (BuildContext context, _, __) {
+                  return new NovaCategoriaPage(false, categoriaAddSubcategoria);
+                },
+                transitionsBuilder: (
+                  BuildContext context,
+                  Animation<double> animation,
+                  Animation<double> secondaryAnimation,
+                  Widget child,
+                ) {
+                  return new SlideTransition(
+                    position: new Tween<Offset>(
+                      begin:  const Offset(1.0, 0.0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  );
+                }
+              ));
+              categoriaDB.getAllCategoria().then(
+                (list) {
+                  setState(() {
+                    this.listaDB = list;
+                  });
+                }
+              );
+            },
+
+          )
         );  
 
         if(i[1].length > 0) {
@@ -60,7 +139,52 @@ class CategoriaPageState extends State<CategoriaPage>{
             var ativada2 = y['ativada'];
 
             this.listaCategorias.add(
-              new ItemCategoria(true, id2, categoria2, cor2, numeroCor2, idcategoriapai2, ativada2)
+              //new ItemCategoria(true, id2, categoria2, cor2, numeroCor2, idcategoriapai2, ativada2)
+              new ItemCategoria(
+                filho: true,
+                id: id2,
+                categoria: categoria2,
+                cor: cor2,
+                numeroCor: numeroCor2,
+                idcategoriapai: idcategoriapai2,
+                ativada: ativada2,
+                onPressed: () async {
+                  Categoria categoriaEditar = new Categoria();
+                  categoriaEditar.id = id2;
+                  categoriaEditar.categoria = categoria2;
+                  categoriaEditar.idcategoriapai = idcategoriapai2;
+                  categoriaEditar.cor = numeroCor2;
+                  categoriaEditar.ativada = ativada2;
+
+                  await Navigator.of(context).push(new PageRouteBuilder(
+                    opaque: false,
+                    pageBuilder: (BuildContext context, _, __) {
+                      return new NovaCategoriaPage(true, categoriaEditar);
+                    },
+                    transitionsBuilder: (
+                      BuildContext context,
+                      Animation<double> animation,
+                      Animation<double> secondaryAnimation,
+                      Widget child,
+                    ) {
+                      return new SlideTransition(
+                        position: new Tween<Offset>(
+                          begin:  const Offset(1.0, 0.0),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      );
+                    }
+                  ));
+                  categoriaDB.getAllCategoria().then(
+                    (list) {
+                      setState(() {
+                        this.listaDB = list;
+                      });
+                    }
+                  );
+                },
+              )
             );
           }
         }      
@@ -137,7 +261,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
   Color colorEscolhida;
   final TextEditingController _controller = new TextEditingController();
   Categoria categoriaDB = new Categoria();
-  Categoria categoriaDBEditar;
+  Categoria categoriaDBEditar= new Categoria();
   List listaCategoria;
   int number;
   List<Widget> tiles;
@@ -153,7 +277,6 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
 
   @override
   void initState() {
-
     setState(() {
       if(editar) {
         categoriaDB.id = categoriaDBEditar.id;
@@ -171,27 +294,46 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
           this.value = "Subcategoria";
           categoriaDB.getCategoria(categoriaDBEditar.idcategoriapai).then(
             (data) {
-              print(data);
               this.categoriaPai = data;
             }
           );
         }
 
+        categoriaDB.getOnlyCategoriaPaiLess(categoriaDB.id).then((list) {
+          setState(() {
+            print(list);
+            if(list.length > 0 && list != null) {
+              this.number = list[0][0]['COUNT(*)'];
+              this.listaCategoria = list[1];
+            }
+          });
+        });
+
+      } else if (!editar && categoriaDBEditar.idcategoriapai != null) {
+        this.value = "Subcategoria";
+        categoriaDB.cor = 0;
+        this.colorEscolhida = new Color(0xFF000000);
+        categoriaDB.getCategoria(categoriaDBEditar.idcategoriapai).then(
+          (data) {
+            this.categoriaPai = data;
+          }
+        );
+
       } else {
         this.value = "Categoria principal";
         categoriaDB.cor = 0;
         this.colorEscolhida = new Color(0xFF000000);
-      }
-    });
 
-    categoriaDB.getOnlyCategoriaPai().then((list) {
-      setState(() {
-        if(list.length > 0 && list != null) {
-          this.number = list[0][0]['COUNT(*)'];
-          this.listaCategoria = list[1];
-        }
-      }); 
-    });
+        categoriaDB.getOnlyCategoriaPai().then((list) {
+          setState(() {
+            if(list.length > 0 && list != null) {
+              this.number = list[0][0]['COUNT(*)'];
+              this.listaCategoria = list[1];
+            }
+          });
+        });
+      }
+    });    
   }
 
   void showCorDialog<T>({ BuildContext context, Widget child }) {
@@ -627,13 +769,15 @@ class DialogItem extends StatelessWidget {
 
 class ItemCategoria extends StatefulWidget {
    
-  bool filho;
-  int id;
-  String categoria;
-  int numeroCor;
-  Color cor;
-  int idcategoriapai;
-  int ativada;
+  final bool filho;
+  final int id;
+  final String categoria;
+  final int numeroCor;
+  final Color cor;
+  final int idcategoriapai;
+  final int ativada;
+  final VoidCallback onPressed;
+  final VoidCallback onPressed2;
 
   ItemCategoria({
     Key key,
@@ -643,48 +787,25 @@ class ItemCategoria extends StatefulWidget {
     this.cor,
     this.numeroCor,
     this.idcategoriapai,
-    this.ativada}) : super(key: key);  
+    this.ativada,
+    this.onPressed,
+    this.onPressed2}) : super(key: key);  
 
   @override
-  ItemCategoriaState createState() => new ItemCategoriaState(
-    this.filho,
-    this.id,
-    this.categoria,
-    this.cor,
-    this.numeroCor,
-    this.idcategoriapai,
-    this.ativada
-  );
+  ItemCategoriaState createState() => new ItemCategoriaState();
 }
 
 class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMixin {
   Categoria categoriaDB = new Categoria();
 
-  bool filho;
-  int id;
-  String categoria;
-  Color cor;
-  int numeroCor;
-  int idcategoriapai;
-  int ativada;
-
-  ItemCategoriaState(
-    this.filho,
-    this.id,
-    this.categoria,
-    this.cor,
-    this.numeroCor,
-    this.idcategoriapai,
-    this.ativada
-  );
+  ItemCategoriaState();
 
   @override
   Widget build(BuildContext context) {
-
     return new Container(
       decoration: new BoxDecoration(
         border: new Border(
-          top: this.filho ? new BorderSide(style: BorderStyle.none) : new BorderSide(style: BorderStyle.solid, color: Colors.black26),
+          top: widget.filho ? new BorderSide(style: BorderStyle.none) : new BorderSide(style: BorderStyle.solid, color: Colors.black26),
         )
       ),
       margin: new EdgeInsets.only(top: 0.0, bottom: 0.0),
@@ -697,73 +818,76 @@ class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMi
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 new InkWell(
-                  onTap: () async {
+                  onTap: widget.onPressed,
     
-                    Categoria categoriaEditar = new Categoria();
-                    categoriaEditar.id = this.id;
-                    categoriaEditar.categoria = this.categoria;
-                    categoriaEditar.idcategoriapai = this.idcategoriapai;
-                    categoriaEditar.cor = this.numeroCor;
-                    categoriaEditar.ativada = this.ativada;
+                  //  Categoria categoriaEditar = new Categoria();
+                  //  categoriaEditar.id = this.id;
+                  //  categoriaEditar.categoria = this.categoria;
+                  //  categoriaEditar.idcategoriapai = this.idcategoriapai;
+                  //  categoriaEditar.cor = this.numeroCor;
+                  //  categoriaEditar.ativada = this.ativada;
+//
+                  //  await Navigator.of(context).push(new PageRouteBuilder(
+                  //    opaque: false,
+                  //    pageBuilder: (BuildContext context, _, __) {
+                  //      return new NovaCategoriaPage(true, categoriaEditar);
+                  //    },
+                  //    transitionsBuilder: (
+                  //      BuildContext context,
+                  //      Animation<double> animation,
+                  //      Animation<double> secondaryAnimation,
+                  //      Widget child,
+                  //    ) {
+                  //      return new SlideTransition(
+                  //        position: new Tween<Offset>(
+                  //          begin:  const Offset(1.0, 0.0),
+                  //          end: Offset.zero,
+                  //        ).animate(animation),
+                  //        child: child,
+                  //      );
+                  //    }
+                  //  ));
+                  //  categoriaDB.getAllCategoria().then(
+                  //    (list) {
+                  //      setState(() {
+                  //        print(list);
+                  //      });
+                  //    }
+                  //  );
+                  //},
 
-                    await Navigator.of(context).push(new PageRouteBuilder(
-                      opaque: false,
-                      pageBuilder: (BuildContext context, _, __) {
-                        return new NovaCategoriaPage(true, categoriaEditar);
-                      },
-                      transitionsBuilder: (
-                        BuildContext context,
-                        Animation<double> animation,
-                        Animation<double> secondaryAnimation,
-                        Widget child,
-                      ) {
-                        return new SlideTransition(
-                          position: new Tween<Offset>(
-                            begin:  const Offset(1.0, 0.0),
-                            end: Offset.zero,
-                          ).animate(animation),
-                          child: child,
-                        );
-                      }
-                    ));
-                    categoriaDB.getAllCategoria().then(
-                      (list) {
-                        setState(() {
-
-                          print(list);
-                        });
-                      }
-                    );
-                  },
-
-                  child: new Container(
-                    margin: new EdgeInsets.only(left: 16.0),
-                    padding: this.filho ? new EdgeInsets.only(right: 40.0, top: 11.5, bottom: 11.5) : new EdgeInsets.only(right: 40.0, top: 4.5, bottom: 4.5),
-                    child: new Row(
-                      children: <Widget>[
-                        new Container(
-                          margin: this.filho ? new EdgeInsets.only(right: 15.0, left: 16.0) : new EdgeInsets.only(right: 16.0),
-                          child: new Icon(
-                            this.filho ? Icons.subdirectory_arrow_right : Icons.brightness_1,
-                            color: this.filho ? Colors.black54 : this.cor,
-                            size: this.filho ? 20.0 : 35.0,
-                          ),  
-                        ),
-                        new Text(
-                          this.categoria,
-                          style: new TextStyle(
-                            color: Colors.black87,
-                            fontSize: 14.0,
-                            fontFamily: "Roboto",
-                            fontWeight: FontWeight.w500,
+                  child: 
+                    new Container(
+                      margin: new EdgeInsets.only(left: 16.0),
+                      padding: widget.filho ? new EdgeInsets.only(right: 40.0, top: 11.5, bottom: 11.5) : new EdgeInsets.only(right: 40.0, top: 4.5, bottom: 4.5),
+                      child: new Row(
+                        children: <Widget>[
+                          new Container(
+                            margin: widget.filho ? new EdgeInsets.only(right: 15.0, left: 16.0) : new EdgeInsets.only(right: 16.0),
+                            child: new Icon(
+                              widget.filho ? Icons.subdirectory_arrow_right : Icons.brightness_1,
+                              color: widget.filho ? Colors.black54 : widget.cor,
+                              size: widget.filho ? 20.0 : 35.0,
+                            ),  
                           ),
-                        ),                                             
-                      ],
+                          new Text(
+                            widget.categoria,
+                            style: new TextStyle(
+                              color: Colors.black87,
+                              fontSize: 14.0,
+                              fontFamily: "Roboto",
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),                                             
+                        ],
+                      )
                     )
                   ),
-                ),
+                //  }
+                //),
+                widget.filho ? new Container() :
                 new InkWell(
-                  onTap: () {},
+                  onTap: widget.onPressed2,
                   child: new Container(
                     margin: new EdgeInsets.only(right: 16.0),
                     padding: new EdgeInsets.only(top: 15.0, bottom: 15.0, left: 10.0),
