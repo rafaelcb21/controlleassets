@@ -9,19 +9,62 @@ class CategoriaPage extends StatefulWidget {
 class CategoriaPageState extends State<CategoriaPage>{
   Color azulAppbar = new Color(0xFF26C6DA);
   Categoria categoriaDB = new Categoria();
+  List<Widget> listaCategorias = [];
+  List listaDB = [];
+
+  List cores = [
+    const Color(0xFF000000),
+    const Color(0xFFd10841),
+    const Color(0xFFcdd399),
+    const Color(0xFF87c0ec),
+    const Color(0xFF5aaeae)
+  ];  
 
   @override
   void initState() {
     categoriaDB.getAllCategoria().then(
       (list) {
-        print(list);
-        
+        setState(() {
+          this.listaDB = list;
+        });
       }
     );
   }
 
   @override
   Widget build(BuildContext context) {
+
+    List<Widget> buildListaCategorias(list) {
+      this.listaCategorias = [];
+
+      for(var i in list) {
+        var id = i[0]['id'];
+        var categoria = i[0]['categoria'];
+        var cor = this.cores[i[0]['cor']];
+        var idcategoriapai = i[0]['idcategoriapai'];
+        var ativada = i[0]['ativada'];
+
+        this.listaCategorias.add(
+          new ItemCategoria(false, id, categoria, cor, idcategoriapai, ativada)
+        );  
+
+        if(i[1].length > 0) {
+          for(var y in i[1]) {
+            var id2 = y['id'];
+            var categoria2 = y['categoria'];
+            var cor2 = this.cores[y['cor']];
+            var idcategoriapai2 = y['idcategoriapai'];
+            var ativada2 = y['ativada'];
+
+            this.listaCategorias.add(
+              new ItemCategoria(true, id2, categoria2, cor2, idcategoriapai2, ativada2)
+            );
+          }
+        }      
+      }
+      return this.listaCategorias;
+    }
+
     return new Scaffold( 
       appBar: new AppBar(
         title: new Text('Categorias'),
@@ -51,24 +94,20 @@ class CategoriaPageState extends State<CategoriaPage>{
                   );
                 }
               ));
-              categoriaDB.getAllCategoria();
+              categoriaDB.getAllCategoria().then(
+                (list) {
+                  setState(() {
+                    this.listaDB = list;
+                  });
+                }
+              );
             }
           )
         ],
       ),
       body: new ListView(
-        padding: new EdgeInsets.only(top: 8.0),
-        children: <Widget>[
-          new ItemCategoria(false),
-          new ItemCategoria(true),
-          new ItemCategoria(true),
-          new ItemCategoria(false),
-          new ItemCategoria(false),
-          new ItemCategoria(true),
-          new ItemCategoria(false),
-          new ItemCategoria(false),
-          new ItemCategoria(false),
-        ],
+        padding: new EdgeInsets.only(top: 8.0, right: 0.0, left: 0.0),
+        children: buildListaCategorias(this.listaDB)
       )
     );
   }
@@ -546,15 +585,48 @@ class DialogItem extends StatelessWidget {
 
 class ItemCategoria extends StatefulWidget {
   bool filho;
-  ItemCategoria(this.filho);
+  int id;
+  String categoria;
+  Color cor;
+  int idcategoriapai;
+  int ativada;
+
+  ItemCategoria(
+    this.filho,
+    this.id,
+    this.categoria,
+    this.cor,
+    this.idcategoriapai,
+    this.ativada
+  );  
 
   @override
-  ItemCategoriaState createState() => new ItemCategoriaState(this.filho);
+  ItemCategoriaState createState() => new ItemCategoriaState(
+    this.filho,
+    this.id,
+    this.categoria,
+    this.cor,
+    this.idcategoriapai,
+    this.ativada
+  );
 }
 
-class ItemCategoriaState extends State<ItemCategoria>  {
+class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMixin {
   bool filho;
-  ItemCategoriaState(this.filho);
+  int id;
+  String categoria;
+  Color cor;
+  int idcategoriapai;
+  int ativada;
+
+  ItemCategoriaState(
+    this.filho,
+    this.id,
+    this.categoria,
+    this.cor,
+    this.idcategoriapai,
+    this.ativada
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -565,7 +637,7 @@ class ItemCategoriaState extends State<ItemCategoria>  {
           top: this.filho ? new BorderSide(style: BorderStyle.none) : new BorderSide(style: BorderStyle.solid, color: Colors.black26),
         )
       ),
-      margin: new EdgeInsets.only(top: 0.0, right: 16.0, left: 16.0, bottom: 0.0),
+      margin: new EdgeInsets.only(top: 0.0, bottom: 0.0),
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -577,19 +649,20 @@ class ItemCategoriaState extends State<ItemCategoria>  {
                 new InkWell(
                   onTap: () {},
                   child: new Container(
-                    padding: this.filho ? new EdgeInsets.only(right: 60.0, top: 15.0, bottom: 15.0) : new EdgeInsets.only(right: 60.0),
+                    margin: new EdgeInsets.only(left: 16.0),
+                    padding: this.filho ? new EdgeInsets.only(right: 40.0, top: 11.5, bottom: 11.5) : new EdgeInsets.only(right: 40.0, top: 4.5, bottom: 4.5),
                     child: new Row(
                       children: <Widget>[
                         new Container(
                           margin: this.filho ? new EdgeInsets.only(right: 15.0, left: 16.0) : new EdgeInsets.only(right: 16.0),
                           child: new Icon(
                             this.filho ? Icons.subdirectory_arrow_right : Icons.brightness_1,
-                            color: this.filho ? Colors.black54 : const Color(0xFF26C6DA),
-                            size: this.filho ? 20 : 35.0,
+                            color: this.filho ? Colors.black54 : this.cor,
+                            size: this.filho ? 20.0 : 35.0,
                           ),  
                         ),
                         new Text(
-                          "Investimento",
+                          this.categoria,
                           style: new TextStyle(
                             color: Colors.black87,
                             fontSize: 14.0,
@@ -604,6 +677,7 @@ class ItemCategoriaState extends State<ItemCategoria>  {
                 new InkWell(
                   onTap: () {},
                   child: new Container(
+                    margin: new EdgeInsets.only(right: 16.0),
                     padding: new EdgeInsets.only(top: 15.0, bottom: 15.0, left: 10.0),
                     child: new Text(
                       "+ subcategoria",

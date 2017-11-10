@@ -57,8 +57,16 @@ class HomePage extends StatefulWidget {
   HomePageState createState() => new HomePageState();
 }
 
-class HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   DatabaseClient db = new DatabaseClient();
+  int _angle = 90;
+  bool _isRotated = true;
+
+  AnimationController _controller;
+  Animation<double> _animation;
+  Animation<double> _animation2;
+  Animation<double> _animation3;
+
   createdb() async {
     await db.create();
   }
@@ -98,17 +106,43 @@ class HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    super.initState();
+    
     FirebaseAdMob.instance.initialize(appId: appId);
-    _bannerAd = createBannerAd()..load();
-    _bannerAd ??= createBannerAd();
-    _bannerAd..load()..show();
+    //_bannerAd = createBannerAd()..load();
+    //_bannerAd ??= createBannerAd();
+    //_bannerAd..load()..show();
+    _interstitialAd = createInterstitialAd()..load();
+    _interstitialAd ??= createInterstitialAd();
+    _interstitialAd..load()..show();
+
+    _controller = new AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 180),
+    );
+
+    _animation = new CurvedAnimation(
+      parent: _controller,
+      curve: new Interval(0.0, 1.0, curve: Curves.linear),
+    );
+
+    _animation2 = new CurvedAnimation(
+      parent: _controller,
+      curve: new Interval(0.5, 1.0, curve: Curves.linear),
+    );
+
+    _animation3 = new CurvedAnimation(
+      parent: _controller,
+      curve: new Interval(0.8, 1.0, curve: Curves.linear),
+    );
+    _controller.reverse();
+    
+    super.initState();
     createdb();
   }
 
   @override
   void dispose() {
-    _bannerAd?.dispose();
+    //_bannerAd?.dispose();
     _interstitialAd?.dispose();
     super.dispose();
   }
@@ -117,175 +151,198 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context){
     Color cinzaDrawer = new Color(0xFF9E9E9E);
     Color azulAppbar = new Color(0xFF26C6DA);
-    
+    final ui.Size logicalSize = MediaQuery.of(context).size;
+    final double _width = logicalSize.width;
+    final double _height = logicalSize.height;
+
+    void _rotate(){
+      setState((){
+        if(_isRotated) {
+          _angle = 45;
+          _isRotated = false;
+          _controller.forward(from: 0.0);
+        } else {
+          _angle = 90;
+          _isRotated = true;
+          _controller.reverse(from: 1.0);
+        }
+      });
+    }
+
     return new Scaffold( 
       appBar: new AppBar(
         backgroundColor: azulAppbar,
-        actions: <Widget>[
-          new IconButton(
-            icon: const Icon(Icons.add_circle),
-            color: new Color(0xFFFFFFFF),
-            onPressed: () {
-              showDialog(
-                context: context,
-                child: new SimpleDialog(
-                  children: <Widget>[
-                    new FlatButton(
-                      textColor: new Color(0xFF9E9E9E),
-                      child: new Row(
-                        children: <Widget>[
-                          new Icon(
-                            Icons.add_circle,
-                            size: 24.0
-                          ),
-                          new Container(
-                            padding: new EdgeInsets.only(left: 16.0),
-                            child: new Text(
-                              'transferência',
-                              style: new TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: 16.0
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      onPressed: () async {
-                        _bannerAd?.dispose();
-                        _bannerAd = null;
-                        Navigator.pop(context);
-                        bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
-                          opaque: false,
-                          pageBuilder: (BuildContext context, _, __) {
-                            return new ContaPage(new Color(0xFF9E9E9E));
-                          },
-                          transitionsBuilder: (
-                            BuildContext context,
-                            Animation<double> animation,
-                            Animation<double> secondaryAnimation,
-                            Widget child,
-                          ) {
-                            return new SlideTransition(
-                              position: new Tween<Offset>(
-                                begin:  const Offset(1.0, 0.0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            );
-                          }
-                        ));
-                        
-                          _bannerAd ??= createBannerAd();
-                          _bannerAd..load()..show();
-                        
-                      },
-                    ),
-                    new FlatButton(
-                      textColor: new Color(0xFF00BFA5),
-                      child: new Row(
-                        children: <Widget>[
-                          new Icon(
-                            Icons.add_circle,
-                            size: 24.0
-                          ),
-                          new Container(
-                            padding: new EdgeInsets.only(left: 16.0),
-                            child: new Text(
-                              'receita',
-                              style: new TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: 16.0
-                              ),
-                            ),
-                          )
-                        ],
-                      ),                
-                      onPressed: () async {
-                        _bannerAd?.dispose();
-                        _bannerAd = null;
-                        Navigator.pop(context);
-                        bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
-                          opaque: false,
-                          pageBuilder: (BuildContext context, _, __) {
-                            return new ContaPage(new Color(0xFF00BFA5));
-                          },
-                          transitionsBuilder: (
-                            BuildContext context,
-                            Animation<double> animation,
-                            Animation<double> secondaryAnimation,
-                            Widget child,
-                          ) {
-                            return new SlideTransition(
-                              position: new Tween<Offset>(
-                                begin:  const Offset(1.0, 0.0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            );
-                          }
-                        ));
-                        
-                          _bannerAd ??= createBannerAd();
-                          _bannerAd..load()..show();
-                        
-                      },
-                    ),
-                    new FlatButton(
-                      textColor: new Color(0xFFE57373),
-                      child: new Row(
-                        children: <Widget>[
-                          new Icon(
-                            Icons.add_circle,
-                            size: 24.0
-                          ),
-                          new Container(
-                            padding: new EdgeInsets.only(left: 16.0),
-                            child: new Text(
-                              'despesa',
-                              style: new TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: 16.0
-                              ),
-                            ),
-                          )
-                        ],
-                      ),                
-                      onPressed: () async {
-                        _bannerAd?.dispose();
-                        _bannerAd = null;
-                        Navigator.pop(context);
-                        bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
-                          opaque: false,
-                          pageBuilder: (BuildContext context, _, __) {
-                            return new ContaPage(new Color(0xFFE57373));
-                          },
-                          transitionsBuilder: (
-                            BuildContext context,
-                            Animation<double> animation,
-                            Animation<double> secondaryAnimation,
-                            Widget child,
-                          ) {
-                            return new SlideTransition(
-                              position: new Tween<Offset>(
-                                begin:  const Offset(1.0, 0.0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            );
-                          }
-                        ));
-                        
-                          _bannerAd ??= createBannerAd();
-                          _bannerAd..load()..show();
-                        
-                      },
-                    ),
-                  ],
-                )
-              );
-            },
-          )
-        ],
+        //actions: <Widget>[
+        //  new IconButton(
+        //    icon: const Icon(Icons.add_circle),
+        //    color: new Color(0xFFFFFFFF),
+        //    onPressed: () {
+        //      showDialog(
+        //        context: context,
+        //        child: new SimpleDialog(
+        //          children: <Widget>[
+        //            new FlatButton(
+        //              textColor: new Color(0xFF9E9E9E),
+        //              child: new Row(
+        //                children: <Widget>[
+        //                  new Icon(
+        //                    Icons.add_circle,
+        //                    size: 24.0
+        //                  ),
+        //                  new Container(
+        //                    padding: new EdgeInsets.only(left: 16.0),
+        //                    child: new Text(
+        //                      'transferência',
+        //                      style: new TextStyle(
+        //                        fontFamily: 'Roboto',
+        //                        fontSize: 16.0
+        //                      ),
+        //                    ),
+        //                  )
+        //                ],
+        //              ),
+        //              onPressed: () async {
+        //                //_bannerAd?.dispose();
+        //                //_bannerAd = null;
+        //                Navigator.pop(context);
+        //                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
+        //                  opaque: false,
+        //                  pageBuilder: (BuildContext context, _, __) {
+        //                    return new ContaPage(new Color(0xFF9E9E9E));
+        //                  },
+        //                  transitionsBuilder: (
+        //                    BuildContext context,
+        //                    Animation<double> animation,
+        //                    Animation<double> secondaryAnimation,
+        //                    Widget child,
+        //                  ) {
+        //                    return new SlideTransition(
+        //                      position: new Tween<Offset>(
+        //                        begin:  const Offset(1.0, 0.0),
+        //                        end: Offset.zero,
+        //                      ).animate(animation),
+        //                      child: child,
+        //                    );
+        //                  }
+        //                ));
+        //                _interstitialAd = createInterstitialAd()..load();
+        //                _interstitialAd ??= createInterstitialAd();
+        //                _interstitialAd..load()..show();
+        //                  //_bannerAd ??= createBannerAd();
+        //                  //_bannerAd..load()..show();
+        //                
+        //              },
+        //            ),
+        //            new FlatButton(
+        //              textColor: new Color(0xFF00BFA5),
+        //              child: new Row(
+        //                children: <Widget>[
+        //                  new Icon(
+        //                    Icons.add_circle,
+        //                    size: 24.0
+        //                  ),
+        //                  new Container(
+        //                    padding: new EdgeInsets.only(left: 16.0),
+        //                    child: new Text(
+        //                      'receita',
+        //                      style: new TextStyle(
+        //                        fontFamily: 'Roboto',
+        //                        fontSize: 16.0
+        //                      ),
+        //                    ),
+        //                  )
+        //                ],
+        //              ),                
+        //              onPressed: () async {
+        //                //_bannerAd?.dispose();
+        //                //_bannerAd = null;
+        //                Navigator.pop(context);
+        //                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
+        //                  opaque: false,
+        //                  pageBuilder: (BuildContext context, _, __) {
+        //                    return new ContaPage(new Color(0xFF00BFA5));
+        //                  },
+        //                  transitionsBuilder: (
+        //                    BuildContext context,
+        //                    Animation<double> animation,
+        //                    Animation<double> secondaryAnimation,
+        //                    Widget child,
+        //                  ) {
+        //                    return new SlideTransition(
+        //                      position: new Tween<Offset>(
+        //                        begin:  const Offset(1.0, 0.0),
+        //                        end: Offset.zero,
+        //                      ).animate(animation),
+        //                      child: child,
+        //                    );
+        //                  }
+        //                ));
+        //                _interstitialAd = createInterstitialAd()..load();
+        //                _interstitialAd ??= createInterstitialAd();
+        //                _interstitialAd..load()..show();
+        //                  //_bannerAd ??= createBannerAd();
+        //                  //_bannerAd..load()..show();
+        //                
+        //              },
+        //            ),
+        //            new FlatButton(
+        //              textColor: new Color(0xFFE57373),
+        //              child: new Row(
+        //                children: <Widget>[
+        //                  new Icon(
+        //                    Icons.add_circle,
+        //                    size: 24.0
+        //                  ),
+        //                  new Container(
+        //                    padding: new EdgeInsets.only(left: 16.0),
+        //                    child: new Text(
+        //                      'despesa',
+        //                      style: new TextStyle(
+        //                        fontFamily: 'Roboto',
+        //                        fontSize: 16.0
+        //                      ),
+        //                    ),
+        //                  )
+        //                ],
+        //              ),                
+        //              onPressed: () async {
+        //                //_bannerAd?.dispose();
+        //                //_bannerAd = null;
+        //                Navigator.pop(context);
+        //                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
+        //                  opaque: false,
+        //                  pageBuilder: (BuildContext context, _, __) {
+        //                    return new ContaPage(new Color(0xFFE57373));
+        //                  },
+        //                  transitionsBuilder: (
+        //                    BuildContext context,
+        //                    Animation<double> animation,
+        //                    Animation<double> secondaryAnimation,
+        //                    Widget child,
+        //                  ) {
+        //                    return new SlideTransition(
+        //                      position: new Tween<Offset>(
+        //                        begin:  const Offset(1.0, 0.0),
+        //                        end: Offset.zero,
+        //                      ).animate(animation),
+        //                      child: child,
+        //                    );
+        //                  }
+        //                ));
+        //                  _interstitialAd = createInterstitialAd()..load();
+        //                  _interstitialAd ??= createInterstitialAd();
+        //                  _interstitialAd..load()..show();
+        //                  //_bannerAd ??= createBannerAd();
+        //                  //_bannerAd..load()..show();
+        //                
+        //              },
+        //            ),
+        //          ],
+        //        )
+        //      );
+        //    },
+        //  )
+        //],
       ),
       drawer: new Drawer(
         child: new ListView(
@@ -438,9 +495,317 @@ class HomePageState extends State<HomePage> {
               )
             ],
           ),
+        new Positioned(
+            bottom: 0.0,
+            child: new GestureDetector(
+              onTap: _rotate,
+              child: new AnimatedBuilder(
+                animation: _animation,
+                builder: (BuildContext context, Widget child) {
+                  return new Container(
+                    height: _height,
+                    child: new CustomPaint(
+                      painter: new Sky(_width, _height * _animation.value),
+                      child: new Container(
+                        height: _isRotated ? 0.0 : _height * _animation.value,
+                        width: _isRotated ? 0.0 : _width,
+                      ),
+                    ),
+                  );
+                }
+              ),
+            )
+          ),
+          new Positioned(
+            bottom: 200.0,
+            right: 24.0,
+            child: new Container(
+              child: new Row(
+                children: <Widget>[
+                  new ScaleTransition(
+                    scale: _animation3,
+                    alignment: FractionalOffset.center,
+                    child: new Container(
+                      margin: new EdgeInsets.only(right: 16.0),
+                      child: new Text(
+                        'transferência',
+                        style: new TextStyle(
+                          fontSize: 13.0,
+                          fontFamily: 'Roboto',
+                          color: new Color(0xFF9E9E9E),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ), 
+                    ),
+                  ),
+                  
+                  new ScaleTransition(
+                    scale: _animation3,
+                    alignment: FractionalOffset.center,
+                    child: new Material(
+                      color: new Color(0xFF9E9E9E),
+                      type: MaterialType.circle,
+                      elevation: 6.0,
+                      child: new GestureDetector(
+                        child: new Container(
+                          width: 40.0,
+                          height: 40.0,
+                          child: new InkWell(
+                            onTap: ()  async {
+                              if(_angle == 45.0){
+                                _rotate();
+                                
+                                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
+                                  opaque: false,
+                                  pageBuilder: (BuildContext context, _, __) {
+                                    return new ContaPage(new Color(0xFF9E9E9E));
+                                  },
+                                  transitionsBuilder: (
+                                    BuildContext context,
+                                    Animation<double> animation,
+                                    Animation<double> secondaryAnimation,
+                                    Widget child,
+                                  ) {
+                                    return new SlideTransition(
+                                      position: new Tween<Offset>(
+                                        begin:  const Offset(1.0, 0.0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    );
+                                  }
+                                ));
+                                _interstitialAd = createInterstitialAd()..load();
+                                _interstitialAd ??= createInterstitialAd();
+                                _interstitialAd..load()..show();
+                              }
+                            },
+                            child: new Center(
+                              child: new Icon(
+                                Icons.add,
+                                color: new Color(0xFFFFFFFF),
+                              ),                      
+                            ),
+                          )
+                        ),
+                      )
+                    ),
+                  ),                                     
+                ],
+              ),
+            )
+          ),
+          
+          new Positioned(
+            bottom: 144.0,
+            right: 24.0,
+            child: new Container(
+              child: new Row(
+                children: <Widget>[
+                  new ScaleTransition(
+                    scale: _animation2,
+                    alignment: FractionalOffset.center,
+                    child: new Container(
+                      margin: new EdgeInsets.only(right: 16.0),
+                      child: new Text(
+                        'receita',
+                        style: new TextStyle(
+                          fontSize: 13.0,
+                          fontFamily: 'Roboto',
+                          color: new Color(0xFF9E9E9E),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ), 
+                    ),
+                  ),
+
+                  new ScaleTransition(
+                    scale: _animation2,
+                    alignment: FractionalOffset.center,
+                    child: new Material(
+                      color: new Color(0xFF00BFA5),
+                      type: MaterialType.circle,
+                      elevation: 6.0,
+                      child: new GestureDetector(
+                        child: new Container(
+                          width: 40.0,
+                          height: 40.0,
+                          child: new InkWell(
+                            onTap: () async {
+                              if(_angle == 45.0) {
+                                _rotate();
+                                
+                                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
+                                  opaque: false,
+                                  pageBuilder: (BuildContext context, _, __) {
+                                    return new ContaPage(new Color(0xFF00BFA5));
+                                  },
+                                  transitionsBuilder: (
+                                    BuildContext context,
+                                    Animation<double> animation,
+                                    Animation<double> secondaryAnimation,
+                                    Widget child,
+                                  ) {
+                                    return new SlideTransition(
+                                      position: new Tween<Offset>(
+                                        begin:  const Offset(1.0, 0.0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    );
+                                  }
+                                ));
+                                _interstitialAd = createInterstitialAd()..load();
+                                _interstitialAd ??= createInterstitialAd();
+                                _interstitialAd..load()..show();
+                              }
+                            },
+                            child: new Center(
+                              child: new Icon(
+                                Icons.add,
+                                color: new Color(0xFFFFFFFF),
+                              ),                      
+                            ),
+                          )
+                        ),
+                      )
+                    ),
+                  ), 
+                ],
+              ),
+            )
+          ),
+          new Positioned(
+            bottom: 88.0,
+            right: 24.0,
+            child: new Container(
+              child: new Row(
+                children: <Widget>[
+                  new ScaleTransition(
+                    scale: _animation,
+                    alignment: FractionalOffset.center,
+                    child: new Container(
+                      margin: new EdgeInsets.only(right: 16.0),
+                      child: new Text(
+                        'despesa',
+                        style: new TextStyle(
+                          fontSize: 13.0,
+                          fontFamily: 'Roboto',
+                          color: new Color(0xFF9E9E9E),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ), 
+                    ),
+                  ),
+                  
+                  new ScaleTransition(
+                    scale: _animation,
+                    alignment: FractionalOffset.center,
+                    child: new Material(
+                      color: new Color(0xFFE57373),
+                      type: MaterialType.circle,
+                      elevation: 6.0,
+                      child: new GestureDetector(
+                        child: new Container(
+                          width: 40.0,
+                          height: 40.0,
+                          child: new InkWell(
+                            onTap: () async {
+                              if(_angle == 45.0){
+                                _rotate();
+                                
+                                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
+                                  opaque: false,
+                                  pageBuilder: (BuildContext context, _, __) {
+                                    return new ContaPage(new Color(0xFFE57373));
+                                  },
+                                  transitionsBuilder: (
+                                    BuildContext context,
+                                    Animation<double> animation,
+                                    Animation<double> secondaryAnimation,
+                                    Widget child,
+                                  ) {
+                                    return new SlideTransition(
+                                      position: new Tween<Offset>(
+                                        begin:  const Offset(1.0, 0.0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    );
+                                  }
+                                ));
+                                _interstitialAd = createInterstitialAd()..load();
+                                _interstitialAd ??= createInterstitialAd();
+                                _interstitialAd..load()..show();
+                              }
+                            },
+                            child: new Center(
+                              child: new Icon(
+                                Icons.add,
+                                color: new Color(0xFFFFFFFF),
+                              ),                      
+                            ),
+                          )
+                        ),
+                      )
+                    ),
+                  ), 
+                ],
+              ),
+            )
+          ),
+          
+          new Positioned(
+            bottom: 16.0,
+            right: 16.0,
+            child: new Material(
+              color: new Color(0xFFE57373),
+              type: MaterialType.circle,
+              elevation: 6.0,
+              child: new GestureDetector(
+                child: new Container(
+                  width: 56.0,
+                  height: 56.00,
+                  child: new InkWell(
+                    onTap: _rotate,
+                    child: new Center(
+                      child: new RotationTransition(
+                        turns: new AlwaysStoppedAnimation(_angle / 360),
+                        child: new Icon(
+                          Icons.add,
+                          color: new Color(0xFFFFFFFF),
+                        ),
+                      )
+                    ),
+                  )
+                ),
+              )
+            ),
+          ),
         ]
-      )   
+      )
     );
   }
 }
 
+class Sky extends CustomPainter {
+  final double _width;
+  double _rectHeight;
+
+  Sky(this._width, this._rectHeight);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(
+      new Rect.fromLTRB(
+        0.0, size.height - _rectHeight, this._width, size.height
+      ),
+      new Paint()..color = new Color.fromRGBO(255, 255, 255, 0.9)
+    );
+  }
+
+  @override
+  bool shouldRepaint(Sky oldDelegate) {
+    return _width != oldDelegate._width || _rectHeight != oldDelegate._rectHeight;
+  }
+}
