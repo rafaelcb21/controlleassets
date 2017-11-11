@@ -86,7 +86,6 @@ class CategoriaPageState extends State<CategoriaPage>{
               categoriaDB.getAllCategoria().then(
                 (list) {
                   setState(() {
-                    print(list);
                     this.listaDB = list;
                   });
                 }
@@ -287,23 +286,36 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
         categoriaDB.cor = categoriaDBEditar.cor;
         this.colorEscolhida = this.cores[categoriaDBEditar.cor];
         categoriaDB.idcategoriapai = categoriaDBEditar.idcategoriapai;
-
+        
         if(categoriaDB.idcategoriapai == 0) {
           this.value = "Categoria principal";
         } else {
           this.value = "Subcategoria";
           categoriaDB.getCategoria(categoriaDBEditar.idcategoriapai).then(
-            (data) {
-              this.categoriaPai = data;
+            (data) {             
+              setState(() {
+                this.categoriaPai = data;
+                categoriaDB.idcategoriapai = categoriaDBEditar.idcategoriapai;
+                this.categoriaPaiId = categoriaDBEditar.idcategoriapai;              
+                categoriaDB.getOnlyCategoriaPai().then((list) {
+                  setState(() {
+                    if(list.length > 0 && list != null) {
+                      this.number = list[0][0]['COUNT(*)'];
+                      this.listaCategoria = list[1];
+                    }
+                  });
+                });
+              });
+
+              //categoriaDB.idcategoriapai = categoriaDBEditar.idcategoriapai;
             }
           );
         }
 
         categoriaDB.getOnlyCategoriaPaiLess(categoriaDB.id).then((list) {
           setState(() {
-            print(list);
             if(list.length > 0 && list != null) {
-              this.number = list[0][0]['COUNT(*)'];
+              this.number = list[0][0]['COUNT(*)'];              
               this.listaCategoria = list[1];
             }
           });
@@ -315,7 +327,19 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
         this.colorEscolhida = new Color(0xFF000000);
         categoriaDB.getCategoria(categoriaDBEditar.idcategoriapai).then(
           (data) {
-            this.categoriaPai = data;
+            setState(() {
+              this.categoriaPai = data;
+              categoriaDB.idcategoriapai = categoriaDBEditar.idcategoriapai;
+              this.categoriaPaiId = categoriaDBEditar.idcategoriapai;              
+              categoriaDB.getOnlyCategoriaPai().then((list) {
+                setState(() {
+                  if(list.length > 0 && list != null) {
+                    this.number = list[0][0]['COUNT(*)'];
+                    this.listaCategoria = list[1];
+                  }
+                });
+              });
+            });            
           }
         );
 

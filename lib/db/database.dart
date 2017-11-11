@@ -219,7 +219,7 @@ class Categoria {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE idcategoriapai = 0");
+    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE idcategoriapai = 0 AND id != ? ", [id]);
 
     List<Map> list = await db.rawQuery("SELECT * FROM categoria WHERE idcategoriapai = 0 AND id != ? ORDER BY categoria ASC", [id]);
 
