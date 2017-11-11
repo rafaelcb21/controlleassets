@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 import '../db/database.dart';
 
 class CategoriaPage extends StatefulWidget {
@@ -821,116 +822,200 @@ class ItemCategoria extends StatefulWidget {
 
 class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMixin {
   Categoria categoriaDB = new Categoria();
+  AnimationController _controller;
+  Animation<double> _animation;
+  double abertura;
 
   ItemCategoriaState();
 
+  void initState() {
+    super.initState();
+    _controller = new AnimationController(duration: 
+      const Duration(milliseconds: 246), vsync: this);
+
+    _animation = new CurvedAnimation(
+      parent: _controller,
+      curve: new Interval(0.0, 1.0, curve: Curves.linear),
+    );
+  }
+
+  void _move(DragUpdateDetails details) {
+    final double delta = details.primaryDelta / 304;
+    switch (Directionality.of(context)) {
+      case TextDirection.rtl:
+        _controller.value += delta;
+        break;
+      case TextDirection.ltr:
+        _controller.value -= delta;
+        break;
+    }
+  }
+
+  void _handleDragEnd(DragEndDetails details) {
+    bool _isFlingGesture = -details.velocity.pixelsPerSecond.dx > 700;
+
+    if (_isFlingGesture) {
+      final double flingVelocity = details.velocity.pixelsPerSecond.dx;
+      _controller.fling(velocity: flingVelocity.abs() * 0.003333);
+    } else if (_controller.value < 0.45) {
+      _controller.reverse();
+    } else {
+      _controller.forward();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new Container(
-      decoration: new BoxDecoration(
-        border: new Border(
-          top: widget.filho ? new BorderSide(style: BorderStyle.none) : new BorderSide(style: BorderStyle.solid, color: Colors.black26),
-        )
-      ),
-      margin: new EdgeInsets.only(top: 0.0, bottom: 0.0),
-      child: new Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[          
-          new Expanded(
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                new InkWell(
-                  onTap: widget.onPressed,
-    
-                  //  Categoria categoriaEditar = new Categoria();
-                  //  categoriaEditar.id = this.id;
-                  //  categoriaEditar.categoria = this.categoria;
-                  //  categoriaEditar.idcategoriapai = this.idcategoriapai;
-                  //  categoriaEditar.cor = this.numeroCor;
-                  //  categoriaEditar.ativada = this.ativada;
-//
-                  //  await Navigator.of(context).push(new PageRouteBuilder(
-                  //    opaque: false,
-                  //    pageBuilder: (BuildContext context, _, __) {
-                  //      return new NovaCategoriaPage(true, categoriaEditar);
-                  //    },
-                  //    transitionsBuilder: (
-                  //      BuildContext context,
-                  //      Animation<double> animation,
-                  //      Animation<double> secondaryAnimation,
-                  //      Widget child,
-                  //    ) {
-                  //      return new SlideTransition(
-                  //        position: new Tween<Offset>(
-                  //          begin:  const Offset(1.0, 0.0),
-                  //          end: Offset.zero,
-                  //        ).animate(animation),
-                  //        child: child,
-                  //      );
-                  //    }
-                  //  ));
-                  //  categoriaDB.getAllCategoria().then(
-                  //    (list) {
-                  //      setState(() {
-                  //        print(list);
-                  //      });
-                  //    }
-                  //  );
-                  //},
+    final ui.Size logicalSize = MediaQuery.of(context).size;
+    final double _width = logicalSize.width;
 
-                  child: 
-                    new Container(
-                      margin: new EdgeInsets.only(left: 16.0),
-                      padding: widget.filho ? new EdgeInsets.only(right: 40.0, top: 11.5, bottom: 11.5) : new EdgeInsets.only(right: 40.0, top: 4.5, bottom: 4.5),
-                      child: new Row(
-                        children: <Widget>[
-                          new Container(
-                            margin: widget.filho ? new EdgeInsets.only(right: 15.0, left: 16.0) : new EdgeInsets.only(right: 16.0),
-                            child: new Icon(
-                              widget.filho ? Icons.subdirectory_arrow_right : Icons.brightness_1,
-                              color: widget.filho ? Colors.black54 : widget.cor,
-                              size: widget.filho ? 20.0 : 35.0,
-                            ),  
-                          ),
-                          new Text(
-                            widget.categoria,
-                            style: new TextStyle(
-                              color: Colors.black87,
-                              fontSize: 14.0,
-                              fontFamily: "Roboto",
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),                                             
-                        ],
-                      )
-                    )
+    this.abertura = -(48.0/_width);
+
+    return new GestureDetector(
+      onHorizontalDragUpdate: _move,
+      onHorizontalDragEnd: _handleDragEnd,
+      child: new Stack(
+        children: <Widget>[
+          new Positioned.fill(            
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                new Container(
+                  decoration: new BoxDecoration(
+                    color: new Color(0xFFE57373),
+                    //border: new Border(
+                    //  top: new BorderSide(style: BorderStyle.solid, color: const Color(0xFFE57373)),
+                    //  bottom: new BorderSide(style: BorderStyle.solid, color: const Color(0xFFE57373)),
+                    //),
                   ),
-                //  }
-                //),
-                widget.filho ? new Container() :
-                new InkWell(
-                  onTap: widget.onPressed2,
-                  child: new Container(
-                    margin: new EdgeInsets.only(right: 16.0),
-                    padding: new EdgeInsets.only(top: 15.0, bottom: 15.0, left: 10.0),
-                    child: new Text(
-                      "+ subcategoria",
-                      style: new TextStyle(
-                        color: Colors.black26,
-                        fontSize: 12.0,
-                        fontFamily: "Roboto",
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                )                
+                  child: new IconButton(                          
+                    //padding: new EdgeInsets.only(top: 16.0, bottom: 16.0, left: 24.0, right: 24.0),
+                    icon: new Icon(Icons.delete),
+                    color: new Color(0xFFFFFFFF),
+                    onPressed: () {
+                      print(_width);
+                      print(this.abertura);
+                    },
+                  )
+                ),
               ],
             ),
-          )
+          ),
+          new SlideTransition(
+            position: new Tween<Offset>(
+              begin:  Offset.zero,
+              end: new Offset(this.abertura, 0.0), //controls the opening of the slice
+            ).animate(_animation),
+            child: new Container(
+              decoration: new BoxDecoration(
+                border: new Border(
+                  top: widget.filho ? new BorderSide(style: BorderStyle.solid, color: new Color(0xFFFFFFFF)) : new BorderSide(style: BorderStyle.solid, color: Colors.black26),
+                ),
+                color: new Color(0xFFFFFFFF),
+              ),
+              margin: new EdgeInsets.only(top: 0.0, bottom: 0.0),
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[          
+                  new Expanded(
+                    child: new Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        new InkWell(
+                          onTap: widget.onPressed,
+            
+                          //  Categoria categoriaEditar = new Categoria();
+                          //  categoriaEditar.id = this.id;
+                          //  categoriaEditar.categoria = this.categoria;
+                          //  categoriaEditar.idcategoriapai = this.idcategoriapai;
+                          //  categoriaEditar.cor = this.numeroCor;
+                          //  categoriaEditar.ativada = this.ativada;
+        //
+                          //  await Navigator.of(context).push(new PageRouteBuilder(
+                          //    opaque: false,
+                          //    pageBuilder: (BuildContext context, _, __) {
+                          //      return new NovaCategoriaPage(true, categoriaEditar);
+                          //    },
+                          //    transitionsBuilder: (
+                          //      BuildContext context,
+                          //      Animation<double> animation,
+                          //      Animation<double> secondaryAnimation,
+                          //      Widget child,
+                          //    ) {
+                          //      return new SlideTransition(
+                          //        position: new Tween<Offset>(
+                          //          begin:  const Offset(1.0, 0.0),
+                          //          end: Offset.zero,
+                          //        ).animate(animation),
+                          //        child: child,
+                          //      );
+                          //    }
+                          //  ));
+                          //  categoriaDB.getAllCategoria().then(
+                          //    (list) {
+                          //      setState(() {
+                          //        print(list);
+                          //      });
+                          //    }
+                          //  );
+                          //},
+
+                          child: 
+                            new Container(
+                              margin: new EdgeInsets.only(left: 16.0),
+                              padding: widget.filho ? new EdgeInsets.only(right: 40.0, top: 11.5, bottom: 11.5) : new EdgeInsets.only(right: 40.0, top: 4.5, bottom: 4.5),
+                              child: new Row(
+                                children: <Widget>[
+                                  new Container(
+                                    margin: widget.filho ? new EdgeInsets.only(right: 15.0, left: 16.0) : new EdgeInsets.only(right: 16.0),
+                                    child: new Icon(
+                                      widget.filho ? Icons.subdirectory_arrow_right : Icons.brightness_1,
+                                      color: widget.filho ? Colors.black54 : widget.cor,
+                                      size: widget.filho ? 20.0 : 35.0,
+                                    ),  
+                                  ),
+                                  new Text(
+                                    widget.categoria,
+                                    style: new TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 14.0,
+                                      fontFamily: "Roboto",
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),                                             
+                                ],
+                              )
+                            )
+                          ),
+                        //  }
+                        //),
+                        widget.filho ? new Container() :
+                        new InkWell(
+                          onTap: widget.onPressed2,
+                          child: new Container(
+                            margin: new EdgeInsets.only(right: 16.0),
+                            padding: new EdgeInsets.only(top: 15.0, bottom: 15.0, left: 10.0),
+                            child: new Text(
+                              "+ subcategoria",
+                              style: new TextStyle(
+                                color: Colors.black26,
+                                fontSize: 12.0,
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        )                
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            )
+          ),
         ],
-      ),
-    );
+      )
+    );    
   }
 }

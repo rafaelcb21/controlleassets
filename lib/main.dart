@@ -9,8 +9,6 @@ import "conta/conta.dart";
 import "categoria/categoria.dart";
 import 'package:flutter/animation.dart';
 import 'dart:ui' as ui;
-import 'dart:async';
-import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
