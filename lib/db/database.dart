@@ -184,14 +184,16 @@ class Categoria {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    List<Map> listaPais = await db.query(categoriaTable, columns: Categoria.columns,
-      where: "idcategoriapai = 0", orderBy: "categoria ASC");    
+    List<Map> listaPais = await db.rawQuery("SELECT * FROM categoria WHERE idcategoriapai == 0 AND ativada == 1 ORDER BY categoria ASC");
+    
+    //await db.query(categoriaTable, columns: Categoria.columns, where: "idcategoriapai = 0", orderBy: "categoria ASC");
+      
     List listaTotal = [];
     List<Map> listaFilhos;
     
     for(var i in listaPais) {
       var id = i["id"];
-      listaFilhos = await db.rawQuery("SELECT * FROM categoria WHERE ? = idcategoriapai ORDER BY categoria ASC", [id]);
+      listaFilhos = await db.rawQuery("SELECT * FROM categoria WHERE ? = idcategoriapai AND ativada == 1 ORDER BY categoria ASC", [id]);
       listaTotal.add([i,listaFilhos]);
     }
 
@@ -205,9 +207,8 @@ class Categoria {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE idcategoriapai = 0");
-    List<Map> list = await db.query(categoriaTable, columns: Categoria.columns,
-      where: "idcategoriapai = 0", orderBy: "categoria ASC");
+    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE idcategoriapai = 0 AND ativada == 1");
+    List<Map> list = await db.rawQuery("SELECT * FROM categoria WHERE idcategoriapai = 0 AND ativada == 1 ORDER BY categoria ASC");
 
     await db.close();
     
@@ -219,9 +220,9 @@ class Categoria {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE idcategoriapai = 0 AND id != ? ", [id]);
+    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE idcategoriapai = 0 AND id != ? AND ativada == 1", [id]);
 
-    List<Map> list = await db.rawQuery("SELECT * FROM categoria WHERE idcategoriapai = 0 AND id != ? ORDER BY categoria ASC", [id]);
+    List<Map> list = await db.rawQuery("SELECT * FROM categoria WHERE idcategoriapai = 0 AND id != ? AND ativada == 1 ORDER BY categoria ASC", [id]);
 
     await db.close();
     
@@ -235,7 +236,7 @@ class Categoria {
 
     if(editar) { return false; }
 
-    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE categoria = ?", [name]);
+    var count = await db.rawQuery("SELECT COUNT(*) FROM categoria WHERE categoria = ? AND ativada == 1", [name]);
     if(count[0]["COUNT(*)"] > 0){ return true; }
     
     await db.close();
@@ -243,7 +244,31 @@ class Categoria {
     return false;
   }
 
+  Future deleteCategoria(List list) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+    List listaTotal = [];
+    List<Map> listaFilhos;
+
+    for(var x in list) {
+      await db.rawUpdate("UPDATE categoria SET ativada = 0 WHERE id = ?", [x]);
+    }
+
+    List<Map> listaPais = await db.rawQuery("SELECT * FROM categoria WHERE idcategoriapai == 0 AND ativada == 1 ORDER BY categoria ASC");
+    
+    for(var i in listaPais) {
+      var id = i["id"];
+      listaFilhos = await db.rawQuery("SELECT * FROM categoria WHERE ? = idcategoriapai AND ativada == 1 ORDER BY categoria ASC", [id]);
+      listaTotal.add([i,listaFilhos]);
+    }
+
+    await db.close();
+
+    return listaTotal;
+  }
   //Future<int> delete(int id) async {
+    //db.delete(categoriaTable, where: "id = ?", whereArgs: list);
   //  return await db.delete(categoriaTable, where: "id = ?", whereArgs: [id]);
   //} //sera para a tabela lancamento
 }

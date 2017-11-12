@@ -46,16 +46,27 @@ class CategoriaPageState extends State<CategoriaPage>{
         var numeroCor = i[0]['cor'];
         var idcategoriapai = i[0]['idcategoriapai'];
         var ativada = i[0]['ativada'];
+        bool temFilhos = false;
+        var listaDelete = [id];
+
+        if (i[1].length > 0) {
+          temFilhos = true;
+          for(var item in i[1]) {
+            listaDelete.add(item["id"]);
+          }
+        }
 
         this.listaCategorias.add(
           new ItemCategoria(
             filho: false,
+            temFilhos: temFilhos,
             id: id,
             categoria: categoria,
             cor: cor,
             numeroCor: numeroCor,
             idcategoriapai: idcategoriapai,
             ativada: ativada,
+            listaDelete: listaDelete,
             onPressed: () async {
               Categoria categoriaEditar = new Categoria();
               categoriaEditar.id = id;
@@ -92,7 +103,6 @@ class CategoriaPageState extends State<CategoriaPage>{
                 }
               );
             },
-
             onPressed2: () async {
               Categoria categoriaAddSubcategoria = new Categoria();
               categoriaAddSubcategoria.idcategoriapai = id;
@@ -125,7 +135,54 @@ class CategoriaPageState extends State<CategoriaPage>{
                 }
               );
             },
+            onPressed3: () async {
+              void showDeleteDialog<T>({ BuildContext context, Widget child }) {
+                showDialog<T>(
+                  context: context,
+                  child: child,
+                )
+                .then<Null>((T value) { });
+              }
 
+              showDeleteDialog<DialogOptionsAction>(
+                context: context,
+                child: new AlertDialog(
+                  title: const Text('Deletar Categoria'),
+                  content: new Text(
+                    temFilhos ? 'Deseja deletar essa categoria e seus filhos?'
+                      : 'Deseja deletar essa categoria?',
+                      softWrap: true,
+                      style: new TextStyle(
+                        color: Colors.black26,
+                        fontSize: 16.0,
+                        fontFamily: "Roboto",
+                        fontWeight: FontWeight.w500,
+                      )
+                  ),
+                  actions: <Widget>[
+                    new FlatButton(
+                      child: const Text('CANCEL'),
+                      onPressed: () {                                
+                        Navigator.pop(context);
+                      }
+                    ),
+                    new FlatButton(
+                      child: const Text('OK'),
+                      onPressed: () {
+                        categoriaDB.deleteCategoria(listaDelete).then(
+                          (list) {
+                            setState(() {
+                              this.listaDB = list;
+                            });
+                          }
+                        );
+                        Navigator.pop(context);
+                      }
+                    )
+                  ]
+                )
+              );
+            }
           )
         );  
 
@@ -137,17 +194,20 @@ class CategoriaPageState extends State<CategoriaPage>{
             var numeroCor2 = y['cor'];
             var idcategoriapai2 = y['idcategoriapai'];
             var ativada2 = y['ativada'];
+            var listaDelete2 = [id2];
 
             this.listaCategorias.add(
               //new ItemCategoria(true, id2, categoria2, cor2, numeroCor2, idcategoriapai2, ativada2)
               new ItemCategoria(
                 filho: true,
+                temFilhos: false,
                 id: id2,
                 categoria: categoria2,
                 cor: cor2,
                 numeroCor: numeroCor2,
                 idcategoriapai: idcategoriapai2,
                 ativada: ativada2,
+                listaDelete: listaDelete2,
                 onPressed: () async {
                   Categoria categoriaEditar = new Categoria();
                   categoriaEditar.id = id2;
@@ -795,38 +855,49 @@ class DialogItem extends StatelessWidget {
 class ItemCategoria extends StatefulWidget {
    
   final bool filho;
+  final bool temFilhos;  
   final int id;
   final String categoria;
   final int numeroCor;
   final Color cor;
   final int idcategoriapai;
   final int ativada;
+  final List listaDelete;
   final VoidCallback onPressed;
   final VoidCallback onPressed2;
+  final VoidCallback onPressed3;
 
   ItemCategoria({
     Key key,
     this.filho,
+    this.temFilhos,
     this.id,
     this.categoria,
     this.cor,
     this.numeroCor,
     this.idcategoriapai,
     this.ativada,
+    this.listaDelete,
     this.onPressed,
-    this.onPressed2}) : super(key: key);  
+    this.onPressed2,
+    this.onPressed3}) : super(key: key);
 
   @override
   ItemCategoriaState createState() => new ItemCategoriaState();
 }
 
+enum DialogOptionsAction {
+  cancel,
+  ok
+}
+
 class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMixin {
+  ItemCategoriaState();
+
   Categoria categoriaDB = new Categoria();
   AnimationController _controller;
   Animation<double> _animation;
   double abertura;
-
-  ItemCategoriaState();
 
   void initState() {
     super.initState();
@@ -864,6 +935,14 @@ class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMi
     }
   }
 
+  void showDeleteDialog<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) { });
+  }
+
   @override
   Widget build(BuildContext context) {
     final ui.Size logicalSize = MediaQuery.of(context).size;
@@ -892,10 +971,7 @@ class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMi
                     //padding: new EdgeInsets.only(top: 16.0, bottom: 16.0, left: 24.0, right: 24.0),
                     icon: new Icon(Icons.delete),
                     color: new Color(0xFFFFFFFF),
-                    onPressed: () {
-                      print(_width);
-                      print(this.abertura);
-                    },
+                    onPressed: widget.onPressed3
                   )
                 ),
               ],
