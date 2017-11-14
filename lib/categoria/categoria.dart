@@ -58,6 +58,7 @@ class CategoriaPageState extends State<CategoriaPage>{
 
         this.listaCategorias.add(
           new ItemCategoria(
+            key: new Key(i[0]),
             filho: false,
             temFilhos: temFilhos,
             id: id,
@@ -199,6 +200,7 @@ class CategoriaPageState extends State<CategoriaPage>{
             this.listaCategorias.add(
               //new ItemCategoria(true, id2, categoria2, cor2, numeroCor2, idcategoriapai2, ativada2)
               new ItemCategoria(
+                key: new Key(y),
                 filho: true,
                 temFilhos: false,
                 id: id2,
@@ -244,6 +246,54 @@ class CategoriaPageState extends State<CategoriaPage>{
                     }
                   );
                 },
+                onPressed3: () async {
+                  void showDeleteDialog<T>({ BuildContext context, Widget child }) {
+                    showDialog<T>(
+                      context: context,
+                      child: child,
+                    )
+                    .then<Null>((T value) { });
+                  }
+
+                  showDeleteDialog<DialogOptionsAction>(
+                    context: context,
+                    child: new AlertDialog(
+                      title: const Text('Deletar Categoria'),
+                      content: new Text(
+                        temFilhos ? 'Deseja deletar essa categoria e seus filhos?'
+                          : 'Deseja deletar essa categoria?',
+                          softWrap: true,
+                          style: new TextStyle(
+                            color: Colors.black26,
+                            fontSize: 16.0,
+                            fontFamily: "Roboto",
+                            fontWeight: FontWeight.w500,
+                          )
+                      ),
+                      actions: <Widget>[
+                        new FlatButton(
+                          child: const Text('CANCEL'),
+                          onPressed: () {                                
+                            Navigator.pop(context);
+                          }
+                        ),
+                        new FlatButton(
+                          child: const Text('OK'),
+                          onPressed: () {
+                            categoriaDB.deleteCategoria(listaDelete).then(
+                              (list) {
+                                setState(() {
+                                  this.listaDB = list;
+                                });
+                              }
+                            );
+                            Navigator.pop(context);
+                          }
+                        )
+                      ]
+                    )
+                  );
+                }
               )
             );
           }
@@ -897,6 +947,7 @@ class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMi
   Categoria categoriaDB = new Categoria();
   AnimationController _controller;
   Animation<double> _animation;
+  bool startFling = true;
   double abertura;
 
   void initState() {
@@ -910,28 +961,42 @@ class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMi
     );
   }
 
+  //void _move(DragUpdateDetails details) {
+  //  final double delta = details.primaryDelta / 304;
+  //  switch (Directionality.of(context)) {
+  //    case TextDirection.rtl:
+  //      _controller.value += delta;
+  //      break;
+  //    case TextDirection.ltr:
+  //      _controller.value -= delta;
+  //      break;
+  //  }
+  //}
+
+  //void _handleDragEnd(DragEndDetails details) {
+  //  bool _isFlingGesture = -details.velocity.pixelsPerSecond.dx > 700;
+  //  if (_isFlingGesture) {
+  //    final double flingVelocity = details.velocity.pixelsPerSecond.dx;
+  //    _controller.fling(velocity: flingVelocity.abs() * 0.003333);
+  //  } else if (_controller.value < 0.45) {
+  //    _controller.reverse();
+  //  } else {
+  //    _controller.forward();
+  //  }
+  //}
+
   void _move(DragUpdateDetails details) {
     final double delta = details.primaryDelta / 304;
-    switch (Directionality.of(context)) {
-      case TextDirection.rtl:
-        _controller.value += delta;
-        break;
-      case TextDirection.ltr:
-        _controller.value -= delta;
-        break;
-    }
+    _controller.value -= delta;
   }
 
-  void _handleDragEnd(DragEndDetails details) {
-    bool _isFlingGesture = -details.velocity.pixelsPerSecond.dx > 700;
-
-    if (_isFlingGesture) {
-      final double flingVelocity = details.velocity.pixelsPerSecond.dx;
-      _controller.fling(velocity: flingVelocity.abs() * 0.003333);
-    } else if (_controller.value < 0.45) {
-      _controller.reverse();
-    } else {
-      _controller.forward();
+  void _settle(DragEndDetails details) {
+    if(this.startFling) {
+      _controller.fling(velocity: 1.0);
+      this.startFling = false;
+    } else if(!this.startFling){
+      _controller.fling(velocity: -1.0);
+      this.startFling = true;
     }
   }
 
@@ -952,7 +1017,7 @@ class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMi
 
     return new GestureDetector(
       onHorizontalDragUpdate: _move,
-      onHorizontalDragEnd: _handleDragEnd,
+      onHorizontalDragEnd: _settle,
       child: new Stack(
         children: <Widget>[
           new Positioned.fill(            
