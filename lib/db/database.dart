@@ -38,8 +38,14 @@ class DatabaseClient {
             CREATE TABLE tag (
               id INTEGER PRIMARY KEY, 
               tag TEXT NOT NULL,
+              cor INTEGER NOT NULL,
               ativada INTEGER NOT NULL
             )""");
+
+    await db.rawInsert("INSERT INTO tag (tag, cor, ativada) VALUES ('Renda Fixa', 39, 1)");
+    await db.rawInsert("INSERT INTO tag (tag, cor, ativada) VALUES ('Renda Variável', 43, 1)");
+    await db.rawInsert("INSERT INTO tag (tag, cor, ativada) VALUES ('Despesa Fixa', 47, 1)");
+    await db.rawInsert("INSERT INTO tag (tag, cor, ativada) VALUES ('Despesa Variável', 15, 1)");
 
     await db.execute("""
             CREATE TABLE conta (
@@ -113,7 +119,7 @@ class Categoria {
 
   String categoriaTable = "categoria";
 
-  static final columns = ["id", "categoria", "idcategoriapai", "cor","ativada"];
+  static final columns = ["id", "categoria", "idcategoriapai", "cor", "ativada"];
 
   Map toMap() {
     Map map = {
@@ -286,16 +292,19 @@ class Categoria {
 
 class Tag {
   Tag();
+  Database db;
 
   int id;
   String tag;
+  int cor;
   int ativada;
 
-  static final columns = ["id", "tag", "ativada"];
+  static final columns = ["id", "tag", "cor", "ativada"];
 
   Map toMap() {
     Map map = {
       "tag": tag,
+      "cor": cor,
       "ativada": ativada
     };
 
@@ -308,9 +317,50 @@ class Tag {
     Tag tagTable = new Tag();
     tagTable.id = map["id"];
     tagTable.tag = map["tag"];
+    tagTable.cor = map["cor"];
     tagTable.ativada = map["ativada"];
 
     return tagTable;
+  }
+
+  Future getAllTag() async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    List lista = await db.rawQuery("SELECT * FROM tag WHERE AND ativada == 1 ORDER BY categoria ASC");
+    await db.close();
+
+    return lista; 
+  }
+
+  Future deleteTag(int id) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    await db.rawUpdate("UPDATE tag SET ativada = 0 WHERE id = ?", [id]);
+    List lista = await db.rawQuery("SELECT * FROM tag WHERE AND ativada == 1 ORDER BY categoria ASC");
+    await db.close();
+
+    return lista;
+  }
+
+  Future upsertTag(Tag tag) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    if (tag.id == null) {
+      tag.id = await db.insert("tag", tag.toMap());
+    } else {
+      await db.update("tag", tag.toMap(),
+        where: "id = ?", whereArgs: [tag.id]);
+    }
+
+    await db.close();
+
+    return tag;
   }
 }
 

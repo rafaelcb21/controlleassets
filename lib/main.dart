@@ -7,6 +7,7 @@ import "home/card_cartoes.dart";
 import "home/card_alertas.dart";
 import "conta/conta.dart";
 import "categoria/categoria.dart";
+import "tag/tag.dart";
 import 'package:flutter/animation.dart';
 import 'dart:ui' as ui;
 import 'package:intl/intl.dart';
@@ -41,6 +42,7 @@ class ControlleApp extends StatelessWidget {
       routes: <String, WidgetBuilder> {
         '/home': (BuildContext context) => new HomePage(),
         '/categoria': (BuildContext context) => new CategoriaPage(),
+        '/tag': (BuildContext context) => new TagPage(),
         //'/novacategoria': (BuildContext context) => new NovaCategoriaPage(),
         //'/conta': (BuildContext context) => new ContaPage()
       },
@@ -402,7 +404,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       child: child,
                     );
                   }
-                ));            
+                ));
               },
               leading: new Icon(
                 Icons.folder,
@@ -416,6 +418,29 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               )
             ),
             new ListTile(
+              onTap: (){
+                Navigator.pop(context);
+                Navigator.of(context).push(new PageRouteBuilder(
+                  opaque: false,
+                  pageBuilder: (BuildContext context, _, __) {
+                    return new TagPage();
+                  },
+                  transitionsBuilder: (
+                      BuildContext context,
+                      Animation<double> animation,
+                      Animation<double> secondaryAnimation,
+                      Widget child,
+                  ) {
+                    return new SlideTransition(
+                      position: new Tween<Offset>(
+                        begin:  const Offset(1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    );
+                  }
+                ));
+              },
               leading: new Icon(
                 Icons.local_offer,
                 color: cinzaDrawer,

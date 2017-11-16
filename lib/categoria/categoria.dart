@@ -625,8 +625,8 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
 
       } else if (!editar && categoriaDBEditar.idcategoriapai != null) {
         this.value = "Subcategoria";
-        categoriaDB.cor = 0;
-        this.colorEscolhida = new Color(0xFF000000);
+        categoriaDB.cor = 3;
+        this.colorEscolhida = Colors.black;
         categoriaDB.getCategoria(categoriaDBEditar.idcategoriapai).then(
           (data) {
             setState(() {
@@ -647,8 +647,8 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
 
       } else {
         this.value = "Categoria principal";
-        categoriaDB.cor = 0;
-        this.colorEscolhida = new Color(0xFF000000);
+        categoriaDB.cor = 3;
+        this.colorEscolhida = Colors.black;
 
         categoriaDB.getOnlyCategoriaPai().then((list) {
           setState(() {
