@@ -14,11 +14,106 @@ class CategoriaPageState extends State<CategoriaPage>{
   List listaDB = [];
 
   List cores = [
-    const Color(0xFF000000),
-    const Color(0xFFd10841),
-    const Color(0xFFcdd399),
-    const Color(0xFF87c0ec),
-    const Color(0xFF5aaeae)
+
+    Colors.black12,
+    Colors.black45,
+    Colors.black87,
+    Colors.black,
+
+    Colors.pinkAccent[100],
+    Colors.pinkAccent,
+    Colors.pinkAccent[400],
+    Colors.pinkAccent[700],
+
+    Colors.redAccent[100],
+    Colors.redAccent,
+    Colors.redAccent[400],
+    Colors.redAccent[700],
+
+    Colors.deepOrangeAccent[100],
+    Colors.deepOrangeAccent,
+    Colors.deepOrangeAccent[400],
+    Colors.deepOrangeAccent[700],
+
+    Colors.orangeAccent[100],
+    Colors.orangeAccent,
+    Colors.orangeAccent[400],
+    Colors.orangeAccent[700],
+
+    Colors.amberAccent[100],
+    Colors.amberAccent,
+    Colors.amberAccent[400],
+    Colors.amberAccent[700],
+
+    Colors.yellowAccent[100],
+    Colors.yellowAccent,
+    Colors.yellowAccent[400],
+    Colors.yellowAccent[700],
+
+    Colors.limeAccent[100],
+    Colors.limeAccent,
+    Colors.limeAccent[400],
+    Colors.limeAccent[700],
+
+    Colors.lightGreenAccent[100],
+    Colors.lightGreenAccent,
+    Colors.lightGreenAccent[400],
+    Colors.lightGreenAccent[700],
+
+    Colors.greenAccent[100],
+    Colors.greenAccent,
+    Colors.greenAccent[400],
+    Colors.greenAccent[700],
+
+    Colors.tealAccent[100],
+    Colors.tealAccent,
+    Colors.tealAccent[400],
+    Colors.tealAccent[700],
+
+    Colors.cyanAccent[100],
+    Colors.cyanAccent,
+    Colors.cyanAccent[400],
+    Colors.cyanAccent[700],
+
+    Colors.lightBlueAccent[100],
+    Colors.lightBlueAccent,
+    Colors.lightBlueAccent[400],
+    Colors.lightBlueAccent[700],
+
+    Colors.blueAccent[100],
+    Colors.blueAccent,
+    Colors.blueAccent[400],
+    Colors.blueAccent[700],
+
+    Colors.indigoAccent[100],
+    Colors.indigoAccent,
+    Colors.indigoAccent[400],
+    Colors.indigoAccent[700],
+
+    Colors.purpleAccent[100],
+    Colors.purpleAccent,
+    Colors.purpleAccent[400],
+    Colors.purpleAccent[700],
+
+    Colors.deepPurpleAccent[100],
+    Colors.deepPurpleAccent,
+    Colors.deepPurpleAccent[400],
+    Colors.deepPurpleAccent[700],
+
+    Colors.blueGrey[100],
+    Colors.blueGrey,
+    Colors.blueGrey[400],
+    Colors.blueGrey[700],
+
+    Colors.brown[100],
+    Colors.brown,
+    Colors.brown[400],
+    Colors.brown[700],
+
+    Colors.grey[100],
+    Colors.grey,
+    Colors.grey[400],
+    Colors.grey[700],
   ];  
 
   @override
@@ -375,14 +470,110 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
   List listaCategoria;
   int number;
   List<Widget> tiles;
+  List<Widget> palette;
   bool x, y;
   
   List cores = [
-    const Color(0xFF000000),
-    const Color(0xFFd10841),
-    const Color(0xFFcdd399),
-    const Color(0xFF87c0ec),
-    const Color(0xFF5aaeae)
+
+    Colors.black12,
+    Colors.black45,
+    Colors.black87,
+    Colors.black,
+
+    Colors.pinkAccent[100],
+    Colors.pinkAccent,
+    Colors.pinkAccent[400],
+    Colors.pinkAccent[700],
+
+    Colors.redAccent[100],
+    Colors.redAccent,
+    Colors.redAccent[400],
+    Colors.redAccent[700],
+
+    Colors.deepOrangeAccent[100],
+    Colors.deepOrangeAccent,
+    Colors.deepOrangeAccent[400],
+    Colors.deepOrangeAccent[700],
+
+    Colors.orangeAccent[100],
+    Colors.orangeAccent,
+    Colors.orangeAccent[400],
+    Colors.orangeAccent[700],
+
+    Colors.amberAccent[100],
+    Colors.amberAccent,
+    Colors.amberAccent[400],
+    Colors.amberAccent[700],
+
+    Colors.yellowAccent[100],
+    Colors.yellowAccent,
+    Colors.yellowAccent[400],
+    Colors.yellowAccent[700],
+
+    Colors.limeAccent[100],
+    Colors.limeAccent,
+    Colors.limeAccent[400],
+    Colors.limeAccent[700],
+
+    Colors.lightGreenAccent[100],
+    Colors.lightGreenAccent,
+    Colors.lightGreenAccent[400],
+    Colors.lightGreenAccent[700],
+
+    Colors.greenAccent[100],
+    Colors.greenAccent,
+    Colors.greenAccent[400],
+    Colors.greenAccent[700],
+
+    Colors.tealAccent[100],
+    Colors.tealAccent,
+    Colors.tealAccent[400],
+    Colors.tealAccent[700],
+
+    Colors.cyanAccent[100],
+    Colors.cyanAccent,
+    Colors.cyanAccent[400],
+    Colors.cyanAccent[700],
+
+    Colors.lightBlueAccent[100],
+    Colors.lightBlueAccent,
+    Colors.lightBlueAccent[400],
+    Colors.lightBlueAccent[700],
+
+    Colors.blueAccent[100],
+    Colors.blueAccent,
+    Colors.blueAccent[400],
+    Colors.blueAccent[700],
+
+    Colors.indigoAccent[100],
+    Colors.indigoAccent,
+    Colors.indigoAccent[400],
+    Colors.indigoAccent[700],
+
+    Colors.purpleAccent[100],
+    Colors.purpleAccent,
+    Colors.purpleAccent[400],
+    Colors.purpleAccent[700],
+
+    Colors.deepPurpleAccent[100],
+    Colors.deepPurpleAccent,
+    Colors.deepPurpleAccent[400],
+    Colors.deepPurpleAccent[700],
+
+    Colors.blueGrey[100],
+    Colors.blueGrey,
+    Colors.blueGrey[400],
+    Colors.blueGrey[700],
+
+    Colors.brown[100],
+    Colors.brown,
+    Colors.brown[400],
+    Colors.brown[700],
+
+    Colors.grey[100],
+    Colors.grey,
+    Colors.grey[400],
+    Colors.grey[700],
   ];
 
   @override
@@ -541,6 +732,70 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
       return this.tiles;
     }
 
+    List<Widget> buildPalette() {
+      this.palette = [];
+      for(var i = 0; i < 77; i+= 4) {
+        this.palette.add(
+          new Container(
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new Container(
+                  color: cores[i],
+                  height: 46.0,
+                  width: 46.0,
+                  child: new InkWell(
+                    onTap: (){
+                      this.colorEscolhida = cores[i];
+                      categoriaDB.cor = i;
+                      Navigator.pop(context, i);
+                    },
+                  ),
+                ),
+                new Container(
+                  color: cores[i+1],
+                  height: 46.0,
+                  width: 46.0,
+                  child: new InkWell(
+                    onTap: (){
+                      this.colorEscolhida = cores[i+1];
+                      categoriaDB.cor = i+1;
+                      Navigator.pop(context, i+1);
+                    },
+                  ),
+                ),
+                new Container(
+                  color: cores[i+2],
+                  height: 46.0,
+                  width: 46.0,
+                  child: new InkWell(
+                    onTap: (){
+                      this.colorEscolhida = cores[i+2];
+                      categoriaDB.cor = i+2;
+                      Navigator.pop(context, i+2);
+                    },
+                  ),
+                ),
+                new Container(
+                  color: cores[i+3],
+                  height: 46.0,
+                  width: 46.0,
+                  child: new InkWell(
+                    onTap: (){
+                      this.colorEscolhida = cores[i+3];
+                      categoriaDB.cor = i+3;
+                      Navigator.pop(context, i+3);
+                    },
+                  ),
+                )
+              ],
+            )
+          )
+        );
+      }
+      return this.palette;
+    }
+
     return new Scaffold( 
       appBar: new AppBar(
         title: new Text('Nova Categoria'),
@@ -604,63 +859,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                           context: context,
                           child: new SimpleDialog(
                             title: const Text('Selecione uma cor'),
-                            children: <Widget>[
-                              new Container(
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    new Container(
-                                      color: cores[1],
-                                      height: 46.0,
-                                      width: 46.0,
-                                      child: new InkWell(
-                                        onTap: (){
-                                          this.colorEscolhida = cores[1];
-                                          categoriaDB.cor = 1;
-                                          Navigator.pop(context, 1);
-                                        },
-                                      ),
-                                    ),
-                                    new Container(
-                                      color: cores[2],
-                                      height: 46.0,
-                                      width: 46.0,
-                                      child: new InkWell(
-                                        onTap: (){
-                                          this.colorEscolhida = cores[2];
-                                          categoriaDB.cor = 2;
-                                          Navigator.pop(context, 2);
-                                        },
-                                      ),
-                                    ),
-                                    new Container(
-                                      color: cores[3],
-                                      height: 46.0,
-                                      width: 46.0,
-                                      child: new InkWell(
-                                        onTap: (){
-                                          this.colorEscolhida = cores[3];
-                                          categoriaDB.cor = 3;
-                                          Navigator.pop(context, 3);
-                                        },
-                                      ),
-                                    ),
-                                    new Container(
-                                      color: cores[4],
-                                      height: 46.0,
-                                      width: 46.0,
-                                      child: new InkWell(
-                                        onTap: (){
-                                          this.colorEscolhida = cores[4];
-                                          categoriaDB.cor = 4;
-                                          Navigator.pop(context, 4);
-                                        },
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ]
+                              children: buildPalette(),
                           )
                         );
                       },
