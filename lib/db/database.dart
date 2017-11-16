@@ -23,6 +23,17 @@ class DatabaseClient {
               ativada INTEGER NOT NULL
             )"""); //se nao for uma subcategoria a coluna idcategoriapai terao valor 0
 
+    await db.rawInsert("INSERT INTO categoria (categoria, idcategoriapai, cor, ativada) VALUES ('Alimentação', 0, 39, 1)");
+    await db.rawInsert("INSERT INTO categoria (categoria, idcategoriapai, cor, ativada) VALUES ('Educação', 0, 43, 1)");
+    await db.rawInsert("INSERT INTO categoria (categoria, idcategoriapai, cor, ativada) VALUES ('Investimento', 0, 47, 1)");
+    await db.rawInsert("INSERT INTO categoria (categoria, idcategoriapai, cor, ativada) VALUES ('Lazer', 0, 15, 1)");
+    await db.rawInsert("INSERT INTO categoria (categoria, idcategoriapai, cor, ativada) VALUES ('Outros', 0, 3, 1)");
+    await db.rawInsert("INSERT INTO categoria (categoria, idcategoriapai, cor, ativada) VALUES ('Salário', 0, 67, 1)");
+    await db.rawInsert("INSERT INTO categoria (categoria, idcategoriapai, cor, ativada) VALUES ('Saúde', 0, 19, 1)");
+    await db.rawInsert("INSERT INTO categoria (categoria, idcategoriapai, cor, ativada) VALUES ('Telefonia', 0, 65, 1)");
+    await db.rawInsert("INSERT INTO categoria (categoria, idcategoriapai, cor, ativada) VALUES ('Transporte', 0, 4, 1)");
+    await db.rawInsert("INSERT INTO categoria (categoria, idcategoriapai, cor, ativada) VALUES ('Vestuário', 0, 73, 1)");
+
     await db.execute("""
             CREATE TABLE tag (
               id INTEGER PRIMARY KEY, 
