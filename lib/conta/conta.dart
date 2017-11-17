@@ -100,77 +100,7 @@ class ContaPageState extends State<ContaPage> {
       ),
       body: new ListView(
         padding: new EdgeInsets.only(top: 8.0, right: 0.0, left: 0.0),
-        children: //buildListaContas(this.listaDB)
-          <Widget>[
-            //new Container(
-              //decoration: new BoxDecoration(
-              //  border: new Border(
-              //    top: new BorderSide(style: BorderStyle.solid, color: Colors.black26),
-              //  ),
-              //  color: new Color(0xFFFFFFFF),
-              //),
-              //margin: new EdgeInsets.only(top: 0.0, bottom: 0.0),
-              //child: //new Row(
-                //mainAxisAlignment: MainAxisAlignment.start,
-                //crossAxisAlignment: CrossAxisAlignment.center,
-                //children: <Widget>[          
-                //new Expanded(
-                //  child: new Row(
-                //    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //    children: <Widget>[
-                      new ListTile(
-                        leading: 
-                          new Icon(Icons.brightness_1,color: Colors.blue),
-                        
-                        title: 
-                          new Text(
-                            'Caixa',
-                            style: new TextStyle(
-                              fontSize: 13.0,
-                              fontFamily: 'Roboto',
-                              color: new Color(0xFF212121),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        
-                        subtitle: 
-                          new Text(
-                            'Conta corrente',
-                            style: new TextStyle(
-                              fontSize: 12.0,
-                              fontFamily: 'Roboto',
-                              color: new Color(0xFF9E9E9E)
-                            ),
-                          ),
-                        
-                        trailing: new Row(
-                          children: <Widget>[
-                            new Text(
-                              this.switchValue ? "ativado" : "desativado",
-                              style: new TextStyle(
-                                fontSize: 16.0,
-                                fontFamily: 'Roboto',
-                                color: this.switchValue ? new Color(0xFF26C6DA) : Colors.black26
-                              ),
-                            ),
-                            new Switch(
-                              value: this.switchValue,
-                              onChanged: (bool value) {
-                                setState(() {
-                                  this.switchValue = value;
-                                });
-                              },
-                            )
-                          ],
-                        )
-                      )
-                    ]    
-                  //),
-                //)
-              //],
-            //),
-          //)
-        //]
+        children: buildListaContas(this.listaDB)
       )
     );
   }
@@ -213,75 +143,175 @@ class ItemContaState extends State<ItemConta> {
     return new Container(
       decoration: new BoxDecoration(
         border: new Border(
-          top: new BorderSide(style: BorderStyle.solid, color: Colors.black26),
-        ),
-        color: new Color(0xFFFFFFFF),
+          bottom: new BorderSide(
+            style: BorderStyle.solid,
+            color: Colors.black26,
+          )
+        )
       ),
-      margin: new EdgeInsets.only(top: 0.0, bottom: 0.0),
       child: new Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[          
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
           new Expanded(
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                new ListTile(
-                  leading: new InkWell(
-                    onTap: () {print('teste1');},
-                    child: new Icon(Icons.brightness_1,color: widget.cor),
-                  ),
-                  title: new InkWell(
-                    onTap: () {print('teste1');},
-                    child: new Text(
-                      widget.conta,
-                      style: new TextStyle(
-                        fontSize: 13.0,
-                        fontFamily: 'Roboto',
-                        color: new Color(0xFF212121),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                  ),
-                  subtitle: new InkWell(
-                    onTap: () {print('teste1');},
-                    child: new Text(
-                      widget.tipo,
-                      style: new TextStyle(
-                        fontSize: 12.0,
-                        fontFamily: 'Roboto',
-                        color: new Color(0xFF9E9E9E)
-                      ),
-                    )
-                  ),
-                  trailing: new Row(
+            child: new InkWell(
+              onTap: () {},
+              child: new Row(
+                children: <Widget>[
+                  new Container(
+                    margin: new EdgeInsets.only(left: 16.0, right: 32.0),
+                    child: new Icon(Icons.brightness_1, color: this.switchValue ? widget.cor : Colors.black26),
+                  ),                         
+                  new Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      new Text(
-                        this.switchValue ? "ativado" : "desativado",
-                        style: new TextStyle(
-                          fontSize: 16.0,
-                          fontFamily: 'Roboto',
-                          color: new Color(0xFF26C6DA)
-                        ),
-                      ),
-                      new Switch(
-                        value: this.switchValue,
-                        onChanged: (bool value) {
-                          setState(() {
-                            this.switchValue = value;
-                          });
-                        },
-                      )
+                      new Text(widget.conta, style: this.switchValue ? Theme.of(context).textTheme.body2 : Colors.black26),
+                      new Text(widget.tipo, style: this.switchValue ? Theme.of(context).textTheme.caption : Colors.black26)
                     ],
                   )
-                )
-              ]    
+                ],
+              ),
             ),
-          )
+          ),
+          new Switch(
+            value: this.switchValue,
+            onChanged: (bool value) {
+              setState(() {
+                this.switchValue = value;
+              });
+            },
+          )                 
         ],
       ),
     );
-  }
+    //return new ListTile(
+    //  leading: new GestureDetector(
+    //    onTap: () async {
+    //      if(this.switchValue) {
+    //        await Navigator.of(context).push(new PageRouteBuilder(
+    //          opaque: false,
+    //          pageBuilder: (BuildContext context, _, __) {
+    //            return new NovaContaPage(false, new Conta());
+    //          },
+    //          transitionsBuilder: (
+    //            BuildContext context,
+    //            Animation<double> animation,
+    //            Animation<double> secondaryAnimation,
+    //            Widget child,
+    //          ) {
+    //            return new SlideTransition(
+    //              position: new Tween<Offset>(
+    //                begin:  const Offset(1.0, 0.0),
+    //                end: Offset.zero,
+    //              ).animate(animation),
+    //              child: child,
+    //            );
+    //          }
+    //        ));
+    //        contaDB.getAllConta().then(
+    //          (list) {
+    //            setState(() {
+    //              //this.listaDB = list;
+    //            });
+    //          }
+    //        );
+    //      }
+    //    },
+    //    child: new Icon(Icons.brightness_1, color: this.switchValue ? Colors.blue : Colors.black26),
+    //  ),
+    //    
+    //  title: new GestureDetector(
+    //    onTap: () async {
+    //      if(this.switchValue) {
+    //        await Navigator.of(context).push(new PageRouteBuilder(
+    //          opaque: false,
+    //          pageBuilder: (BuildContext context, _, __) {
+    //            return new NovaContaPage(false, new Conta());
+    //          },
+    //          transitionsBuilder: (
+    //            BuildContext context,
+    //            Animation<double> animation,
+    //            Animation<double> secondaryAnimation,
+    //            Widget child,
+    //          ) {
+    //            return new SlideTransition(
+    //              position: new Tween<Offset>(
+    //                begin:  const Offset(1.0, 0.0),
+    //                end: Offset.zero,
+    //              ).animate(animation),
+    //              child: child,
+    //            );
+    //          }
+    //        ));
+    //        contaDB.getAllConta().then(
+    //          (list) {
+    //            setState(() {
+    //              //this.listaDB = list;
+    //            });
+    //          }
+    //        );
+    //      }
+    //    },
+    //    child: new Text(
+    //      'Caixa',
+    //      style: new TextStyle(
+    //        fontSize: 13.0,
+    //        fontFamily: 'Roboto',
+    //        color: this.switchValue ? new Color(0xFF212121) : Colors.black26,
+    //        fontWeight: FontWeight.bold,
+    //      ),
+    //    ),
+    //  ), 
+    //  subtitle:  new GestureDetector(
+    //    onTap: () async {
+    //      if(this.switchValue) {
+    //        await Navigator.of(context).push(new PageRouteBuilder(
+    //          opaque: false,
+    //          pageBuilder: (BuildContext context, _, __) {
+    //            return new NovaContaPage(false, new Conta());
+    //          },
+    //          transitionsBuilder: (
+    //            BuildContext context,
+    //            Animation<double> animation,
+    //            Animation<double> secondaryAnimation,
+    //            Widget child,
+    //          ) {
+    //            return new SlideTransition(
+    //              position: new Tween<Offset>(
+    //                begin:  const Offset(1.0, 0.0),
+    //                end: Offset.zero,
+    //              ).animate(animation),
+    //              child: child,
+    //            );
+    //          }
+    //        ));                            
+    //        contaDB.getAllConta().then(
+    //          (list) {
+    //            setState(() {
+    //              //this.listaDB = list;
+    //            });
+    //          }
+    //        );
+    //      }
+    //    },
+    //    child: new Text(
+    //      'Conta corrente',
+    //      style: new TextStyle(
+    //        fontSize: 12.0,
+    //        fontFamily: 'Roboto',
+    //        color: this.switchValue ? new Color(0xFF9E9E9E) : Colors.black26,
+    //      ),
+    //    ),
+    //  ),
+    //  trailing: new Switch(
+    //    value: this.switchValue,
+    //    onChanged: (bool value) {
+    //      setState(() {
+    //        this.switchValue = value;
+    //      });
+    //    },
+    //  )
+    //);  
+  }  
 }
 
 
