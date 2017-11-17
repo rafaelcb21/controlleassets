@@ -122,7 +122,6 @@ class TagPageState extends State<TagPage>{
       (list) {
         setState(() {
           this.listaDB = list;
-          print(list);
         });
       }
     );
@@ -196,9 +195,9 @@ class TagPageState extends State<TagPage>{
               showDeleteDialog<DialogOptionsAction>(
                 context: context,
                 child: new AlertDialog(
-                  title: const Text('Deletar Categoria'),
+                  title: const Text('Deletar Tag'),
                   content: new Text(
-                      'Deseja deletar essa categoria?',
+                      'Deseja deletar essa tag?',
                       softWrap: true,
                       style: new TextStyle(
                         color: Colors.black26,

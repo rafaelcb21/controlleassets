@@ -328,7 +328,7 @@ class Tag {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    List lista = await db.rawQuery("SELECT * FROM tag WHERE AND ativada == 1 ORDER BY categoria ASC");
+    List lista = await db.rawQuery("SELECT * FROM tag WHERE ativada == 1 ORDER BY tag ASC");
     await db.close();
 
     return lista; 
@@ -340,7 +340,7 @@ class Tag {
     Database db = await openDatabase(dbPath);
 
     await db.rawUpdate("UPDATE tag SET ativada = 0 WHERE id = ?", [id]);
-    List lista = await db.rawQuery("SELECT * FROM tag WHERE AND ativada == 1 ORDER BY categoria ASC");
+    List lista = await db.rawQuery("SELECT * FROM tag WHERE ativada == 1 ORDER BY tag ASC");
     await db.close();
 
     return lista;
