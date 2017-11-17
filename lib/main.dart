@@ -5,8 +5,9 @@ import "home/card_saldo.dart";
 import "home/card_contas.dart";
 import "home/card_cartoes.dart";
 import "home/card_alertas.dart";
-import "conta/conta.dart";
+import "lancamento/lancamento.dart";
 import "categoria/categoria.dart";
+import "conta/conta.dart";
 import "tag/tag.dart";
 import 'package:flutter/animation.dart';
 import 'dart:ui' as ui;
@@ -43,8 +44,9 @@ class ControlleApp extends StatelessWidget {
         '/home': (BuildContext context) => new HomePage(),
         '/categoria': (BuildContext context) => new CategoriaPage(),
         '/tag': (BuildContext context) => new TagPage(),
+        '/conta': (BuildContext context) => new ContaPage(),
         //'/novacategoria': (BuildContext context) => new NovaCategoriaPage(),
-        //'/conta': (BuildContext context) => new ContaPage()
+        //'/conta': (BuildContext context) => new LancamentoPage()
       },
     );
   }
@@ -208,7 +210,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         //                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
         //                  opaque: false,
         //                  pageBuilder: (BuildContext context, _, __) {
-        //                    return new ContaPage(new Color(0xFF9E9E9E));
+        //                    return new LancamentoPage(new Color(0xFF9E9E9E));
         //                  },
         //                  transitionsBuilder: (
         //                    BuildContext context,
@@ -260,7 +262,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         //                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
         //                  opaque: false,
         //                  pageBuilder: (BuildContext context, _, __) {
-        //                    return new ContaPage(new Color(0xFF00BFA5));
+        //                    return new LancamentoPage(new Color(0xFF00BFA5));
         //                  },
         //                  transitionsBuilder: (
         //                    BuildContext context,
@@ -312,7 +314,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         //                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
         //                  opaque: false,
         //                  pageBuilder: (BuildContext context, _, __) {
-        //                    return new ContaPage(new Color(0xFFE57373));
+        //                    return new LancamentoPage(new Color(0xFFE57373));
         //                  },
         //                  transitionsBuilder: (
         //                    BuildContext context,
@@ -358,6 +360,29 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               height: 80.0,
             ),
             new ListTile(
+              onTap: (){
+                Navigator.pop(context);
+                Navigator.of(context).push(new PageRouteBuilder(
+                  opaque: false,
+                  pageBuilder: (BuildContext context, _, __) {
+                    return new ContaPage();
+                  },
+                  transitionsBuilder: (
+                      BuildContext context,
+                      Animation<double> animation,
+                      Animation<double> secondaryAnimation,
+                      Widget child,
+                  ) {
+                    return new SlideTransition(
+                      position: new Tween<Offset>(
+                        begin:  const Offset(1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    );
+                  }
+                ));
+              },
               leading: new Icon(
                 Icons.account_balance,
                 color: cinzaDrawer,
@@ -581,7 +606,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
                                   opaque: false,
                                   pageBuilder: (BuildContext context, _, __) {
-                                    return new ContaPage(new Color(0xFF9E9E9E));
+                                    return new LancamentoPage(new Color(0xFF9E9E9E));
                                   },
                                   transitionsBuilder: (
                                     BuildContext context,
@@ -661,7 +686,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
                                   opaque: false,
                                   pageBuilder: (BuildContext context, _, __) {
-                                    return new ContaPage(new Color(0xFF00BFA5));
+                                    return new LancamentoPage(new Color(0xFF00BFA5));
                                   },
                                   transitionsBuilder: (
                                     BuildContext context,
@@ -740,7 +765,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
                                   opaque: false,
                                   pageBuilder: (BuildContext context, _, __) {
-                                    return new ContaPage(new Color(0xFFE57373));
+                                    return new LancamentoPage(new Color(0xFFE57373));
                                   },
                                   transitionsBuilder: (
                                     BuildContext context,

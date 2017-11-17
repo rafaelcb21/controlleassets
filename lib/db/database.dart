@@ -51,9 +51,15 @@ class DatabaseClient {
             CREATE TABLE conta (
               id INTEGER PRIMARY KEY, 
               conta TEXT NOT NULL,
+              tipo TEXT NOT NULL,
               saldoinicial REAL NOT NULL,
+              cor INTEGER NOT NULL,
               ativada INTEGER NOT NULL
             )""");
+
+    await db.rawInsert("INSERT INTO conta (conta, tipo, saldoinicial, cor, ativada) VALUES ('Caixa', 'Conta corrente', 1000.00, 39, 1)");
+    await db.rawInsert("INSERT INTO conta (conta, tipo, saldoinicial, cor, ativada) VALUES ('Itaú', 'Conta poupança', 2000.00, 43, 1)");
+    await db.rawInsert("INSERT INTO conta (conta, tipo, saldoinicial, cor, ativada) VALUES ('Spinelli', 'Outros', 3000.00, 47, 1)");
 
     await db.execute("""
             CREATE TABLE cartao (
@@ -369,15 +375,19 @@ class Conta {
 
   int id;
   String conta;
+  String tipo;
   double saldoinicial;
+  int cor;
   int ativada;
 
-  static final columns = ["id", "categoria", "saldoinicial", "ativada"];
+  static final columns = ["id", "conta", "tipo", "saldoinicial", "cor", "ativada"];
 
   Map toMap() {
     Map map = {
       "conta": conta,
+      "tipo": tipo,
       "saldoinicial": saldoinicial,
+      "cor": cor,
       "ativada": ativada
     };
 
@@ -390,10 +400,23 @@ class Conta {
     Conta contaTable = new Conta();
     contaTable.id = map["id"];
     contaTable.conta = map["conta"];
+    contaTable.tipo = map["tipo"];
     contaTable.saldoinicial = map["saldoinicial"];
+    contaTable.cor = map["cor"];
     contaTable.ativada = map["ativada"];
 
     return contaTable;
+  }
+
+  Future getAllConta() async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    List lista = await db.rawQuery("SELECT * FROM conta WHERE ativada == 1 ORDER BY conta ASC");
+    await db.close();
+
+    return lista; 
   }
 }
 
