@@ -413,10 +413,27 @@ class Conta {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    List lista = await db.rawQuery("SELECT * FROM conta WHERE ativada == 1 ORDER BY conta ASC");
+    List lista = await db.rawQuery("SELECT * FROM conta ORDER BY conta ASC");
     await db.close();
 
     return lista; 
+  }
+
+  Future upsertConta(Conta conta) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    if (conta.id == null) {
+      conta.id = await db.insert("conta", conta.toMap());
+    } else {
+      await db.update("conta", conta.toMap(),
+        where: "id = ?", whereArgs: [conta.id]);
+    }
+
+    await db.close();
+
+    return conta;
   }
 }
 
