@@ -57,14 +57,11 @@ class DatabaseClient {
               ativada INTEGER NOT NULL
             )""");
 
-    await db.rawInsert("INSERT INTO conta (conta, tipo, saldoinicial, cor, ativada) VALUES ('Caixa', 'Conta corrente', 1000.00, 39, 1)");
-    await db.rawInsert("INSERT INTO conta (conta, tipo, saldoinicial, cor, ativada) VALUES ('Itaú', 'Conta poupança', 2000.00, 43, 1)");
-    await db.rawInsert("INSERT INTO conta (conta, tipo, saldoinicial, cor, ativada) VALUES ('Spinelli', 'Outros', 3000.00, 47, 1)");
-
     await db.execute("""
             CREATE TABLE cartao (
               id INTEGER PRIMARY KEY, 
               cartao TEXT NOT NULL,
+              cor INTEGER NOT NULL,
               limite REAL,
               vencimento TEXT NOT NULL,
               fechamento TEXT NOT NULL,
@@ -73,6 +70,8 @@ class DatabaseClient {
               FOREIGN KEY (contapagamento) REFERENCES conta (id) 
                 ON DELETE NO ACTION ON UPDATE NO ACTION
             )""");
+
+    await db.rawInsert("INSERT INTO cartao (cartao, cor, limite, vencimento, fechamento, contapagamento, ativada) VALUES ('FIT', 39, 3000.00, '14', '30', 1, 1)");
 
     await db.execute("""
             CREATE TABLE lancamento (
@@ -442,18 +441,20 @@ class Cartao {
 
   int id;
   String cartao;
+  int cor;
   double limite;
   String vencimento;
   String fechamento;
   int contapagamento;
   int ativada;
 
-  static final columns = ["id", "cartao", "limite", "vencimento", "fechamento",
+  static final columns = ["id", "cartao", "cor", "limite", "vencimento", "fechamento",
                             "contapagamento", "atvada"];
 
   Map toMap() {
     Map map = {
       "cartao": cartao,
+      "cor": cor,
       "limite": limite,
       "vencimento": vencimento,
       "fechamento": fechamento,      
@@ -470,6 +471,7 @@ class Cartao {
     Cartao cartaoTable = new Cartao();
     cartaoTable.id = map["id"];
     cartaoTable.cartao = map["cartao"];
+    cartaoTable.cor = map["cor"];
     cartaoTable.limite = map["limite"];
     cartaoTable.vencimento = map["vencimento"];
     cartaoTable.fechamento = map["fechamento"];
@@ -477,6 +479,34 @@ class Cartao {
     cartaoTable.ativada = map["ativada"];
 
     return cartaoTable;
+  }
+
+    Future getAllCartao() async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    List lista = await db.rawQuery("SELECT * FROM cartao ORDER BY cartao ASC");
+    await db.close();
+
+    return lista; 
+  }
+
+  Future upsertCartao(Cartao cartao) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    if (cartao.id == null) {
+      cartao.id = await db.insert("cartao", cartao.toMap());
+    } else {
+      await db.update("cartao", cartao.toMap(),
+        where: "id = ?", whereArgs: [cartao.id]);
+    }
+
+    await db.close();
+
+    return cartao;
   }
 }
 

@@ -8,6 +8,7 @@ import "home/card_alertas.dart";
 import "lancamento/lancamento.dart";
 import "categoria/categoria.dart";
 import "conta/conta.dart";
+import "cartao/cartao.dart";
 import "tag/tag.dart";
 import 'package:flutter/animation.dart';
 import 'dart:ui' as ui;
@@ -25,6 +26,7 @@ const String appId = 'ca-app-pub-5211132910751370~8529761448';
 const String testDevice = '33B6FA56617D7688A3A466295DED82BE';
 const String bannerAdUnitId = 'ca-app-pub-5211132910751370/4346015999';
 const String interstitialAdUnitId = 'ca-app-pub-5211132910751370/9854327692';
+const String interstitialAdUnitIdVideo = 'ca-app-pub-5211132910751370/8510754579';
 
 void main() {
   Intl.defaultLocale = 'pt_BR';
@@ -45,6 +47,7 @@ class ControlleApp extends StatelessWidget {
         '/categoria': (BuildContext context) => new CategoriaPage(),
         '/tag': (BuildContext context) => new TagPage(),
         '/conta': (BuildContext context) => new ContaPage(),
+        '/cartao': (BuildContext context) => new CartaoPage(),
         //'/novacategoria': (BuildContext context) => new NovaCategoriaPage(),
         //'/conta': (BuildContext context) => new LancamentoPage()
       },
@@ -395,6 +398,29 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               )
             ),
             new ListTile(
+              onTap: (){
+                Navigator.pop(context);
+                Navigator.of(context).push(new PageRouteBuilder(
+                  opaque: false,
+                  pageBuilder: (BuildContext context, _, __) {
+                    return new CartaoPage();
+                  },
+                  transitionsBuilder: (
+                      BuildContext context,
+                      Animation<double> animation,
+                      Animation<double> secondaryAnimation,
+                      Widget child,
+                  ) {
+                    return new SlideTransition(
+                      position: new Tween<Offset>(
+                        begin:  const Offset(1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    );
+                  }
+                ));
+              },
               leading: new Icon(
                 Icons.credit_card,
                 color: cinzaDrawer,
