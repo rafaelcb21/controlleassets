@@ -301,7 +301,7 @@ class NovaContaPageState extends State<NovaContaPage>{
         contaDB.id = contaDBEditar.id;
         contaDB.conta = contaDBEditar.conta;
         contaDB.cor = contaDBEditar.cor;
-        contaDB.tipo = contaDBEditar.tipo;        
+        contaDB.tipo = contaDBEditar.tipo;
         contaDB.ativada = contaDBEditar.ativada;
         contaDBEditar.saldoinicial = sanitizeNumber;
         _controller.text = contaDBEditar.conta;
