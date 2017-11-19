@@ -101,7 +101,7 @@ class TagPageState extends State<TagPage>{
                       'Deseja deletar essa tag?',
                       softWrap: true,
                       style: new TextStyle(
-                        color: Colors.black26,
+                        color: Colors.black45,
                         fontSize: 16.0,
                         fontFamily: "Roboto",
                         fontWeight: FontWeight.w500,
@@ -447,7 +447,7 @@ class NovaTagPageState extends State<NovaTagPage>{
                                       "Preencha os campos",
                                       softWrap: true,
                                       style: new TextStyle(
-                                        color: Colors.black26,
+                                        color: Colors.black45,
                                         fontSize: 16.0,
                                         fontFamily: "Roboto",
                                         fontWeight: FontWeight.w500,

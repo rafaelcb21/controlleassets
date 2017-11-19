@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
+import 'dart:async';
 import '../palette/palette.dart';
 import '../db/database.dart';
 
@@ -257,6 +260,7 @@ class NovaContaPage extends StatefulWidget {
 
 class NovaContaPageState extends State<NovaContaPage>{
   NovaContaPageState(this.editar, this.contaDBEditar);
+  FocusNode _focusNode = new FocusNode();
 
   bool editar;
   Conta contaDBEditar= new Conta();
@@ -328,6 +332,20 @@ class NovaContaPageState extends State<NovaContaPage>{
   }
 
   void showContaDialog<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) {
+      if (value != null) {
+        setState(() {
+          
+        });
+      }
+    });
+  }
+
+  void showValidarDialog<T>({ BuildContext context, Widget child }) {
     showDialog<T>(
       context: context,
       child: child,
@@ -570,15 +588,19 @@ class NovaContaPageState extends State<NovaContaPage>{
 
             new Container( //saldo inicial
               margin: new EdgeInsets.only(right: 16.0),
+              child: new EnsureVisibleWhenFocused(
+              focusNode: _focusNode,            
               child: new TextField(
-                controller: _controllerNumber,
-
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  icon: const Icon(Icons.attach_money),
-                  labelText: "Saldo inicial",
+                  controller: _controllerNumber,
+                  //keyboardType: TextInputType.number,
+                  maxLines: 1,
+                  focusNode: _focusNode,
+                  style: Theme.of(context).textTheme.title,
+                  decoration: new InputDecoration(
+                    labelText: "Saldo inicial",
+                    icon: const Icon(Icons.attach_money),
+                  ),
                 ),
-                style: Theme.of(context).textTheme.title,
               ),
             ),
 
@@ -600,30 +622,64 @@ class NovaContaPageState extends State<NovaContaPage>{
                       contaDB.ativada = 1;
 
                       var saldo = _controllerNumber.text.toString();
-                      saldo.replaceAll(new RegExp(r','), '.');
-                      
-                      RegExp _float = new RegExp(r'^(?:-?(?:[0-9]+))?(?:\.[0-9]*)?(?:[eE][\+\-]?(?:[0-9]+))?$');
-                      bool isFloat = _float.hasMatch(saldo);
+                      var saldoSanitize = saldo.replaceAll(new RegExp(r"[' ']+"), '');
 
-                      if(!isFloat) {
-                        print('oiii');
+                      if(saldoSanitize.length == 0) {
+                        saldoSanitize = '0,00';
+                      }
+                      
+                      RegExp _float = new RegExp(r'^(?:-?(?:[0-9]+))?(?:\,[0-9]{0,2})?$');
+                      bool isFloat = _float.hasMatch(saldoSanitize);
+
+                      if(isFloat) {
+                        var saldoSanitize2 = saldoSanitize.replaceAll(new RegExp(r","), '.');
+                        contaDB.saldoinicial = double.parse(saldoSanitize2);
                       } else {
-                          saldo = "0.0";
-                          contaDB.saldoinicial = double.parse(saldo);                        
+                        showValidarDialog<String>(
+                          context: context,
+                          child: new SimpleDialog(
+                            title: const Text('Erro'),
+                            children: <Widget>[
+                              new Container(
+                                margin: new EdgeInsets.only(left: 24.0),
+                                child: new Row(
+                                  children: <Widget>[
+                                    new Container(
+                                      margin: new EdgeInsets.only(right: 10.0),
+                                      child: new Icon(
+                                        Icons.error,
+                                        color: const Color(0xFFE57373)),
+                                    ),
+                                    new Text(
+                                      "Saldo inicial inválido\nExemplo: 1234,56\n                -1234,56",
+                                      softWrap: true,
+                                      style: new TextStyle(
+                                        color: Colors.black45,
+                                        fontSize: 16.0,
+                                        fontFamily: "Roboto",
+                                        fontWeight: FontWeight.w500,
+                                      )
+                                    )
+                                  ],
+                                ),
+                              )
+                            ]
+                          )
+                        );                      
                       }
                       
 
                       
                       
-                      print(x);
-                      print(contaDB.conta);
-                      print(contaDB.tipo);
-                      print(contaDB.cor);
-                      print(contaDB.saldoinicial);
-                      print(contaDB.ativada);
-                      if(contaDB.conta.length > 0) {
-                        this.x = true;
-                      } else { this.x = false; }
+                      //print(x);
+                      //print(contaDB.conta);
+                      //print(contaDB.tipo);
+                      //print(contaDB.cor);
+                      //print(contaDB.saldoinicial);
+                      //print(contaDB.ativada);
+                      //if(contaDB.conta.length > 0) {
+                      //  this.x = true;
+                      //} else { this.x = false; }
 
                       //if(this.x) {
                       //  contaDB.upsertConta(contaDB);
@@ -702,4 +758,66 @@ class DialogItem extends StatelessWidget {
       )
     );
   }
+}
+
+class EnsureVisibleWhenFocused extends StatefulWidget {
+  const EnsureVisibleWhenFocused({
+    Key key,
+    @required this.child,
+    @required this.focusNode,
+    this.curve: Curves.ease,
+    this.duration: const Duration(milliseconds: 100),
+  }) : super(key: key);
+
+  final FocusNode focusNode;
+  final Widget child;
+  final Curve curve;
+  final Duration duration;
+
+  EnsureVisibleWhenFocusedState createState() => new EnsureVisibleWhenFocusedState();
+}
+
+class EnsureVisibleWhenFocusedState extends State<EnsureVisibleWhenFocused> {
+  @override
+  void initState() {
+    super.initState();
+    widget.focusNode.addListener(_ensureVisible);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.focusNode.removeListener(_ensureVisible);
+  }
+
+  Future<Null> _ensureVisible() async {
+    await new Future.delayed(const Duration(milliseconds: 600));
+
+    if (!widget.focusNode.hasFocus)
+      return;
+
+    final RenderObject object = context.findRenderObject();
+    final RenderAbstractViewport viewport = RenderAbstractViewport.of(object);
+    assert(viewport != null);
+
+    ScrollableState scrollableState = Scrollable.of(context);
+    assert(scrollableState != null);
+
+    ScrollPosition position = scrollableState.position;
+    double alignment;
+    if (position.pixels > viewport.getOffsetToReveal(object, 0.0)) {
+      alignment = 0.0;
+    } else if (position.pixels < viewport.getOffsetToReveal(object, 1.0)) {
+      alignment = 1.0;
+    } else {
+      return;
+    }
+    position.ensureVisible(
+      object,
+      alignment: alignment,
+      duration: widget.duration,
+      curve: widget.curve,
+    );
+  }
+  Widget build(BuildContext context) => widget.child;
 }

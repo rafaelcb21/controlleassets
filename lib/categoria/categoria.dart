@@ -150,7 +150,7 @@ class CategoriaPageState extends State<CategoriaPage>{
                       : 'Deseja deletar essa categoria?',
                       softWrap: true,
                       style: new TextStyle(
-                        color: Colors.black26,
+                        color: Colors.black45,
                         fontSize: 16.0,
                         fontFamily: "Roboto",
                         fontWeight: FontWeight.w500,
@@ -260,7 +260,7 @@ class CategoriaPageState extends State<CategoriaPage>{
                           : 'Deseja deletar essa categoria?',
                           softWrap: true,
                           style: new TextStyle(
-                            color: Colors.black26,
+                            color: Colors.black45,
                             fontSize: 16.0,
                             fontFamily: "Roboto",
                             fontWeight: FontWeight.w500,
@@ -805,7 +805,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                                           "Essa categoria já existe",
                                           softWrap: true,
                                           style: new TextStyle(
-                                            color: Colors.black26,
+                                            color: Colors.black45,
                                             fontSize: 16.0,
                                             fontFamily: "Roboto",
                                             fontWeight: FontWeight.w500,
@@ -842,7 +842,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
                                       "Preencha os campos",
                                       softWrap: true,
                                       style: new TextStyle(
-                                        color: Colors.black26,
+                                        color: Colors.black45,
                                         fontSize: 16.0,
                                         fontFamily: "Roboto",
                                         fontWeight: FontWeight.w500,
