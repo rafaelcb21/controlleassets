@@ -261,14 +261,445 @@ class NovaContaPageState extends State<NovaContaPage>{
   bool editar;
   Conta contaDBEditar= new Conta();
   Color azulAppbar = new Color(0xFF26C6DA);
+  Color colorEscolhida;
+  final TextEditingController _controller = new TextEditingController();
+  final TextEditingController _controllerNumber = new TextEditingController();
+  Conta contaDB = new Conta();
+  List listaCategoria;
+  List<Widget> palette;
+  bool x;
+  Palette listaCores = new Palette();
+  List cores = [];
+  String tipo;
+
+  @override
+  void initState() {
+    this.cores = listaCores.cores;
+    this.tipo = "Conta corrente";
+
+    contaDB.tipo = 'Conta corrente';
+    contaDB.cor = 3;
+    contaDB.saldoinicial = 0.0;
+
+    setState(() {
+      if(editar) {
+        contaDB.id = contaDBEditar.id;
+        contaDB.conta = contaDBEditar.conta;
+        _controller.text = contaDBEditar.conta;
+        contaDB.tipo = contaDBEditar.tipo;
+        contaDB.saldoinicial= contaDBEditar.saldoinicial;
+        //_controllerNumber.value = contaDBEditar.saldoinicial;
+        contaDB.ativada = contaDBEditar.ativada;
+        contaDB.cor = contaDBEditar.cor;
+        this.colorEscolhida = this.cores[contaDBEditar.cor];
+      } else {
+        contaDBEditar.cor = 3;
+        this.colorEscolhida = Colors.black;
+      }
+    });    
+  }
+
+  void showCorDialog<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) {
+      if (value != null) {
+        setState(() {
+          
+        });
+      }
+    });
+  }
+
+  void showTipoDialog<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) {
+      if (value != null) {
+        setState(() {
+
+        });
+      }
+    });
+  }
+
+  void showContaDialog<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) {
+      if (value != null) {
+        setState(() {
+          
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    List<Widget> buildPalette() {
+      this.palette = [];
+      for(var i = 0; i < 77; i+= 4) {
+        this.palette.add(
+          new Container(
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new Container(
+                  color: cores[i],
+                  height: 46.0,
+                  width: 46.0,
+                  child: new InkWell(
+                    onTap: (){
+                      this.colorEscolhida = cores[i];
+                      contaDB.cor = i;
+                      Navigator.pop(context, i);
+                    },
+                  ),
+                ),
+                new Container(
+                  color: cores[i+1],
+                  height: 46.0,
+                  width: 46.0,
+                  child: new InkWell(
+                    onTap: (){
+                      this.colorEscolhida = cores[i+1];
+                      contaDB.cor = i+1;
+                      Navigator.pop(context, i+1);
+                    },
+                  ),
+                ),
+                new Container(
+                  color: cores[i+2],
+                  height: 46.0,
+                  width: 46.0,
+                  child: new InkWell(
+                    onTap: (){
+                      this.colorEscolhida = cores[i+2];
+                      contaDB.cor = i+2;
+                      Navigator.pop(context, i+2);
+                    },
+                  ),
+                ),
+                new Container(
+                  color: cores[i+3],
+                  height: 46.0,
+                  width: 46.0,
+                  child: new InkWell(
+                    onTap: (){
+                      this.colorEscolhida = cores[i+3];
+                      contaDB.cor = i+3;
+                      Navigator.pop(context, i+3);
+                    },
+                  ),
+                )
+              ],
+            )
+          )
+        );
+      }
+      return this.palette;
+    }
+
     return new Scaffold( 
       appBar: new AppBar(
         title: new Text('Nova Conta'),
         backgroundColor: azulAppbar,
       ),
+      body: new Container(
+        //margin: new EdgeInsets.only(top: 6.0),
+        child: new ListView(
+          children: <Widget>[
+            new Container( //nome da conta
+              margin: new EdgeInsets.only(right: 16.0),
+              child: new TextField(
+                controller: _controller,
+                maxLines: 1,
+                decoration: const InputDecoration(
+                  icon: const Icon(Icons.account_balance),
+                  labelText: "Nome da conta",
+                ),
+                style: Theme.of(context).textTheme.title,
+              ),
+            ),
+            
+            new Container( //cor
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 16.0),
+              child: new Row(
+                children: <Widget>[
+                  new Icon(
+                    Icons.palette,
+                    size: 24.0,
+                    color: Colors.black45,
+                  ),
+                  new Expanded(
+                    child: new InkWell(
+                      onTap: () {
+                        showCorDialog<String>(
+                          context: context,
+                          child: new SimpleDialog(
+                            title: const Text('Selecione uma cor'),
+                              children: buildPalette(),
+                          )
+                        );
+                      },
+                      child: new Container(
+                        margin: new EdgeInsets.only(left: 12.0),
+                        padding: new EdgeInsets.only(bottom: 2.0),
+                        decoration: new BoxDecoration(
+                          border: new Border(
+                            bottom: new BorderSide(
+                              style: BorderStyle.solid,
+                              color: Colors.black26,
+                            )
+                          )
+                        ),
+                        child: new Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            new Container(
+                              child: new Text(
+                                'Cor',
+                                style: new TextStyle(
+                                  color: Colors.black26,
+                                  fontSize: 20.0,
+                                  fontFamily: "Roboto",
+                                  fontWeight: FontWeight.w500,
+                                )
+                              ),
+                            ),
+                            new Icon(Icons.lens, color: this.colorEscolhida)
+                          ],
+                        ),
+                      )
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            new Container( //tipo
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 32.0),
+              child: new Row(
+                children: <Widget>[
+                  new Icon(
+                    Icons.account_balance_wallet,
+                    size: 24.0,
+                    color: Colors.black45,
+                  ),
+                  new Expanded(
+                    child: new InkWell(
+                      onTap: () {
+                        showTipoDialog<String>(
+                          context: context,
+                          child: new SimpleDialog(
+                            title: const Text('Tipo de conta'),
+                            children: <Widget>[
+                              new Column(
+                                children: <Widget>[
+                                  new DialogItem(
+                                    text: 'Conta corrente',
+                                    onPressed: () {
+                                      contaDB.tipo = 'Conta corrente';
+                                      this.tipo = contaDB.tipo;
+                                      Navigator.pop(context, 'Conta corrente');
+                                    }
+                                  ),
+                                  new DialogItem(
+                                    text: 'Conta poupança',
+                                    onPressed: () {
+                                      contaDB.tipo = 'Conta poupança';
+                                      this.tipo = contaDB.tipo;
+                                      Navigator.pop(context, 'Conta poupança');
+                                    }
+                                  ),
+                                  new DialogItem(
+                                    text: 'Outros',
+                                    onPressed: () {
+                                      contaDB.tipo = 'Outros';
+                                      this.tipo = contaDB.tipo;
+                                      Navigator.pop(context, 'Outros');
+                                    }
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                        );
+                      },
+                      child: new Container(
+                        margin: new EdgeInsets.only(left: 12.0),
+                        padding: new EdgeInsets.only(bottom: 2.0),
+                        decoration: new BoxDecoration(
+                          border: new Border(
+                            bottom: new BorderSide(
+                              style: BorderStyle.solid,
+                              color: Colors.black26,
+                            )
+                          )
+                        ),
+                        child: new Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            new Container(
+                              child: new Text(
+                                this.tipo,
+                                style: new TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 20.0,
+                                  fontFamily: "Roboto",
+                                  fontWeight: FontWeight.w500,
+                                )
+                              ),
+                            ),
+                          ],
+                        )
+                      )
+                    )
+                  ),
+                ]
+              ),
+            ),            
+
+            new Container( //saldo inicial
+              margin: new EdgeInsets.only(right: 16.0),
+              child: new TextField(
+                controller: _controllerNumber,
+
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  icon: const Icon(Icons.attach_money),
+                  labelText: "Saldo inicial",
+                ),
+                style: Theme.of(context).textTheme.title,
+              ),
+            ),
+
+            new Container(
+              margin: new EdgeInsets.only(top: 36.0),
+              child: new Column(
+                children: <Widget>[
+                  new RaisedButton(
+                    color: this.azulAppbar,
+                    child: const Text(
+                      'OK',
+                      style: const TextStyle(
+                        color: const Color(0xFFFFFFFF),
+                        fontSize: 24.0
+                      ),  
+                    ),
+                    onPressed: () {
+                      contaDB.conta = _controller.text;
+                      contaDB.ativada = 1;
+
+                      var saldo = _controllerNumber.text.toString();
+                      saldo.replaceAll(new RegExp(r','), '.');
+                      
+                      RegExp _float = new RegExp(r'^(?:-?(?:[0-9]+))?(?:\.[0-9]*)?(?:[eE][\+\-]?(?:[0-9]+))?$');
+                      bool isFloat = _float.hasMatch(saldo);
+
+                      if(!isFloat) {
+                        print('oiii');
+                      } else {
+                          saldo = "0.0";
+                          contaDB.saldoinicial = double.parse(saldo);                        
+                      }
+                      
+
+                      
+                      
+                      print(x);
+                      print(contaDB.conta);
+                      print(contaDB.tipo);
+                      print(contaDB.cor);
+                      print(contaDB.saldoinicial);
+                      print(contaDB.ativada);
+                      if(contaDB.conta.length > 0) {
+                        this.x = true;
+                      } else { this.x = false; }
+
+                      //if(this.x) {
+                      //  contaDB.upsertConta(contaDB);
+                      //  Navigator.pop(context);
+                      //} else {
+                      //  showContaDialog<String>(
+                      //    context: context,
+                      //    child: new SimpleDialog(
+                      //      title: const Text('Erro'),
+                      //      children: <Widget>[
+                      //        new Container(
+                      //          margin: new EdgeInsets.only(left: 24.0),
+                      //          child: new Row(
+                      //            children: <Widget>[
+                      //              new Container(
+                      //                margin: new EdgeInsets.only(right: 10.0),
+                      //                child: new Icon(
+                      //                  Icons.error,
+                      //                  color: const Color(0xFFE57373)),
+                      //              ),
+                      //              new Text(
+                      //                "Preencha os campos",
+                      //                softWrap: true,
+                      //                style: new TextStyle(
+                      //                  color: Colors.black26,
+                      //                  fontSize: 16.0,
+                      //                  fontFamily: "Roboto",
+                      //                  fontWeight: FontWeight.w500,
+                      //                )
+                      //              )
+                      //            ],
+                      //          ),
+                      //        )
+                      //      ]
+                      //    )
+                      //  );
+                      //}
+                    }
+                  ),
+                ],
+              )
+            )
+          ],
+        ),
+      )
+    );
+  }
+}
+
+class DialogItem extends StatelessWidget {
+  DialogItem({ Key key, this.icon, this.size, this.color, this.text, this.onPressed }) : super(key: key);
+ 
+  final IconData icon;
+  double size = 36.0;
+  final Color color;
+  final String text;
+  final VoidCallback onPressed;
+ 
+  @override
+  Widget build(BuildContext context) {
+    return new SimpleDialogOption(
+      onPressed: onPressed,
+      child: new Container(
+        child: new Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[       
+            new Text(
+              text,
+              style: new TextStyle(
+                fontSize: 16.0
+              ),
+            )
+          ],
+        ),
+      )
     );
   }
 }
