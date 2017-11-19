@@ -56,10 +56,18 @@ class ContaPageState extends State<ContaPage> {
             numeroCor: numeroCor,
             ativada: ativada,
             onPressed: () async {
+              Conta contaEditar = new Conta();
+              contaEditar.id = id;
+              contaEditar.conta = conta;
+              contaEditar.tipo = tipo;
+              contaEditar.cor = numeroCor;
+              contaEditar.saldoinicial = saldoinicial;
+              contaEditar.ativada = ativada;
+
               await Navigator.of(context).push(new PageRouteBuilder(
                 opaque: false,
                 pageBuilder: (BuildContext context, _, __) {
-                  return new NovaContaPage(false, new Conta());
+                  return new NovaContaPage(true, contaEditar);
                 },
                 transitionsBuilder: (
                   BuildContext context,
@@ -271,7 +279,6 @@ class NovaContaPageState extends State<NovaContaPage>{
   Conta contaDB = new Conta();
   List listaCategoria;
   List<Widget> palette;
-  bool x;
   Palette listaCores = new Palette();
   List cores = [];
   String tipo;
@@ -286,15 +293,20 @@ class NovaContaPageState extends State<NovaContaPage>{
     contaDB.saldoinicial = 0.0;
 
     setState(() {
-      if(editar) {
+      if(this.editar) {
+        
+        var sanitizeNumberToString = contaDBEditar.saldoinicial.toString().replaceAll(new RegExp(r"\."), ',');
+        double sanitizeNumber = double.parse(sanitizeNumberToString.replaceAll(new RegExp(r","), '.'));
+        
         contaDB.id = contaDBEditar.id;
         contaDB.conta = contaDBEditar.conta;
-        _controller.text = contaDBEditar.conta;
-        contaDB.tipo = contaDBEditar.tipo;
-        contaDB.saldoinicial= contaDBEditar.saldoinicial;
-        //_controllerNumber.value = contaDBEditar.saldoinicial;
-        contaDB.ativada = contaDBEditar.ativada;
         contaDB.cor = contaDBEditar.cor;
+        contaDB.tipo = contaDBEditar.tipo;        
+        contaDB.ativada = contaDBEditar.ativada;
+        contaDBEditar.saldoinicial = sanitizeNumber;
+        _controller.text = contaDBEditar.conta;
+        _controllerNumber.text = sanitizeNumber.toStringAsFixed(2).toString().replaceAll(new RegExp(r"\."), ',');     
+        
         this.colorEscolhida = this.cores[contaDBEditar.cor];
       } else {
         contaDBEditar.cor = 3;
@@ -634,6 +646,44 @@ class NovaContaPageState extends State<NovaContaPage>{
                       if(isFloat) {
                         var saldoSanitize2 = saldoSanitize.replaceAll(new RegExp(r","), '.');
                         contaDB.saldoinicial = double.parse(saldoSanitize2);
+
+                        if(contaDB.conta.length > 0) {
+                          contaDB.upsertConta(contaDB);
+                          Navigator.pop(context);
+                        } else { 
+                          showContaDialog<String>(
+                            context: context,
+                            child: new SimpleDialog(
+                              title: const Text('Erro'),
+                              children: <Widget>[
+                                new Container(
+                                  margin: new EdgeInsets.only(left: 24.0),
+                                  child: new Row(
+                                    children: <Widget>[
+                                      new Container(
+                                        margin: new EdgeInsets.only(right: 10.0),
+                                        child: new Icon(
+                                          Icons.error,
+                                          color: const Color(0xFFE57373)),
+                                      ),
+                                      new Text(
+                                        "Preencha o campo:\nNome da conta",
+                                        softWrap: true,
+                                        style: new TextStyle(
+                                          color: Colors.black45,
+                                          fontSize: 16.0,
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500,
+                                        )
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ]
+                            )
+                          );
+                        }
+
                       } else {
                         showValidarDialog<String>(
                           context: context,
@@ -667,56 +717,6 @@ class NovaContaPageState extends State<NovaContaPage>{
                           )
                         );                      
                       }
-                      
-
-                      
-                      
-                      //print(x);
-                      //print(contaDB.conta);
-                      //print(contaDB.tipo);
-                      //print(contaDB.cor);
-                      //print(contaDB.saldoinicial);
-                      //print(contaDB.ativada);
-                      //if(contaDB.conta.length > 0) {
-                      //  this.x = true;
-                      //} else { this.x = false; }
-
-                      //if(this.x) {
-                      //  contaDB.upsertConta(contaDB);
-                      //  Navigator.pop(context);
-                      //} else {
-                      //  showContaDialog<String>(
-                      //    context: context,
-                      //    child: new SimpleDialog(
-                      //      title: const Text('Erro'),
-                      //      children: <Widget>[
-                      //        new Container(
-                      //          margin: new EdgeInsets.only(left: 24.0),
-                      //          child: new Row(
-                      //            children: <Widget>[
-                      //              new Container(
-                      //                margin: new EdgeInsets.only(right: 10.0),
-                      //                child: new Icon(
-                      //                  Icons.error,
-                      //                  color: const Color(0xFFE57373)),
-                      //              ),
-                      //              new Text(
-                      //                "Preencha os campos",
-                      //                softWrap: true,
-                      //                style: new TextStyle(
-                      //                  color: Colors.black26,
-                      //                  fontSize: 16.0,
-                      //                  fontFamily: "Roboto",
-                      //                  fontWeight: FontWeight.w500,
-                      //                )
-                      //              )
-                      //            ],
-                      //          ),
-                      //        )
-                      //      ]
-                      //    )
-                      //  );
-                      //}
                     }
                   ),
                 ],
