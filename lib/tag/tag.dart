@@ -332,11 +332,10 @@ class NovaTagPageState extends State<NovaTagPage>{
         backgroundColor: azulAppbar,
       ),
       body: new Container(
-        margin: new EdgeInsets.only(top: 16.0),
         child: new ListView(
           children: <Widget>[
             new Container(
-              margin: new EdgeInsets.only(right: 16.0, top: 25.0),
+              margin: new EdgeInsets.only(right: 16.0),
               child: new TextField(
                 controller: _controller,
                 maxLines: 1,
