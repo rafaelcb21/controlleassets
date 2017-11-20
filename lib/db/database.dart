@@ -71,8 +71,6 @@ class DatabaseClient {
                 ON DELETE NO ACTION ON UPDATE NO ACTION
             )""");
 
-    await db.rawInsert("INSERT INTO cartao (cartao, cor, limite, vencimento, fechamento, contapagamento, ativada) VALUES ('FIT', 39, 3000.00, '14', '30', 1, 1)");
-
     await db.execute("""
             CREATE TABLE lancamento (
               id INTEGER PRIMARY KEY, 
@@ -434,6 +432,17 @@ class Conta {
 
     return conta;
   }
+
+    Future getConta(int id) async {
+      Directory path = await getApplicationDocumentsDirectory();
+      String dbPath = join(path.path, "database.db");
+      Database db = await openDatabase(dbPath);
+      List lista = await db.rawQuery("SELECT * FROM conta WHERE id = ? ORDER BY conta ASC", [id]);
+
+      await db.close();
+
+      return lista;
+    }
 }
 
 class Cartao {
@@ -482,14 +491,15 @@ class Cartao {
   }
 
     Future getAllCartao() async {
-    Directory path = await getApplicationDocumentsDirectory();
-    String dbPath = join(path.path, "database.db");
-    Database db = await openDatabase(dbPath);
+      Directory path = await getApplicationDocumentsDirectory();
+      String dbPath = join(path.path, "database.db");
+      Database db = await openDatabase(dbPath);
+      
+      List lista = await db.rawQuery("SELECT * FROM cartao ORDER BY cartao ASC");
 
-    List lista = await db.rawQuery("SELECT * FROM cartao ORDER BY cartao ASC");
-    await db.close();
+      await db.close();
 
-    return lista; 
+      return lista; 
   }
 
   Future upsertCartao(Cartao cartao) async {

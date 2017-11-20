@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 import 'dart:async';
 import '../palette/palette.dart';
 import '../db/database.dart';
@@ -73,7 +74,7 @@ class CartaoPageState extends State<CartaoPage> {
               await Navigator.of(context).push(new PageRouteBuilder(
                 opaque: false,
                 pageBuilder: (BuildContext context, _, __) {
-                  return new NovacartaoPage(true, cartaoEditar);
+                  return new NovaCartaoPage(true, cartaoEditar);
                 },
                 transitionsBuilder: (
                   BuildContext context,
@@ -116,7 +117,7 @@ class CartaoPageState extends State<CartaoPage> {
               await Navigator.of(context).push(new PageRouteBuilder(
                 opaque: false,
                 pageBuilder: (BuildContext context, _, __) {
-                  return new NovacartaoPage(false, new Cartao());
+                  return new NovaCartaoPage(false, new Cartao());
                 },
                 transitionsBuilder: (
                   BuildContext context,
@@ -187,6 +188,13 @@ class ItemCartaoState extends State<ItemCartao> {
   bool switchValue;
   Cartao cartaoDB = new Cartao();
 
+  String sanitazerMoney(double money) {
+    //var moneyBR = money.toStringAsFixed(2).toString().replaceAll(new RegExp(r"\."), ',');
+    var f = new NumberFormat("#,###,###,###,###.00", "pt_BR");
+    var moneyBR = f.format(double.parse(money.toStringAsFixed(2).toString()));
+    return moneyBR;
+  }
+
   @override
   void initState() {
     this.switchValue = widget.ativada == 1 ? true : false;
@@ -229,7 +237,7 @@ class ItemCartaoState extends State<ItemCartao> {
                         ),
                       ),
                       new Text(
-                        widget.limite.toString(),
+                        "Limite: R\$ " + sanitazerMoney(widget.limite),
                         style: new TextStyle(
                           color: this.switchValue ? Colors.black54 : Colors.black26,
                           fontFamily: "Roboto",
@@ -268,8 +276,8 @@ class ItemCartaoState extends State<ItemCartao> {
 }
 
 
-class NovacartaoPage extends StatefulWidget {
-  NovacartaoPage(this.editar, this.cartaoDBEditar);
+class NovaCartaoPage extends StatefulWidget {
+  NovaCartaoPage(this.editar, this.cartaoDBEditar);
 
   bool editar;
   Cartao cartaoDBEditar;
@@ -278,27 +286,37 @@ class NovacartaoPage extends StatefulWidget {
   NovaCartaoPageState createState() => new NovaCartaoPageState(this.editar, this.cartaoDBEditar);
 }
 
-class NovaCartaoPageState extends State<NovacartaoPage>{
+class NovaCartaoPageState extends State<NovaCartaoPage>{
   NovaCartaoPageState(this.editar, this.cartaoDBEditar);
   FocusNode _focusNode = new FocusNode();
 
+  String sanitazerMoney(double money) {
+    var moneyBR = money.toStringAsFixed(2).toString().replaceAll(new RegExp(r"\."), ',');
+    return moneyBR;
+  }
+
   bool editar;
-  Cartao cartaoDBEditar= new Cartao();
+  Cartao cartaoDBEditar = new Cartao();
+  Conta cartaoContaDB = new Conta();
   Color azulAppbar = new Color(0xFF26C6DA);
   Color colorEscolhida;
   final TextEditingController _controller = new TextEditingController();
   final TextEditingController _controllerNumber = new TextEditingController();
   Cartao cartaoDB = new Cartao();
-  List listaCategoria;
+  List<Widget> tiles;
   List<Widget> palette;
+  List<Widget> calendario;
+  List<Widget> calendarioShow;
   Palette listaCores = new Palette();
   List cores = [];
-  String tipo;
+  List listaContaDB = [];
+  String contaPagamento = "Conta para pagamento";
+  String fechamento = "";
+  String vencimento = "";
 
   @override
   void initState() {
     this.cores = listaCores.cores;
-    this.tipo = "cartao corrente";
 
     //cartaoDB.tipo = 'cartao corrente';
     cartaoDB.cor = 3;
@@ -306,25 +324,39 @@ class NovaCartaoPageState extends State<NovacartaoPage>{
 
     setState(() {
       if(this.editar) {
-        
-        //var sanitizeNumberToString = cartaoDBEditar.saldoinicial.toString().replaceAll(new RegExp(r"\."), ',');
-        //double sanitizeNumber = double.parse(sanitizeNumberToString.replaceAll(new RegExp(r","), '.'));
-        
         cartaoDB.id = cartaoDBEditar.id;
         cartaoDB.cartao = cartaoDBEditar.cartao;
         cartaoDB.cor = cartaoDBEditar.cor;
-        //cartaoDB.tipo = cartaoDBEditar.tipo;
-        cartaoDB.ativada = cartaoDBEditar.ativada;
-        //cartaoDBEditar.saldoinicial = sanitizeNumber;
+        cartaoDB.limite = cartaoDBEditar.limite;
+        cartaoDB.vencimento = cartaoDBEditar.vencimento;
+        cartaoDB.fechamento = cartaoDBEditar.fechamento;
+        cartaoDB.contapagamento = cartaoDBEditar.contapagamento;
+        cartaoDB.ativada = cartaoDBEditar.ativada;        
         _controller.text = cartaoDBEditar.cartao;
-        //_controllerNumber.text = sanitizeNumber.toStringAsFixed(2).toString().replaceAll(new RegExp(r"\."), ',');     
-        
+        _controllerNumber.text = sanitazerMoney(cartaoDB.limite);
         this.colorEscolhida = this.cores[cartaoDBEditar.cor];
+        this.vencimento = cartaoDB.vencimento;
+        this.fechamento = cartaoDB.fechamento;
+        cartaoContaDB.getConta(cartaoDB.contapagamento).then(
+          (list) {
+            setState(() {
+              this.contaPagamento = list[0]["conta"];
+            });
+          }
+        );
       } else {
-        cartaoDBEditar.cor = 3;
+        cartaoDB.cor = 3;
         this.colorEscolhida = Colors.black;
       }
-    });    
+    });
+
+    cartaoContaDB.getAllConta().then(
+      (list) {
+        setState(() {
+          this.listaContaDB = list;
+        });
+      }
+    );
   }
 
   void showCorDialog<T>({ BuildContext context, Widget child }) {
@@ -341,7 +373,7 @@ class NovaCartaoPageState extends State<NovacartaoPage>{
     });
   }
 
-  void showTipoDialog<T>({ BuildContext context, Widget child }) {
+  void showContaPagamentoDialog<T>({ BuildContext context, Widget child }) {
     showDialog<T>(
       context: context,
       child: child,
@@ -349,7 +381,37 @@ class NovaCartaoPageState extends State<NovacartaoPage>{
     .then<Null>((T value) {
       if (value != null) {
         setState(() {
+          
+        });
+      }
+    });
+  }
 
+  void showFechamentoDialog<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) {
+      if (value != null) {
+        setState(() {
+          this.fechamento = value.toString();
+          cartaoDB.fechamento = this.fechamento;
+        });
+      }
+    });
+  }
+
+  void showVencimentoDialog<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) {
+      if (value != null) {
+        setState(() {
+          this.vencimento = value.toString();
+          cartaoDB.vencimento = this.vencimento;
         });
       }
     });
@@ -385,6 +447,149 @@ class NovaCartaoPageState extends State<NovacartaoPage>{
 
   @override
   Widget build(BuildContext context) {
+
+    List<Widget> numerosCalendario() {
+      this.calendario = [];
+      for(var i = 1; i < 32; i++) {
+        this.calendario.add(
+          new InkWell(
+            onTap: () {
+              Navigator.pop(context, i.toString());
+            },
+            child: new Container(
+              width: 20.0,
+              height: 20.0,
+              child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  new Text(
+                    i.toString(),
+                    style: new TextStyle(
+                      color: Colors.black45,
+                      fontSize: 16.0,
+                      fontFamily: "Roboto",
+                      fontWeight: FontWeight.w400,
+                    )
+                  ),
+                ],
+              ),
+            )            
+          )
+        );
+      }
+
+      for(var i = 32; i < 37; i++) {
+        this.calendario.add(
+          new Container(
+            width: 20.0,
+            height: 20.0,
+            child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new Text(
+                  i.toString(),
+                  style: new TextStyle(
+                    color: Colors.white,
+                    fontSize: 16.0,
+                    fontFamily: "Roboto",
+                    fontWeight: FontWeight.w400,
+                  )
+                ),
+              ],
+            ),
+          )          
+        );
+      }
+      return this.calendario;
+    }    
+
+    List<Widget> numerosCalendarioShow() {
+      List<Widget> numeros = numerosCalendario();
+      this.calendarioShow = [];
+      this.calendarioShow.add(
+        new Container(
+          child: new Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              new Container(
+                padding: new EdgeInsets.all(10.0),
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: numeros.sublist(0, 5)
+                ),
+              ),
+              new Container(
+                padding: new EdgeInsets.all(10.0),
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: numeros.sublist(5, 10)
+                ),
+              ),
+              new Container(
+                padding: new EdgeInsets.all(10.0),
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: numeros.sublist(10, 15)
+                ),
+              ),
+              new Container(
+                padding: new EdgeInsets.all(10.0),
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: numeros.sublist(15, 20)
+                ),
+              ),
+              new Container(
+                padding: new EdgeInsets.all(10.0),
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: numeros.sublist(20, 25)
+                ),
+              ),
+              new Container(
+                padding: new EdgeInsets.all(10.0),
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: numeros.sublist(25, 30)
+                ),
+              ),
+              new Container(
+                padding: new EdgeInsets.all(10.0),
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: numeros.sublist(30, 35)
+                ),
+              ),
+            ],
+          ),
+        )
+      );
+      return this.calendarioShow;
+    }
+
+    List<Widget> buildTile(contaList) {
+      this.tiles = [];
+        for(var i in contaList) {
+          this.tiles.add(
+            new DialogContaItem(
+              icon: Icons.brightness_1,
+              color: this.cores[i['cor']],
+              text: i['conta'],
+              onPressed: () {
+                setState((){
+                  cartaoDB.contapagamento = i['id'];
+                  this.contaPagamento = i['conta'];
+                });
+                Navigator.pop(context);
+              }
+            )
+          );
+        }
+      return this.tiles;
+    }
 
     List<Widget> buildPalette() {
       this.palette = [];
@@ -456,7 +661,6 @@ class NovaCartaoPageState extends State<NovacartaoPage>{
         backgroundColor: azulAppbar,
       ),
       body: new Container(
-        //margin: new EdgeInsets.only(top: 6.0),
         child: new ListView(
           children: <Widget>[
             new Container( //nome do cartao
@@ -466,7 +670,7 @@ class NovaCartaoPageState extends State<NovacartaoPage>{
                 maxLines: 1,
                 decoration: const InputDecoration(
                   icon: const Icon(Icons.account_balance),
-                  labelText: "Nome da cartao",
+                  labelText: "Nome do cartão",
                 ),
                 style: Theme.of(context).textTheme.title,
               ),
@@ -527,52 +731,40 @@ class NovaCartaoPageState extends State<NovacartaoPage>{
               ),
             ),
 
-            new Container( //tipo
-              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 32.0),
+            new Container( //limite
+              margin: new EdgeInsets.only(right: 16.0),
+              child: new EnsureVisibleWhenFocused(
+              focusNode: _focusNode,            
+              child: new TextField(
+                  controller: _controllerNumber,
+                  maxLines: 1,
+                  focusNode: _focusNode,
+                  style: Theme.of(context).textTheme.title,
+                  decoration: new InputDecoration(
+                    labelText: "Limite",
+                    icon: const Icon(Icons.attach_money),
+                  ),
+                ),
+              ),
+            ),
+
+            new Container( //conta para pagamento
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 16.0),
               child: new Row(
                 children: <Widget>[
                   new Icon(
-                    Icons.account_balance_wallet,
+                    Icons.account_balance,
                     size: 24.0,
                     color: Colors.black45,
                   ),
                   new Expanded(
                     child: new InkWell(
                       onTap: () {
-                        showTipoDialog<String>(
+                        showContaPagamentoDialog<String>(
                           context: context,
                           child: new SimpleDialog(
-                            title: const Text('Tipo de cartao'),
-                            children: <Widget>[
-                              new Column(
-                                children: <Widget>[
-                                  new DialogItem(
-                                    text: 'cartao corrente',
-                                    onPressed: () {
-                                      //cartaoDB.tipo = 'cartao corrente';
-                                      //this.tipo = cartaoDB.tipo;
-                                      Navigator.pop(context, 'cartao corrente');
-                                    }
-                                  ),
-                                  new DialogItem(
-                                    text: 'cartao poupança',
-                                    onPressed: () {
-                                      //cartaoDB.tipo = 'cartao poupança';
-                                      //this.tipo = cartaoDB.tipo;
-                                      Navigator.pop(context, 'cartao poupança');
-                                    }
-                                  ),
-                                  new DialogItem(
-                                    text: 'Outros',
-                                    onPressed: () {
-                                      //cartaoDB.tipo = 'Outros';
-                                      //this.tipo = cartaoDB.tipo;
-                                      Navigator.pop(context, 'Outros');
-                                    }
-                                  ),
-                                ],
-                              ),
-                            ],
+                            title: const Text('Selecione uma conta'),
+                            children: buildTile(this.listaContaDB)
                           )
                         );
                       },
@@ -592,7 +784,130 @@ class NovaCartaoPageState extends State<NovacartaoPage>{
                           children: <Widget>[
                             new Container(
                               child: new Text(
-                                this.tipo,
+                                this.contaPagamento,
+                                style: new TextStyle(
+                                  color: this.contaPagamento == "Conta para pagamento" ? Colors.black26 : Colors.black87,
+                                  fontSize: 20.0,
+                                  fontFamily: "Roboto",
+                                  fontWeight: FontWeight.w500,
+                                )
+                              ),
+                            ),
+                          ],
+                        )
+                      )
+                    )
+                  ),
+                ]
+              ),
+            ),
+
+            new Container( //fechamento e vencimento
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 32.0),
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  new Row(
+                    children: <Widget>[
+                      new Icon(
+                        Icons.date_range,
+                        size: 24.0,
+                        color: Colors.black45,
+                      ),
+                      new Container(
+                        child: new InkWell(
+                          onTap: () {
+                            showFechamentoDialog<String>(
+                              context: context,
+                              child: new SimpleDialog(
+                                title: const Text('Selecione o dia'),
+                                children: numerosCalendarioShow()
+                              )
+                            );
+                          },
+                          child: new Container(
+                            margin: new EdgeInsets.only(left: 12.0),
+                            padding: new EdgeInsets.only(bottom: 2.0),
+                            decoration: new BoxDecoration(
+                              border: new Border(
+                                bottom: new BorderSide(
+                                  style: BorderStyle.solid,
+                                  color: Colors.black26,
+                                )
+                              )
+                            ),
+                            child: new Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                new Container(
+                                  child: new Text(
+                                    'Fecha dia:  ',
+                                    style: new TextStyle(
+                                      color: Colors.black26,
+                                      fontSize: 20.0,
+                                      fontFamily: "Roboto",
+                                      fontWeight: FontWeight.w500,
+                                    )
+                                  ),
+                                ),
+                                new Container(
+                                  child: new Text(
+                                    this.fechamento,
+                                    style: new TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 20.0,
+                                      fontFamily: "Roboto",
+                                      fontWeight: FontWeight.w500,
+                                    )
+                                  ),
+                                ),
+                              ],
+                            )
+                          )
+                        )
+                      ),
+                    ],
+                  ),                  
+                  
+                  new Container(
+                    child: new InkWell(
+                      onTap: () {
+                        showVencimentoDialog<String>(
+                          context: context,
+                          child: new SimpleDialog(
+                            title: const Text('Selecione o dia'),
+                            children: numerosCalendarioShow()
+                          )
+                        );
+                      },
+                      child: new Container(
+                        margin: new EdgeInsets.only(left: 12.0),
+                        padding: new EdgeInsets.only(bottom: 2.0),
+                        decoration: new BoxDecoration(
+                          border: new Border(
+                            bottom: new BorderSide(
+                              style: BorderStyle.solid,
+                              color: Colors.black26,
+                            )
+                          )
+                        ),
+                        child: new Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            new Container(
+                              child: new Text(
+                                'Vence dia:  ',
+                                style: new TextStyle(
+                                  color: Colors.black26,
+                                  fontSize: 20.0,
+                                  fontFamily: "Roboto",
+                                  fontWeight: FontWeight.w500,
+                                )
+                              ),
+                            ),
+                            new Container(
+                              child: new Text(
+                                this.vencimento,
                                 style: new TextStyle(
                                   color: Colors.black87,
                                   fontSize: 20.0,
@@ -607,24 +922,6 @@ class NovaCartaoPageState extends State<NovacartaoPage>{
                     )
                   ),
                 ]
-              ),
-            ),            
-
-            new Container( //saldo inicial
-              margin: new EdgeInsets.only(right: 16.0),
-              child: new EnsureVisibleWhenFocused(
-              focusNode: _focusNode,            
-              child: new TextField(
-                  controller: _controllerNumber,
-                  //keyboardType: TextInputType.number,
-                  maxLines: 1,
-                  focusNode: _focusNode,
-                  style: Theme.of(context).textTheme.title,
-                  decoration: new InputDecoration(
-                    labelText: "Saldo inicial",
-                    icon: const Icon(Icons.attach_money),
-                  ),
-                ),
               ),
             ),
 
@@ -643,23 +940,30 @@ class NovaCartaoPageState extends State<NovacartaoPage>{
                     ),
                     onPressed: () {
                       cartaoDB.cartao = _controller.text;
+                      var validarText = _controller.text.replaceAll(new RegExp(r"[' ']+"), '');
                       cartaoDB.ativada = 1;
 
-                      var saldo = _controllerNumber.text.toString();
-                      var saldoSanitize = saldo.replaceAll(new RegExp(r"[' ']+"), '');
+                      var limite = _controllerNumber.text.toString();
+                      var limiteSanitize = limite.replaceAll(new RegExp(r"[' ']+"), '');
 
-                      if(saldoSanitize.length == 0) {
-                        saldoSanitize = '0,00';
+                      if(limiteSanitize.length == 0) {
+                        limiteSanitize = '0,00';
                       }
                       
                       RegExp _float = new RegExp(r'^(?:-?(?:[0-9]+))?(?:\,[0-9]{0,2})?$');
-                      bool isFloat = _float.hasMatch(saldoSanitize);
+                      bool isFloat = _float.hasMatch(limiteSanitize);
 
                       if(isFloat) {
-                        var saldoSanitize2 = saldoSanitize.replaceAll(new RegExp(r","), '.');
-                        //cartaoDB.saldoinicial = double.parse(saldoSanitize2);
+                        var limiteSanitize2 = limiteSanitize.replaceAll(new RegExp(r","), '.');
+                        cartaoDB.limite = double.parse(limiteSanitize2);
 
-                        if(cartaoDB.cartao.length > 0) {
+                        if(
+                          validarText.length > 0 &&
+                          cartaoDB.vencimento != null &&
+                          cartaoDB.fechamento != null &&
+                          cartaoDB.contapagamento != null &&
+                          limite.length > 0
+                        ) {
                           cartaoDB.upsertCartao(cartaoDB);
                           Navigator.pop(context);
                         } else { 
@@ -679,7 +983,7 @@ class NovaCartaoPageState extends State<NovacartaoPage>{
                                           color: const Color(0xFFE57373)),
                                       ),
                                       new Text(
-                                        "Preencha o campo:\nNome da cartao",
+                                        "Preencha os campos",
                                         softWrap: true,
                                         style: new TextStyle(
                                           color: Colors.black45,
@@ -713,7 +1017,7 @@ class NovaCartaoPageState extends State<NovacartaoPage>{
                                         color: const Color(0xFFE57373)),
                                     ),
                                     new Text(
-                                      "Saldo inicial inválido\nExemplo: 1234,56\n                -1234,56",
+                                      "Limite inválido\nExemplo: 1234,56\n                -1234,56",
                                       softWrap: true,
                                       style: new TextStyle(
                                         color: Colors.black45,
@@ -765,6 +1069,41 @@ class DialogItem extends StatelessWidget {
                 fontSize: 16.0
               ),
             )
+          ],
+        ),
+      )
+    );
+  }
+}
+
+class DialogContaItem extends StatelessWidget {
+  DialogContaItem({ Key key, this.icon, this.size, this.color, this.text, this.onPressed }) : super(key: key);
+ 
+  final IconData icon;
+  double size = 36.0;
+  final Color color;
+  final String text;
+  final VoidCallback onPressed;
+ 
+  @override
+  Widget build(BuildContext context) {
+    return new SimpleDialogOption(
+      onPressed: onPressed,
+      child: new Container(
+        child: new Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            new Container(
+              child: new Container(
+                margin: size == 16.0 ? new EdgeInsets.only(left: 7.0) : null,
+                child: new Icon(icon, size: size, color: color),
+              )
+            ),
+            new Padding(
+              padding: size == 16.0 ? const EdgeInsets.only(left: 17.0) : const EdgeInsets.only(left: 16.0),
+              child: new Text(text),
+            ),
           ],
         ),
       )

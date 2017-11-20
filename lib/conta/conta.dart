@@ -303,13 +303,13 @@ class NovaContaPageState extends State<NovaContaPage>{
         contaDB.cor = contaDBEditar.cor;
         contaDB.tipo = contaDBEditar.tipo;
         contaDB.ativada = contaDBEditar.ativada;
-        contaDBEditar.saldoinicial = sanitizeNumber;
+        contaDB.saldoinicial = sanitizeNumber;
         _controller.text = contaDBEditar.conta;
-        _controllerNumber.text = sanitizeNumber.toStringAsFixed(2).toString().replaceAll(new RegExp(r"\."), ',');     
+        _controllerNumber.text = sanitizeNumber.toStringAsFixed(2).toString().replaceAll(new RegExp(r"\."), ',');
         
         this.colorEscolhida = this.cores[contaDBEditar.cor];
       } else {
-        contaDBEditar.cor = 3;
+        contaDB.cor = 3;
         this.colorEscolhida = Colors.black;
       }
     });    
@@ -631,6 +631,7 @@ class NovaContaPageState extends State<NovaContaPage>{
                     ),
                     onPressed: () {
                       contaDB.conta = _controller.text;
+                      var validarText = _controller.text.replaceAll(new RegExp(r"[' ']+"), '');
                       contaDB.ativada = 1;
 
                       var saldo = _controllerNumber.text.toString();
@@ -647,7 +648,7 @@ class NovaContaPageState extends State<NovaContaPage>{
                         var saldoSanitize2 = saldoSanitize.replaceAll(new RegExp(r","), '.');
                         contaDB.saldoinicial = double.parse(saldoSanitize2);
 
-                        if(contaDB.conta.length > 0) {
+                        if(validarText.length > 0) {
                           contaDB.upsertConta(contaDB);
                           Navigator.pop(context);
                         } else { 
