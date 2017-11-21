@@ -7,6 +7,8 @@ import 'package:meta/meta.dart';
 import 'package:flutter/rendering.dart';
 import './textpicker.dart';
 import 'package:numberpicker/numberpicker.dart';
+import '../db/database.dart';
+import '../palette/palette.dart';
 
 class LancamentoPage extends StatefulWidget {
   final Color color;
@@ -608,17 +610,26 @@ class FormularioState extends State<Formulario> {
   FormularioState(this.color, this.numeros);
   //RadioGroup itemType = RadioGroup.fixo;
   DateTime _toDate = new DateTime.now();
-  String _valueText = "Outros";
+  String _valueText = " ";
   String _valueTextCartao = "Caixa";
   String _valueTextContaDestino = "Caixa";
-  String _valueTextTag = '';
+  String _valueTextTag = " ";
+  List<Widget> listaCategorias;
+  Categoria categoriaDB = new Categoria();
+  Tag tagDB = new Tag();
+  List listaDB = [];
+  List listaTagsDB = [];
+
+  List cores = [];
+  Palette listaCores = new Palette();
+  
   
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   FocusNode _focusNode = new FocusNode();
   final TextEditingController _controller = new TextEditingController();
 
-  Map formSubmit = {'tipo':'', 'valor':'' ,'data':new DateTime.now().toString(),
-    'categoria':'Outros', 'tag':'', 'conta':'Caixa', 'contaDestino':'','descricao':'', 'repetir':''};
+  Map formSubmit = {'tipo':'', 'valor':'' ,'data':new DateTime.now().toString(), 'idcategoria':0,
+    'categoria':'', 'tag':'', 'conta':'Caixa', 'contaDestino':'','descricao':'', 'repetir':''};
     //falta colocar se eh cartao ou nao, e se for qual sera a fatura que sera lancada
     //se for cartao e tiver repeticao lancar o valor nas fatura corretas se for
     //  fixa lancar somente do mes atual ou lancar as parceladas tb somente no mes atual
@@ -627,13 +638,29 @@ class FormularioState extends State<Formulario> {
     //  e qdo for para o mes seguinte ou no relatorio lancara as repeticoes que nao
     //  foram lancadas
   void initState(){
-    if(color == const Color(0xffe57373)){
-       _valueTextTag = 'Despesa Variável';
-    } else if(this.color == const Color(0xff9e9e9e)) {
-      _valueTextTag = '';
+    this.cores = listaCores.cores;
+
+    if(color == const Color(0xFFE57373)){
+      tagDB.getTagGroup('despesa').then((list) {
+        this.listaTagsDB = list;
+      });
+    } else if(this.color == const Color(0xFF00BFA5)) {
+      tagDB.getTagGroup('receita').then((list) {
+        this.listaTagsDB = list;
+      });
     } else {
-      _valueTextTag = 'Receita Variável';
+      tagDB.getAllTag().then((list) {
+        this.listaTagsDB = list;
+      });
     }
+
+    
+
+    categoriaDB.getAllCategoria().then((list) {
+      setState(() {
+        this.listaDB = list;
+      });
+    });
   }
 
   String tagDdespesaOUreceita(color) {
@@ -682,7 +709,7 @@ class FormularioState extends State<Formulario> {
     }
   }
 
-  void showDemoDialog<T>({ BuildContext context, Widget child }) {
+  void showCategoriaDialog<T>({ BuildContext context, Widget child }) {
     showDialog<T>(
       context: context,
       child: child,
@@ -760,6 +787,101 @@ class FormularioState extends State<Formulario> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final TextStyle valueStyle = Theme.of(context).textTheme.title;
+    final TextStyle branco = new TextStyle(
+      fontFamily: 'Roboto',
+      color: Colors.white12,
+      fontSize:  20.0,
+      fontWeight: FontWeight.w500,
+      textBaseline: TextBaseline.alphabetic
+    );
+
+    List<Widget> buildListaCategorias(list) {
+      this.listaCategorias = [];
+      for(var i in list) {
+        var id = i[0]['id'];
+        var categoria = i[0]['categoria'];
+        var cor = this.cores[i[0]['cor']];
+
+        this.listaCategorias.add(
+          new DialogItem(
+            icon: Icons.brightness_1,
+            color: cor,
+            text: categoria,
+            onPressed: () {
+              this.formSubmit['idcategoria'] = id;
+              this.formSubmit['categoria'] = categoria;
+              Navigator.pop(context, categoria);
+            }
+          ),
+        );
+
+        if(i[1].length > 0) {
+          for(var y in i[1]) {
+            var id2 = y['id'];
+            var categoria2 = y['categoria'];
+
+            this.listaCategorias.add(
+              new DialogItem(
+                icon: Icons.subdirectory_arrow_right,
+                size: 16.0,
+                color: theme.disabledColor,
+                text: categoria2,
+                onPressed: () {
+                  this.formSubmit['idcategoria'] = id2;
+                  this.formSubmit['categoria'] = categoria2;
+                  Navigator.pop(context, categoria2);
+                }
+              ),
+            );
+          }
+        }
+      }      
+      return this.listaCategorias;
+    }
+
+    List<Widget> buildListaTags(list) {
+      this.listaCategorias = [];
+      for(var i in list) {
+        var id = i[0]['id'];
+        var categoria = i[0]['categoria'];
+        var cor = this.cores[i[0]['cor']];
+
+        this.listaCategorias.add(
+          new DialogItem(
+            icon: Icons.brightness_1,
+            color: cor,
+            text: categoria,
+            onPressed: () {
+              this.formSubmit['idcategoria'] = id;
+              this.formSubmit['categoria'] = categoria;
+              Navigator.pop(context, categoria);
+            }
+          ),
+        );
+
+        if(i[1].length > 0) {
+          for(var y in i[1]) {
+            var id2 = y['id'];
+            var categoria2 = y['categoria'];
+
+            this.listaCategorias.add(
+              new DialogItem(
+                icon: Icons.subdirectory_arrow_right,
+                size: 16.0,
+                color: theme.disabledColor,
+                text: categoria2,
+                onPressed: () {
+                  this.formSubmit['idcategoria'] = id2;
+                  this.formSubmit['categoria'] = categoria2;
+                  Navigator.pop(context, categoria2);
+                }
+              ),
+            );
+          }
+        }
+      }      
+      return this.listaCategorias;
+    }
  
     return new Container(
       padding: new EdgeInsets.only(right: 24.0, left: 24.0, top: 0.0, bottom: 0.0),
@@ -828,180 +950,11 @@ class FormularioState extends State<Formulario> {
                   valueText: _valueText,
                   valueStyle: valueStyle,
                   onPressed: () {
-                    showDemoDialog<String>(
+                    showCategoriaDialog<String>(
                       context: context,
                       child: new SimpleDialog(
                         title: const Text('Categorias'),
-                        children: <Widget>[
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFFFFA500),
-                            text: 'Alimentação',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Alimentação';
-                              Navigator.pop(context, 'Alimentação');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFF279605),
-                            text: 'Cartão',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Cartão';
-                              Navigator.pop(context, 'Cartão');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFF005959),
-                            text: 'Educação',                           
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Educação';
-                              Navigator.pop(context, 'Educação');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.subdirectory_arrow_right,
-                            size: 16.0,
-                            color: theme.disabledColor,
-                            text: 'Cultura',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Cultura';
-                              Navigator.pop(context, 'Cultura');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFFFF99FF),
-                            text: 'Investimento',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Investimento';
-                              Navigator.pop(context, 'Investimento');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.subdirectory_arrow_right,
-                            size: 16.0,
-                            color: theme.disabledColor,
-                            text: 'Poupança',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Poupança';
-                              Navigator.pop(context, 'Poupança');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFF00ABFF),
-                            text: 'Lazer',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Lazer';
-                              Navigator.pop(context, 'Lazer');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFFB6A8A5),
-                            text: 'Moradia',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Moradia';
-                              Navigator.pop(context, 'Moradia');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.subdirectory_arrow_right,
-                            size: 16.0,
-                            color: theme.disabledColor,
-                            text: 'Eletrônico',                           
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Eletrônico';
-                              Navigator.pop(context, 'Eletrônico');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.subdirectory_arrow_right,
-                            size: 16.0,
-                            color: theme.disabledColor,
-                            text: 'Hotel',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Hotel';
-                              Navigator.pop(context, 'Hotel');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFF000000),
-                            text: 'Outros',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Outros';
-                              Navigator.pop(context, 'Outros');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFFA3D97D),
-                            text: 'Salário',                           
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Salário';
-                              Navigator.pop(context, 'Salário');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFFF5423C),
-                            text: 'Saúde',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Saúde';
-                              Navigator.pop(context, 'Saúde');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.subdirectory_arrow_right,
-                            size: 16.0,
-                            color: theme.disabledColor,
-                            text: 'Cosméticos',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Cosméticos';
-                              Navigator.pop(context, 'Cosméticos');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.subdirectory_arrow_right,
-                            size: 16.0,
-                            color: theme.disabledColor,
-                            text: 'Drogaria',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Drogaria';
-                              Navigator.pop(context, 'Drogaria');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFF92A8D1),
-                            text: 'Telefonia',                           
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Telefonia';
-                              Navigator.pop(context, 'Telefonia');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFFF6F902),
-                            text: 'Transporte',
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Transporte';
-                              Navigator.pop(context, 'Transporte');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFF3DDF0B),
-                            text: 'Vestuário',                            
-                            onPressed: () {
-                              this.formSubmit['categoria'] = 'Vestuário';
-                              Navigator.pop(context, 'Vestuário');
-                            }
-                          )
-                        ]
+                        children: buildListaCategorias(this.listaDB)
                       )
                     );
                   },
@@ -1021,38 +974,11 @@ class FormularioState extends State<Formulario> {
                   valueText: _valueTextTag,
                   valueStyle: valueStyle,
                   onPressed: () {
-                    showDialogTag<String>(
+                    showCategoriaDialog<String>(
                       context: context,
                       child: new SimpleDialog(
                         title: const Text('Tags'),
-                        children: <Widget>[
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFFFFA500),
-                            text: this.color == const Color(0xffe57373) ? 'Despesa Fixa' : 'Receita Fixa',
-                            onPressed: () {
-                              var depRec;
-                              this.color == const Color(0xffe57373) ?
-                                depRec = 'Despesa Fixa' : depRec = 'Receita Fixa';
-
-                              this.formSubmit['tag'] = depRec;
-                              Navigator.pop(context, depRec);
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFF279605),
-                            text: this.color == const Color(0xffe57373) ? 'Despesa Variável' : 'Receita Variável',
-                            onPressed: () {
-                              var depRec;
-                              this.color == const Color(0xffe57373) ?
-                                depRec = 'Despesa Variável' : depRec = 'Receita Variável';
-
-                              this.formSubmit['tag'] = depRec;
-                              Navigator.pop(context, depRec);
-                            }
-                          ),
-                        ]
+                        children: buildListaTags(this.listaTagsDB)
                       )
                     );
                   },
@@ -1060,6 +986,55 @@ class FormularioState extends State<Formulario> {
               ),
             ],
           ),
+          //new Row(
+          //  crossAxisAlignment: CrossAxisAlignment.end,
+          //  children: <Widget>[
+          //    new Expanded(
+          //      flex: 4,
+          //      child: new _InputDropdown(
+          //        labelText: 'Tag',
+          //        valueText: _valueTextTag,
+          //        valueStyle: valueStyle,
+          //        onPressed: () {
+          //          showDialogTag<String>(
+          //            context: context,
+          //            child: new SimpleDialog(
+          //              title: const Text('Tags'),
+          //              children: <Widget>[
+          //                new DialogItem(
+          //                  icon: Icons.brightness_1,
+          //                  color: new Color(0xFFFFA500),
+          //                  text: this.color == const Color(0xffe57373) ? 'Despesa Fixa' : 'Receita Fixa',
+          //                  onPressed: () {
+          //                    var depRec;
+          //                    this.color == const Color(0xffe57373) ?
+          //                      depRec = 'Despesa Fixa' : depRec = 'Receita Fixa';
+//
+          //                    this.formSubmit['tag'] = depRec;
+          //                    Navigator.pop(context, depRec);
+          //                  }
+          //                ),
+          //                new DialogItem(
+          //                  icon: Icons.brightness_1,
+          //                  color: new Color(0xFF279605),
+          //                  text: this.color == const Color(0xffe57373) ? 'Despesa Variável' : 'Receita Variável',
+          //                  onPressed: () {
+          //                    var depRec;
+          //                    this.color == const Color(0xffe57373) ?
+          //                      depRec = 'Despesa Variável' : depRec = 'Receita Variável';
+//
+          //                    this.formSubmit['tag'] = depRec;
+          //                    Navigator.pop(context, depRec);
+          //                  }
+          //                ),
+          //              ]
+          //            )
+          //          );
+          //        },
+          //      ),
+          //    ),
+          //  ],
+          //),
 
           new Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -1197,6 +1172,9 @@ class FormularioState extends State<Formulario> {
               ),//new Icon(Icons.check, color: new Color(0xFFFFFFFF),),
               onPressed: (){
                 
+                if(this.formSubmit['idcategoria'] == 0) {
+                  print('Preencha os campos');
+                }
                 this.formSubmit['descricao'] = _controller.text;
                 if(this.color == const Color(0xffe57373)) {
                   this.formSubmit['tipo'] = 'Despesa';

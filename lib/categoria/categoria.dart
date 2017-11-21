@@ -293,7 +293,7 @@ class CategoriaPageState extends State<CategoriaPage>{
               )
             );
           }
-        }      
+        }
       }
       return this.listaCategorias;
     }

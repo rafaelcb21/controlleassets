@@ -40,12 +40,14 @@ class TagPageState extends State<TagPage>{
         var cor = this.cores[i['cor']];
         var numeroCor = i['cor'];
         var ativada = i['ativada'];
+        var relacionada = i['relacionada'];
 
         this.listaTags.add(
           new ItemTag(
             key: new Key(i),
             id: id,
             tag: tag,
+            relacionada: relacionada,
             cor: cor,
             numeroCor: numeroCor,
             ativada: ativada,
@@ -53,6 +55,7 @@ class TagPageState extends State<TagPage>{
               Tag tagEditar = new Tag();
               tagEditar.id = id;
               tagEditar.tag = tag;
+              tagEditar.relacionada = relacionada;
               tagEditar.cor = numeroCor;
               tagEditar.ativada = ativada;
 
@@ -209,6 +212,8 @@ class NovaTagPageState extends State<NovaTagPage>{
   bool x;
   Palette listaCores = new Palette();
   List cores = [];
+  String relacionado;
+
   @override
   void initState() {
     this.cores = listaCores.cores;
@@ -216,13 +221,13 @@ class NovaTagPageState extends State<NovaTagPage>{
       if(editar) {
         tagDB.id = tagDBEditar.id;
         tagDB.tag = tagDBEditar.tag;
+        tagDB.relacionada = tagDBEditar.relacionada;
         _controller.text = tagDBEditar.tag;
 
         tagDB.ativada = tagDBEditar.ativada;
         tagDB.cor = tagDBEditar.cor;
         this.colorEscolhida = this.cores[tagDBEditar.cor];
-        
-        
+        this.relacionado = relacionadaEdit(tagDB.relacionada);
 
       } else {
         tagDB.cor = 3;
@@ -257,6 +262,39 @@ class NovaTagPageState extends State<NovaTagPage>{
         });
       }
     });
+  }
+
+  void onSubmit(String result) {
+    tagDB.relacionada = result;
+    switch(result) {
+      case 'despesa':
+        this.relacionado = "Despesa";
+        break;
+      case 'receita':
+        this.relacionado = "Receita";
+        break;
+      case 'todos':
+        this.relacionado = "Todos";
+        break;
+      default:
+        break;
+    }
+    //Navigator.pop(context, 'result');
+  }
+
+  String relacionadaEdit(String result) {
+    switch(result) {
+      case 'despesa':
+        return "Despesa";
+        break;
+      case 'receita':
+        return "Receita";
+        break;
+      case 'todos':
+        return "Todos";
+        break;
+
+    }
   }
 
   @override
@@ -403,6 +441,57 @@ class NovaTagPageState extends State<NovaTagPage>{
             ),
 
             new Container(
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 32.0),
+              child: new Row(
+                children: <Widget>[
+                  new Icon(
+                    Icons.label,
+                    size: 24.0,
+                    color: Colors.black45,
+                  ),
+                  new Expanded(
+                    child: new InkWell(
+                      onTap: () {
+                        showDialog<String>(
+                          context: context,
+                          child: new MyForm(onSubmit: onSubmit)
+                        );
+                      },
+                      child: new Container(
+                        margin: new EdgeInsets.only(left: 12.0),
+                        padding: new EdgeInsets.only(bottom: 2.0),
+                        decoration: new BoxDecoration(
+                          border: new Border(
+                            bottom: new BorderSide(
+                              style: BorderStyle.solid,
+                              color: Colors.black26,
+                            )
+                          )
+                        ),
+                        child: new Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            new Container(
+                              child: new Text(
+                                this.relacionado == null ? 'Relacionar à:' : this.relacionado,
+                                style: new TextStyle(
+                                  color: this.relacionado == null ? Colors.black26 : Colors.black87,
+                                  fontSize: 20.0,
+                                  fontFamily: "Roboto",
+                                  fontWeight: FontWeight.w500,
+                                )
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            new Container(
               margin: new EdgeInsets.only(top: 36.0),
               child: new Column(
                 children: <Widget>[
@@ -419,7 +508,7 @@ class NovaTagPageState extends State<NovaTagPage>{
                       tagDB.tag = _controller.text;
                       tagDB.ativada = 1;
 
-                      if(tagDB.tag.length > 0) {
+                      if(tagDB.tag.length > 0 && tagDB.relacionada != null) {
                         this.x = true;
                       } else { this.x = false; }
 
@@ -476,6 +565,7 @@ class ItemTag extends StatefulWidget {
   final int id;
   final String tag;
   final int numeroCor;
+  final String relacionada;
   final Color cor;
   final int ativada;
   final VoidCallback onPressed;
@@ -486,6 +576,7 @@ class ItemTag extends StatefulWidget {
 
     this.id,
     this.tag,
+    this.relacionada,
     this.cor,
     this.numeroCor,
     this.ativada,
@@ -633,5 +724,92 @@ class ItemTagState extends State<ItemTag> with TickerProviderStateMixin {
         ],
       )
     );    
+  }
+}
+
+typedef void MyFormCallback(String result);
+
+class MyForm extends StatefulWidget {
+  final MyFormCallback onSubmit;
+
+  MyForm({this.onSubmit});
+
+  @override
+  _MyFormState createState() => new _MyFormState();
+}
+
+class _MyFormState extends State<MyForm> {
+  String value = "despesa";
+
+  @override
+  Widget build(BuildContext context) {
+    return new SimpleDialog(
+      title: new Text("Relacionar à:"),
+      children: <Widget>[
+        new Container(
+          margin: new EdgeInsets.only(left: 16.0),
+          child: new Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              new Row(              
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  new Radio(
+                    groupValue: value,
+                    onChanged: (value) => setState(() => this.value = value),
+                    value: "despesa",
+                  ),
+                  const Text("Despesa")                
+                ],
+              ),
+              new Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  new Radio(
+                    groupValue: value,
+                    onChanged: (value) => setState(() => this.value = value),
+                    value: "receita",
+                  ),
+                  const Text("Receita")
+                ],
+              ),
+              new Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  new Radio(
+                    groupValue: value,
+                    onChanged: (value) => setState(() => this.value = value),
+                    value: "todos",
+                  ),
+                  const Text("Todos")                
+                ],
+              ),
+            ],
+          ),          
+        ),
+        
+
+        new FlatButton(
+          onPressed: () {
+            Navigator.pop(context);
+            widget.onSubmit(value);
+          },
+          child: new Container(
+            margin: new EdgeInsets.only(right: 10.0),
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                new Text(
+                  "OK",
+                  style: new TextStyle(
+                    fontSize: 16.0
+                  ),
+                ),
+              ],
+            ),
+          )
+        )
+      ],
+    );
   }
 }

@@ -39,13 +39,16 @@ class DatabaseClient {
               id INTEGER PRIMARY KEY, 
               tag TEXT NOT NULL,
               cor INTEGER NOT NULL,
+              relacionada TEXT NOT NULL,
               ativada INTEGER NOT NULL
             )""");
 
-    await db.rawInsert("INSERT INTO tag (tag, cor, ativada) VALUES ('Renda Fixa', 39, 1)");
-    await db.rawInsert("INSERT INTO tag (tag, cor, ativada) VALUES ('Renda Variável', 43, 1)");
-    await db.rawInsert("INSERT INTO tag (tag, cor, ativada) VALUES ('Despesa Fixa', 47, 1)");
-    await db.rawInsert("INSERT INTO tag (tag, cor, ativada) VALUES ('Despesa Variável', 15, 1)");
+    await db.rawInsert("INSERT INTO tag (tag, cor, relacionada, ativada) VALUES ('Renda Fixa', 39, 'receita', 1)");
+    await db.rawInsert("INSERT INTO tag (tag, cor, relacionada, ativada) VALUES ('Renda Variável', 43, 'receita', 1)");
+    await db.rawInsert("INSERT INTO tag (tag, cor, relacionada, ativada) VALUES ('Despesa Fixa', 47, 'despesa', 1)");
+    await db.rawInsert("INSERT INTO tag (tag, cor, relacionada, ativada) VALUES ('Despesa Variável', 15, 'despesa', 1)");
+    await db.rawInsert("INSERT INTO tag (tag, cor, relacionada, ativada) VALUES ('Café', 47, 'todos', 1)");
+    await db.rawInsert("INSERT INTO tag (tag, cor, relacionada, ativada) VALUES ('Vendas', 15, 'transferencia', 1)");
 
     await db.execute("""
             CREATE TABLE conta (
@@ -175,14 +178,10 @@ class Categoria {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    List results = await db.query(categoriaTable,
-      columns: Categoria.columns, where: "categoria = ?", whereArgs: [name]);
-    
-    Categoria categoria = Categoria.fromMap(results[0]);
+    List results = await db.rawQuery("SELECT * FROM categoria WHERE categoria == ? AND ativada == 1", [name]);
+    await db.close();   
 
-    await db.close();     
-    return categoria;
-
+    return results[0];
   }
 
   Future getCategoria(int id) async {
@@ -300,14 +299,16 @@ class Tag {
   int id;
   String tag;
   int cor;
+  String relacionada;
   int ativada;
 
-  static final columns = ["id", "tag", "cor", "ativada"];
+  static final columns = ["id", "tag", "cor", "relacionada", "ativada"];
 
   Map toMap() {
     Map map = {
       "tag": tag,
       "cor": cor,
+      "relacionada": relacionada,
       "ativada": ativada
     };
 
@@ -321,6 +322,7 @@ class Tag {
     tagTable.id = map["id"];
     tagTable.tag = map["tag"];
     tagTable.cor = map["cor"];
+    tagTable.relacionada = map["relacionada"];
     tagTable.ativada = map["ativada"];
 
     return tagTable;
@@ -332,6 +334,17 @@ class Tag {
     Database db = await openDatabase(dbPath);
 
     List lista = await db.rawQuery("SELECT * FROM tag WHERE ativada == 1 ORDER BY tag ASC");
+    await db.close();
+
+    return lista; 
+  }
+
+  Future getTagGroup(name) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+    
+    List lista = await db.rawQuery("SELECT * FROM tag WHERE ativada == 1 AND relacionada = ? ORDER BY tag ASC", [name]);
     await db.close();
 
     return lista; 
