@@ -47,8 +47,6 @@ class DatabaseClient {
     await db.rawInsert("INSERT INTO tag (tag, cor, relacionada, ativada) VALUES ('Renda Variável', 43, 'receita', 1)");
     await db.rawInsert("INSERT INTO tag (tag, cor, relacionada, ativada) VALUES ('Despesa Fixa', 47, 'despesa', 1)");
     await db.rawInsert("INSERT INTO tag (tag, cor, relacionada, ativada) VALUES ('Despesa Variável', 15, 'despesa', 1)");
-    await db.rawInsert("INSERT INTO tag (tag, cor, relacionada, ativada) VALUES ('Café', 47, 'todos', 1)");
-    await db.rawInsert("INSERT INTO tag (tag, cor, relacionada, ativada) VALUES ('Vendas', 15, 'transferencia', 1)");
 
     await db.execute("""
             CREATE TABLE conta (

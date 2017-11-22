@@ -603,6 +603,72 @@ class _MyFormState extends State<MyForm> {
   }
 }
 
+class MyForm2 extends StatefulWidget {
+  final MyFormCallback onSubmit;
+
+  MyForm2({this.onSubmit});
+
+  @override
+  _MyFormState2 createState() => new _MyFormState2();
+}
+
+class _MyFormState2 extends State<MyForm> {
+  int _currentValueDividido = 3;
+  int _currentValue = 2;
+
+  List periodoList = ['Dias', 'Semanas', 'Quinzenas', 'Meses', 
+                          'Bimestres', 'Trimestres', 'Semestres', 'Anos'];  
+
+  @override
+  Widget build(BuildContext context) {
+    return new SimpleDialog(
+      title: new Text("Dividir"),
+      children: <Widget>[
+        new Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new NumberPicker.integer(
+              initialValue: _currentValue,
+              minValue: 2,
+              maxValue: 360,
+              onChanged: (newValue) =>
+                  setState(() => _currentValue = newValue)),
+
+            new TextPicker(
+              initialValue: _currentValueDividido,
+              listName: this.periodoList,
+              onChanged: (newValue) =>
+                setState(() => _currentValueDividido = newValue)
+            ),
+          ],
+        ),
+
+        new FlatButton(
+          onPressed: () {
+            Navigator.pop(context);
+            widget.onSubmit(_currentValue.toString() + ';' + 
+              periodoList[_currentValueDividido]);
+          },
+          child: new Container(
+            margin: new EdgeInsets.only(right: 10.0),
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                new Text(
+                  "OK",
+                  style: new TextStyle(
+                    fontSize: 16.0
+                  ),
+                ),
+              ],
+            ),
+          )
+        )
+      ],
+    );
+  }
+}
+
 class FormularioState extends State<Formulario> {
   final Color color;
   final ValueNotifier<List<int>> numeros;
@@ -639,7 +705,7 @@ class FormularioState extends State<Formulario> {
   final TextEditingController _controller = new TextEditingController();
 
   Map formSubmit = {'tipo':'', 'valor':'' ,'data':new DateTime.now().toString(), 'idcategoria':0,
-    'categoria':'', 'tag':'', 'idtag':0, 'conta':' ', 'idconta':0, 'cartao':' ', 'idcartao':0, 'contaDestino':'','descricao':'', 'repetir':''};
+    'categoria':'', 'tag':'', 'idtag':0, 'conta':' ', 'idconta':0, 'cartao':' ', 'idcartao':0, 'contaDestino':'','descricao':'', 'repetir':'', 'dividir':''};
     //falta colocar se eh cartao ou nao, e se for qual sera a fatura que sera lancada
     //se for cartao e tiver repeticao lancar o valor nas fatura corretas se for
     //  fixa lancar somente do mes atual ou lancar as parceladas tb somente no mes atual
@@ -696,6 +762,18 @@ class FormularioState extends State<Formulario> {
     if(fraseLowerCaseList.length == 3) {
       fraseLowerCaseList.insert(1, 'em');
     }
+    if(color == const Color(0xffe57373)){
+      return 'Despesa ' + fraseLowerCaseList.join(' ');
+    } else if(this.color == const Color(0xff9e9e9e)) {
+      return 'Transferência ' + fraseLowerCaseList.join(' ');
+    } else {
+      return 'Receita ' + fraseLowerCaseList.join(' ');
+    }
+  }
+
+  String dividirLabel(color, String frase) {
+    var fraseLowerCaseList = frase.toLowerCase().split(';');
+    fraseLowerCaseList.insert(0, 'dividida em');
     if(color == const Color(0xffe57373)){
       return 'Despesa ' + fraseLowerCaseList.join(' ');
     } else if(this.color == const Color(0xff9e9e9e)) {
@@ -801,6 +879,10 @@ class FormularioState extends State<Formulario> {
   void onSubmit(String result) {
     this.formSubmit['repetir'] = result;
     //Navigator.pop(context, 'result');
+  }
+
+  void onSubmitDividir(String result) {
+    this.formSubmit['dividir'] = result;
   }
 
   @override
@@ -977,47 +1059,100 @@ class FormularioState extends State<Formulario> {
       child: new Column(
         children: <Widget>[
           new Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              new InkWell(
-                onTap: (){
-                  showDialog(
-                    context: context,
-                    child: new MyForm(onSubmit: onSubmit));
-                },
-                child: new Container(
-                  margin: new EdgeInsets.only(top: 16.0, bottom: 8.0),
-                  child: new Text(
-                    this.formSubmit['repetir'] == ''
-                    ?
-                      'Repetir'
-                    : despesaOUreceita(this.color, this.formSubmit['repetir']),
-                    style: new TextStyle(
-                      color: this.color
+              new Container(
+                child: new Row(
+                  children: <Widget>[
+                    this.formSubmit['repetir'] != '' ? new Container() :
+                    new InkWell(
+                      onTap: (){
+                        showDialog(
+                          context: context,
+                          child: new MyForm2(onSubmit: onSubmitDividir)
+                        );
+                      },
+                      child: new Container(
+                        margin: new EdgeInsets.only(top: 16.0, bottom: 8.0),
+                        child: new Text(
+                          this.formSubmit['dividir'] == ''
+                          ?
+                          'Dividir'
+                          : dividirLabel(this.color, this.formSubmit['dividir']),
+                          style: new TextStyle(
+                            color: this.color
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+
+                    this.formSubmit['dividir'] != '' ?
+                    new InkWell(
+                      onTap: (){
+                        setState(() {
+                          this.formSubmit['dividir'] = '';
+                        });
+                      },
+                      child: new Container(
+                        margin: new EdgeInsets.only(top: 16.0, bottom: 8.0, left: 8.0),
+                        child: new Icon(
+                          Icons.cancel,
+                          size: 18.0,
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    ) : new Container(),                    
+                  ],
                 ),
               ),
-
-              this.formSubmit['repetir'] != '' ?
-                new InkWell(
-                  onTap: (){
-                    setState(() {
-                      this.formSubmit['repetir'] = '';
-                    });
-                  },
-                  child: new Container(
-                    margin: new EdgeInsets.only(top: 16.0, bottom: 8.0, left: 8.0),
-                    child: new Icon(
-                      Icons.cancel,
-                      size: 18.0,
-                      color: Colors.grey[400],
+              
+              new Container(
+                child: new Row(
+                  children: <Widget>[
+                    this.formSubmit['dividir'] != '' ? new Container() :
+                    new InkWell(
+                      onTap: (){
+                        showDialog(
+                          context: context,
+                          child: new MyForm(onSubmit: onSubmit)
+                        );
+                      },
+                      child: new Container(
+                        margin: new EdgeInsets.only(top: 16.0, bottom: 8.0),
+                        child: new Text(
+                          this.formSubmit['repetir'] == ''
+                          ?
+                          'Repetir'
+                          : despesaOUreceita(this.color, this.formSubmit['repetir']),
+                          style: new TextStyle(
+                            color: this.color
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ) : new Container()
 
+                    this.formSubmit['repetir'] != '' ?
+                    new InkWell(
+                      onTap: (){
+                        setState(() {
+                          this.formSubmit['repetir'] = '';
+                        });
+                      },
+                      child: new Container(
+                        margin: new EdgeInsets.only(top: 16.0, bottom: 8.0, left: 8.0),
+                        child: new Icon(
+                          Icons.cancel,
+                          size: 18.0,
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    ) : new Container()
+                  ],
+                ),
+              )
             ],
           ),
+
           new _DateTimePicker(
             labelText: 'Data',
             selectedDate: _toDate,
