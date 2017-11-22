@@ -611,14 +611,24 @@ class FormularioState extends State<Formulario> {
   //RadioGroup itemType = RadioGroup.fixo;
   DateTime _toDate = new DateTime.now();
   String _valueText = " ";
-  String _valueTextCartao = "Caixa";
-  String _valueTextContaDestino = "Caixa";
+  String _valueTextCartao = " ";
+  String _valueTextContaDestino = " ";
   String _valueTextTag = " ";
-  List<Widget> listaCategorias;
+  List<Widget> listaCategorias = [];
+  List<Widget> listaTags = [];
+  List<Widget> listaContas = [];
+  List<Widget> listaContasOrigem = [];
+  List<Widget> listaContasDestino = [];
+  List<Widget> listaCartoes = [];
+  List<Widget> listaContasCartoes = [];
   Categoria categoriaDB = new Categoria();
   Tag tagDB = new Tag();
-  List listaDB = [];
+  Conta contaDB = new Conta();
+  Cartao cartaoDB = new Cartao();
+  List listaCategoriasDB = [];
   List listaTagsDB = [];
+  List listaContasDB = [];
+  List listaCartoesDB = [];
 
   List cores = [];
   Palette listaCores = new Palette();
@@ -629,7 +639,7 @@ class FormularioState extends State<Formulario> {
   final TextEditingController _controller = new TextEditingController();
 
   Map formSubmit = {'tipo':'', 'valor':'' ,'data':new DateTime.now().toString(), 'idcategoria':0,
-    'categoria':'', 'tag':'', 'conta':'Caixa', 'contaDestino':'','descricao':'', 'repetir':''};
+    'categoria':'', 'tag':'', 'idtag':0, 'conta':' ', 'idconta':0, 'cartao':' ', 'idcartao':0, 'contaDestino':'','descricao':'', 'repetir':''};
     //falta colocar se eh cartao ou nao, e se for qual sera a fatura que sera lancada
     //se for cartao e tiver repeticao lancar o valor nas fatura corretas se for
     //  fixa lancar somente do mes atual ou lancar as parceladas tb somente no mes atual
@@ -641,24 +651,34 @@ class FormularioState extends State<Formulario> {
     this.cores = listaCores.cores;
 
     if(color == const Color(0xFFE57373)){
-      tagDB.getTagGroup('despesa').then((list) {
+      tagDB.getTagGroup('receita').then((list) {
         this.listaTagsDB = list;
       });
     } else if(this.color == const Color(0xFF00BFA5)) {
-      tagDB.getTagGroup('receita').then((list) {
+      tagDB.getTagGroup('despesa').then((list) {
         this.listaTagsDB = list;
       });
     } else {
       tagDB.getAllTag().then((list) {
         this.listaTagsDB = list;
       });
-    }
-
-    
+    }   
 
     categoriaDB.getAllCategoria().then((list) {
       setState(() {
-        this.listaDB = list;
+        this.listaCategoriasDB = list;
+      });
+    });
+
+    contaDB.getAllContaAtivas().then((list) {
+      setState(() {
+        this.listaContasDB = list;
+      });
+    });
+
+    cartaoDB.getAllCartaoAtivos().then((list) {
+      setState(() {
+        this.listaCartoesDB = list;
       });
     });
   }
@@ -751,7 +771,7 @@ class FormularioState extends State<Formulario> {
     });
   }
 
-  void showDialogTag<T>({ BuildContext context, Widget child }) {
+  void showTagDialog<T>({ BuildContext context, Widget child }) {
     showDialog<T>(
       context: context,
       child: child,
@@ -840,47 +860,116 @@ class FormularioState extends State<Formulario> {
     }
 
     List<Widget> buildListaTags(list) {
-      this.listaCategorias = [];
+      this.listaTags = [];
       for(var i in list) {
-        var id = i[0]['id'];
-        var categoria = i[0]['categoria'];
-        var cor = this.cores[i[0]['cor']];
-
-        this.listaCategorias.add(
+        var id = i['id'];
+        var tag = i['tag'];
+        var cor = this.cores[i['cor']];
+        this.listaTags.add(
           new DialogItem(
             icon: Icons.brightness_1,
             color: cor,
-            text: categoria,
+            text: tag,
             onPressed: () {
-              this.formSubmit['idcategoria'] = id;
-              this.formSubmit['categoria'] = categoria;
-              Navigator.pop(context, categoria);
+              this.formSubmit['idtag'] = id;
+              this.formSubmit['tag'] = tag;
+              Navigator.pop(context, tag);
             }
           ),
         );
+      }
+      return this.listaTags;
+    }
 
-        if(i[1].length > 0) {
-          for(var y in i[1]) {
-            var id2 = y['id'];
-            var categoria2 = y['categoria'];
+    List<Widget> buildListaContaCartao(listAccount, listCard) {
+      this.listaContas = [];
+      this.listaCartoes = [];
 
-            this.listaCategorias.add(
-              new DialogItem(
-                icon: Icons.subdirectory_arrow_right,
-                size: 16.0,
-                color: theme.disabledColor,
-                text: categoria2,
-                onPressed: () {
-                  this.formSubmit['idcategoria'] = id2;
-                  this.formSubmit['categoria'] = categoria2;
-                  Navigator.pop(context, categoria2);
-                }
-              ),
-            );
-          }
-        }
-      }      
-      return this.listaCategorias;
+      this.listaContas.add( //HEADER Contas
+        new Container(
+          padding: new EdgeInsets.only(left: 24.0, top: 8.0, bottom: 8.0),
+          color: new Color(0xFFDFD9D9),
+          child: new Text('CONTAS'),
+        )
+      );
+      for(var i in listAccount) {
+        var id = i['id'];
+        var conta = i['conta'];
+        var cor = this.cores[i['cor']];
+
+        this.listaContas.add(
+          new DialogItem(
+            icon: Icons.brightness_1,
+            color: cor,
+            text: conta,
+            onPressed: () {
+              this.formSubmit['idconta'] = id;
+              this.formSubmit['conta'] = conta;
+              Navigator.pop(context, conta);
+            }
+          ),
+        );
+      }
+
+      this.listaCartoes.add( //HEADER Cartoes
+        new Container(
+          padding: new EdgeInsets.only(left: 24.0, top: 8.0, bottom: 8.0),
+          color: new Color(0xFFDFD9D9),
+          child: new Text('CARTÕES'),
+        )
+      );
+      for(var i in listCard) {
+        var id = i['id'];
+        var cartao = i['cartao'];
+        var cor = this.cores[i['cor']];
+
+        this.listaCartoes.add(
+          new DialogItem(
+            icon: Icons.brightness_1,
+            color: cor,
+            text: cartao,
+            onPressed: () {
+              this.formSubmit['idcartao'] = id;
+              this.formSubmit['cartao'] = cartao;
+              Navigator.pop(context, cartao);
+            }
+          ),
+        );
+      }
+      
+      if(this.color == const Color(0xff9e9e9e)) {
+        this.listaContasOrigem = this.listaContas.sublist(1, this.listaContas.length);
+        return this.listaContasOrigem;
+      } else {
+        this.listaContasCartoes = new List.from(this.listaContas)..addAll(this.listaCartoes);
+        return this.listaContasCartoes;
+      }
+      
+    }
+
+    List<Widget> buildListaContaDestino(listAccount) {
+
+      this.listaContasDestino = [];
+
+      for(var i in listAccount) {
+        var id = i['id'];
+        var conta = i['conta'];
+        var cor = this.cores[i['cor']];
+
+        this.listaContasDestino.add(
+          new DialogItem(
+            icon: Icons.brightness_1,
+            color: cor,
+            text: conta,
+            onPressed: () {
+              this.formSubmit['idconta'] = id;
+              this.formSubmit['conta'] = conta;
+              Navigator.pop(context, conta);
+            }
+          ),
+        );
+      }
+      return this.listaContasDestino;
     }
  
     return new Container(
@@ -954,7 +1043,7 @@ class FormularioState extends State<Formulario> {
                       context: context,
                       child: new SimpleDialog(
                         title: const Text('Categorias'),
-                        children: buildListaCategorias(this.listaDB)
+                        children: buildListaCategorias(this.listaCategoriasDB)
                       )
                     );
                   },
@@ -974,7 +1063,7 @@ class FormularioState extends State<Formulario> {
                   valueText: _valueTextTag,
                   valueStyle: valueStyle,
                   onPressed: () {
-                    showCategoriaDialog<String>(
+                    showTagDialog<String>(
                       context: context,
                       child: new SimpleDialog(
                         title: const Text('Tags'),
@@ -986,55 +1075,6 @@ class FormularioState extends State<Formulario> {
               ),
             ],
           ),
-          //new Row(
-          //  crossAxisAlignment: CrossAxisAlignment.end,
-          //  children: <Widget>[
-          //    new Expanded(
-          //      flex: 4,
-          //      child: new _InputDropdown(
-          //        labelText: 'Tag',
-          //        valueText: _valueTextTag,
-          //        valueStyle: valueStyle,
-          //        onPressed: () {
-          //          showDialogTag<String>(
-          //            context: context,
-          //            child: new SimpleDialog(
-          //              title: const Text('Tags'),
-          //              children: <Widget>[
-          //                new DialogItem(
-          //                  icon: Icons.brightness_1,
-          //                  color: new Color(0xFFFFA500),
-          //                  text: this.color == const Color(0xffe57373) ? 'Despesa Fixa' : 'Receita Fixa',
-          //                  onPressed: () {
-          //                    var depRec;
-          //                    this.color == const Color(0xffe57373) ?
-          //                      depRec = 'Despesa Fixa' : depRec = 'Receita Fixa';
-//
-          //                    this.formSubmit['tag'] = depRec;
-          //                    Navigator.pop(context, depRec);
-          //                  }
-          //                ),
-          //                new DialogItem(
-          //                  icon: Icons.brightness_1,
-          //                  color: new Color(0xFF279605),
-          //                  text: this.color == const Color(0xffe57373) ? 'Despesa Variável' : 'Receita Variável',
-          //                  onPressed: () {
-          //                    var depRec;
-          //                    this.color == const Color(0xffe57373) ?
-          //                      depRec = 'Despesa Variável' : depRec = 'Receita Variável';
-//
-          //                    this.formSubmit['tag'] = depRec;
-          //                    Navigator.pop(context, depRec);
-          //                  }
-          //                ),
-          //              ]
-          //            )
-          //          );
-          //        },
-          //      ),
-          //    ),
-          //  ],
-          //),
 
           new Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -1050,50 +1090,9 @@ class FormularioState extends State<Formulario> {
                       context: context,
                       child: new SimpleDialog(
                         title: const Text('Selecione uma conta'),
-                        children: <Widget>[
-                          this.color == const Color(0xff9e9e9e) ? new Container() : 
-                          new Container(
-                            padding: new EdgeInsets.only(left: 24.0, top: 8.0, bottom: 8.0),
-                            color: new Color(0xFFDFD9D9),
-                            child: new Text('CONTAS'),
-                          ),                          
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFF279605),
-                            text: 'Caixa',
-                            onPressed: () {
-                              this.formSubmit['conta'] = 'Caixa';
-                              Navigator.pop(context, 'Caixa');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFF244086),
-                            text: 'Itaú',
-                            onPressed: () {
-                              this.formSubmit['conta'] = 'Itaú';
-                              Navigator.pop(context, 'Itaú');
-                            }
-                          ),
-
-                          this.color == const Color(0xff9e9e9e) ? new Container() : 
-                          new Container(
-                            padding: new EdgeInsets.only(left: 24.0, top: 8.0, bottom: 8.0),
-                            color: new Color(0xFFDFD9D9),
-                            child: new Text('CARTÕES'),
-                          ),
-
-                          this.color == const Color(0xff9e9e9e) ? new Container() : 
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFF005959),
-                            text: 'NuBank',                           
-                            onPressed: () {
-                              this.formSubmit['conta'] = 'NuBank';
-                              Navigator.pop(context, 'NuBank');
-                            }
-                          ),
-                        ],
+                        children: buildListaContaCartao(
+                          this.listaContasDB, this.listaCartoesDB
+                        )
                       )
                     );
                   }
@@ -1117,26 +1116,7 @@ class FormularioState extends State<Formulario> {
                       context: context,
                       child: new SimpleDialog(
                         title: const Text('Selecione uma conta'),
-                        children: <Widget>[                          
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFF279605),
-                            text: 'Caixa',
-                            onPressed: () {
-                              this.formSubmit['contaDestino'] = 'Caixa';
-                              Navigator.pop(context, 'Caixa');
-                            }
-                          ),
-                          new DialogItem(
-                            icon: Icons.brightness_1,
-                            color: new Color(0xFF244086),
-                            text: 'Itaú',
-                            onPressed: () {
-                              this.formSubmit['contaDestino'] = 'Itaú';
-                              Navigator.pop(context, 'Itaú');
-                            }
-                          ),
-                        ],
+                        children: buildListaContaDestino(this.listaContasDB)
                       )
                     );
                   }

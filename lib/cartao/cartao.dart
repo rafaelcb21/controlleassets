@@ -313,6 +313,7 @@ class NovaCartaoPageState extends State<NovaCartaoPage>{
   String contaPagamento = "Conta para pagamento";
   String fechamento = "";
   String vencimento = "";
+  bool tamanhoList;
 
   @override
   void initState() {
@@ -943,31 +944,80 @@ class NovaCartaoPageState extends State<NovaCartaoPage>{
                       var validarText = _controller.text.replaceAll(new RegExp(r"[' ']+"), '');
                       cartaoDB.ativada = 1;
 
-                      var limite = _controllerNumber.text.toString();
-                      var limiteSanitize = limite.replaceAll(new RegExp(r"[' ']+"), '');
+                      cartaoDB.getCartaoByName(_controller.text).then((list) {
+                        list.length > 0 ? this.tamanhoList = true : this.tamanhoList = false;
 
-                      if(limiteSanitize.length == 0) {
-                        limiteSanitize = '0,00';
-                      }
-                      
-                      RegExp _float = new RegExp(r'^(?:-?(?:[0-9]+))?(?:\,[0-9]{0,2})?$');
-                      bool isFloat = _float.hasMatch(limiteSanitize);
+                        var limite = _controllerNumber.text.toString();
+                        var limiteSanitize = limite.replaceAll(new RegExp(r"[' ']+"), '');
 
-                      if(isFloat) {
-                        var limiteSanitize2 = limiteSanitize.replaceAll(new RegExp(r","), '.');
-                        cartaoDB.limite = double.parse(limiteSanitize2);
+                        if(limiteSanitize.length == 0) {
+                          limiteSanitize = '0,00';
+                        }
+                        
+                        RegExp _float = new RegExp(r'^(?:-?(?:[0-9]+))?(?:\,[0-9]{0,2})?$');
+                        bool isFloat = _float.hasMatch(limiteSanitize);
 
-                        if(
-                          validarText.length > 0 &&
-                          cartaoDB.vencimento != null &&
-                          cartaoDB.fechamento != null &&
-                          cartaoDB.contapagamento != null &&
-                          limite.length > 0
-                        ) {
-                          cartaoDB.upsertCartao(cartaoDB);
-                          Navigator.pop(context);
-                        } else { 
-                          showCartaoDialog<String>(
+                        if(isFloat) {
+                          var limiteSanitize2 = limiteSanitize.replaceAll(new RegExp(r","), '.');
+                          cartaoDB.limite = double.parse(limiteSanitize2);
+
+                          if(
+                            validarText.length > 0 &&
+                            cartaoDB.vencimento != null &&
+                            cartaoDB.fechamento != null &&
+                            cartaoDB.contapagamento != null &&
+                            limite.length > 0 &&
+                            this.tamanhoList == false
+                          ) {
+                            cartaoDB.upsertCartao(cartaoDB);
+                            Navigator.pop(context);
+                          } else { 
+                            showCartaoDialog<String>(
+                              context: context,
+                              child: new SimpleDialog(
+                                title: const Text('Erro'),
+                                children: <Widget>[
+                                  new Container(
+                                    margin: new EdgeInsets.only(left: 24.0),
+                                    child: new Row(
+                                      children: <Widget>[
+                                        new Container(
+                                          margin: new EdgeInsets.only(right: 10.0),
+                                          child: new Icon(
+                                            Icons.error,
+                                            color: const Color(0xFFE57373)),
+                                        ),
+                                        this.tamanhoList == false ?
+                                        new Text(
+                                          "Preencha os campos",
+                                          softWrap: true,
+                                          style: new TextStyle(
+                                            color: Colors.black45,
+                                            fontSize: 16.0,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.w500,
+                                          )
+                                        ) :
+                                        new Text(
+                                          "Cartão já existente",
+                                          softWrap: true,
+                                          style: new TextStyle(
+                                            color: Colors.black45,
+                                            fontSize: 16.0,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.w500,
+                                          )
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                ]
+                              )
+                            );
+                          }
+
+                        } else {
+                          showValidarDialog<String>(
                             context: context,
                             child: new SimpleDialog(
                               title: const Text('Erro'),
@@ -983,7 +1033,7 @@ class NovaCartaoPageState extends State<NovaCartaoPage>{
                                           color: const Color(0xFFE57373)),
                                       ),
                                       new Text(
-                                        "Preencha os campos",
+                                        "Limite inválido\nExemplo: 1234,56\n                -1234,56",
                                         softWrap: true,
                                         style: new TextStyle(
                                           color: Colors.black45,
@@ -999,40 +1049,7 @@ class NovaCartaoPageState extends State<NovaCartaoPage>{
                             )
                           );
                         }
-
-                      } else {
-                        showValidarDialog<String>(
-                          context: context,
-                          child: new SimpleDialog(
-                            title: const Text('Erro'),
-                            children: <Widget>[
-                              new Container(
-                                margin: new EdgeInsets.only(left: 24.0),
-                                child: new Row(
-                                  children: <Widget>[
-                                    new Container(
-                                      margin: new EdgeInsets.only(right: 10.0),
-                                      child: new Icon(
-                                        Icons.error,
-                                        color: const Color(0xFFE57373)),
-                                    ),
-                                    new Text(
-                                      "Limite inválido\nExemplo: 1234,56\n                -1234,56",
-                                      softWrap: true,
-                                      style: new TextStyle(
-                                        color: Colors.black45,
-                                        fontSize: 16.0,
-                                        fontFamily: "Roboto",
-                                        fontWeight: FontWeight.w500,
-                                      )
-                                    )
-                                  ],
-                                ),
-                              )
-                            ]
-                          )
-                        );                      
-                      }
+                      });
                     }
                   ),
                 ],

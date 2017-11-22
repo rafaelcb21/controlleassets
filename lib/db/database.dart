@@ -335,7 +335,6 @@ class Tag {
 
     List lista = await db.rawQuery("SELECT * FROM tag WHERE ativada == 1 ORDER BY tag ASC");
     await db.close();
-
     return lista; 
   }
 
@@ -344,10 +343,9 @@ class Tag {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
     
-    List lista = await db.rawQuery("SELECT * FROM tag WHERE ativada == 1 AND relacionada = ? ORDER BY tag ASC", [name]);
+    List lista = await db.rawQuery("SELECT * FROM tag WHERE ativada == 1 AND NOT relacionada = ? ORDER BY tag ASC", [name]);
     await db.close();
-
-    return lista; 
+    return lista;
   }
 
   Future deleteTag(int id) async {
@@ -429,6 +427,17 @@ class Conta {
     return lista; 
   }
 
+  Future getAllContaAtivas() async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    List lista = await db.rawQuery("SELECT * FROM conta WHERE ativada = 1 ORDER BY conta ASC");
+    await db.close();
+
+    return lista; 
+  }
+
   Future upsertConta(Conta conta) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
@@ -451,6 +460,17 @@ class Conta {
       String dbPath = join(path.path, "database.db");
       Database db = await openDatabase(dbPath);
       List lista = await db.rawQuery("SELECT * FROM conta WHERE id = ? ORDER BY conta ASC", [id]);
+
+      await db.close();
+
+      return lista;
+    }
+
+    Future getContaByName(String name) async {
+      Directory path = await getApplicationDocumentsDirectory();
+      String dbPath = join(path.path, "database.db");
+      Database db = await openDatabase(dbPath);
+      List lista = await db.rawQuery("SELECT * FROM conta WHERE conta = ? ORDER BY conta ASC", [name]);
 
       await db.close();
 
@@ -503,16 +523,28 @@ class Cartao {
     return cartaoTable;
   }
 
-    Future getAllCartao() async {
-      Directory path = await getApplicationDocumentsDirectory();
-      String dbPath = join(path.path, "database.db");
-      Database db = await openDatabase(dbPath);
-      
-      List lista = await db.rawQuery("SELECT * FROM cartao ORDER BY cartao ASC");
+  Future getAllCartao() async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+    
+    List lista = await db.rawQuery("SELECT * FROM cartao ORDER BY cartao ASC");
 
-      await db.close();
+    await db.close();
 
-      return lista; 
+    return lista; 
+  }
+
+  Future getAllCartaoAtivos() async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+    
+    List lista = await db.rawQuery("SELECT * FROM cartao WHERE ativada = 1 ORDER BY cartao ASC");
+
+    await db.close();
+
+    return lista; 
   }
 
   Future upsertCartao(Cartao cartao) async {
@@ -531,6 +563,17 @@ class Cartao {
 
     return cartao;
   }
+
+  Future getCartaoByName(String name) async {
+      Directory path = await getApplicationDocumentsDirectory();
+      String dbPath = join(path.path, "database.db");
+      Database db = await openDatabase(dbPath);
+      List lista = await db.rawQuery("SELECT * FROM cartao WHERE cartao = ? ORDER BY cartao ASC", [name]);
+
+      await db.close();
+
+      return lista;
+    }
 }
 
 class Lancamento {

@@ -282,6 +282,7 @@ class NovaContaPageState extends State<NovaContaPage>{
   Palette listaCores = new Palette();
   List cores = [];
   String tipo;
+  bool tamanhoList;
 
   @override
   void initState() {
@@ -634,25 +635,73 @@ class NovaContaPageState extends State<NovaContaPage>{
                       var validarText = _controller.text.replaceAll(new RegExp(r"[' ']+"), '');
                       contaDB.ativada = 1;
 
-                      var saldo = _controllerNumber.text.toString();
-                      var saldoSanitize = saldo.replaceAll(new RegExp(r"[' ']+"), '');
+                      contaDB.getContaByName(_controller.text).then((list) {
+                        list.length > 0 ? this.tamanhoList = true : this.tamanhoList = false;
 
-                      if(saldoSanitize.length == 0) {
-                        saldoSanitize = '0,00';
-                      }
-                      
-                      RegExp _float = new RegExp(r'^(?:-?(?:[0-9]+))?(?:\,[0-9]{0,2})?$');
-                      bool isFloat = _float.hasMatch(saldoSanitize);
+                        var saldo = _controllerNumber.text.toString();
+                        var saldoSanitize = saldo.replaceAll(new RegExp(r"[' ']+"), '');
 
-                      if(isFloat) {
-                        var saldoSanitize2 = saldoSanitize.replaceAll(new RegExp(r","), '.');
-                        contaDB.saldoinicial = double.parse(saldoSanitize2);
+                        if(saldoSanitize.length == 0) {
+                          saldoSanitize = '0,00';
+                        }
+                        
+                        RegExp _float = new RegExp(r'^(?:-?(?:[0-9]+))?(?:\,[0-9]{0,2})?$');
+                        bool isFloat = _float.hasMatch(saldoSanitize);
 
-                        if(validarText.length > 0) {
-                          contaDB.upsertConta(contaDB);
-                          Navigator.pop(context);
-                        } else { 
-                          showContaDialog<String>(
+                        if(isFloat) {
+                          var saldoSanitize2 = saldoSanitize.replaceAll(new RegExp(r","), '.');
+                          contaDB.saldoinicial = double.parse(saldoSanitize2);
+
+                          if(validarText.length > 0 && this.tamanhoList == false) {
+                            contaDB.upsertConta(contaDB);
+                            Navigator.pop(context);
+                          } else { 
+                            showContaDialog<String>(
+                              context: context,
+                              child: new SimpleDialog(
+                                title: const Text('Erro'),
+                                children: <Widget>[
+                                  new Container(
+                                    margin: new EdgeInsets.only(left: 24.0),
+                                    child: new Row(
+                                      children: <Widget>[
+                                        new Container(
+                                          margin: new EdgeInsets.only(right: 10.0),
+                                          child: new Icon(
+                                            Icons.error,
+                                            color: const Color(0xFFE57373)),
+                                        ),
+                                        this.tamanhoList == false ?
+                                        new Text(
+                                          "Preencha o campo:\nNome da conta",
+                                          softWrap: true,
+                                          style: new TextStyle(
+                                            color: Colors.black45,
+                                            fontSize: 16.0,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.w500,
+                                          )
+                                        ) :
+                                        new Text(
+                                          "Conta já existente",
+                                          softWrap: true,
+                                          style: new TextStyle(
+                                            color: Colors.black45,
+                                            fontSize: 16.0,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.w500,
+                                          )
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                ]
+                              )
+                            );
+                          }
+
+                        } else {
+                          showValidarDialog<String>(
                             context: context,
                             child: new SimpleDialog(
                               title: const Text('Erro'),
@@ -668,7 +717,7 @@ class NovaContaPageState extends State<NovaContaPage>{
                                           color: const Color(0xFFE57373)),
                                       ),
                                       new Text(
-                                        "Preencha o campo:\nNome da conta",
+                                        "Saldo inicial inválido\nExemplo: 1234,56\n                -1234,56",
                                         softWrap: true,
                                         style: new TextStyle(
                                           color: Colors.black45,
@@ -684,41 +733,8 @@ class NovaContaPageState extends State<NovaContaPage>{
                             )
                           );
                         }
-
-                      } else {
-                        showValidarDialog<String>(
-                          context: context,
-                          child: new SimpleDialog(
-                            title: const Text('Erro'),
-                            children: <Widget>[
-                              new Container(
-                                margin: new EdgeInsets.only(left: 24.0),
-                                child: new Row(
-                                  children: <Widget>[
-                                    new Container(
-                                      margin: new EdgeInsets.only(right: 10.0),
-                                      child: new Icon(
-                                        Icons.error,
-                                        color: const Color(0xFFE57373)),
-                                    ),
-                                    new Text(
-                                      "Saldo inicial inválido\nExemplo: 1234,56\n                -1234,56",
-                                      softWrap: true,
-                                      style: new TextStyle(
-                                        color: Colors.black45,
-                                        fontSize: 16.0,
-                                        fontFamily: "Roboto",
-                                        fontWeight: FontWeight.w500,
-                                      )
-                                    )
-                                  ],
-                                ),
-                              )
-                            ]
-                          )
-                        );                      
-                      }
-                    }
+                      });
+                    }                    
                   ),
                 ],
               )
@@ -726,7 +742,7 @@ class NovaContaPageState extends State<NovaContaPage>{
           ],
         ),
       )
-    );
+    );    
   }
 }
 
