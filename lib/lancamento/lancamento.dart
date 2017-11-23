@@ -695,6 +695,9 @@ class FormularioState extends State<Formulario> {
   List listaTagsDB = [];
   List listaContasDB = [];
   List listaCartoesDB = [];
+  bool isCard = false;
+  String fechamento;
+  String nomeMes;
 
   List cores = [];
   Palette listaCores = new Palette();
@@ -821,6 +824,25 @@ class FormularioState extends State<Formulario> {
     });
   }
  
+  String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
+
+  String mesEscolhido(month) {
+    switch(month) {
+      case 1: return "Janeiro"; break;
+      case 2: return "Fevereiro"; break;
+      case 3: return "Março"; break;
+      case 4: return "Abril"; break;
+      case 5: return "May"; break;
+      case 6: return "Junho"; break;
+      case 7: return "Julho"; break;
+      case 8: return "Agosto"; break;
+      case 9: return "Setembro"; break;
+      case 10:return  "Outubro"; break;
+      case 11:return  "Novembro"; break;
+      case 12:return  "Dezembro"; break;
+    }
+  }
+
   void showDialogCartao<T>({ BuildContext context, Widget child }) {
     showDialog<T>(
       context: context,
@@ -830,6 +852,27 @@ class FormularioState extends State<Formulario> {
       if (value != null) {
         setState(() {
           _valueTextCartao = value.toString();
+          if(this.formSubmit['idcartao'] != 0) {
+            this.isCard = true;
+          } else {
+            this.isCard = false;
+          }
+          var dia = new DateTime.now().day;
+          var mes = new DateTime.now().month;
+          var ano = new DateTime.now().year;
+
+          if(dia >= int.parse(fechamento)) {
+            var month = new DateTime.now().add(new Duration(days: 31)).month;
+            var year = new DateTime.now().add(new Duration(days: 31)).year;
+            this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
+
+          } else {
+            var month = new DateTime.now().month;
+            var year = new DateTime.now().year;
+            this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
+            print(month);
+            //editar cartao e ver se estoura com dois numeros ex 22 30 ???
+          }
         });
       }
     });
@@ -987,6 +1030,8 @@ class FormularioState extends State<Formulario> {
             onPressed: () {
               this.formSubmit['idconta'] = id;
               this.formSubmit['conta'] = conta;
+              this.formSubmit['idcartao'] = 0;
+              this.formSubmit['cartao'] = ' ';
               Navigator.pop(context, conta);
             }
           ),
@@ -1004,6 +1049,7 @@ class FormularioState extends State<Formulario> {
         var id = i['id'];
         var cartao = i['cartao'];
         var cor = this.cores[i['cor']];
+        var fechamento = i['fechamento'];
 
         this.listaCartoes.add(
           new DialogItem(
@@ -1013,6 +1059,9 @@ class FormularioState extends State<Formulario> {
             onPressed: () {
               this.formSubmit['idcartao'] = id;
               this.formSubmit['cartao'] = cartao;
+              this.fechamento = fechamento;
+              this.formSubmit['idconta'] = 0;
+              this.formSubmit['conta'] = ' ';
               Navigator.pop(context, cartao);
             }
           ),
@@ -1216,10 +1265,12 @@ class FormularioState extends State<Formulario> {
             children: <Widget>[
               new Expanded(
                 flex: 4,
-                child: new _InputDropdown(
+                child: new _InputDropdown2(
                   labelText: this.color == const Color(0xff9e9e9e) ? 'Conta origem' : 'Conta/Cartão',
+                  labelTextPeriod: this.nomeMes,
                   valueText: _valueTextCartao,
                   valueStyle: valueStyle,
+                  isCard: isCard,
                   onPressed: () {
                     showDialogCartao<String>(
                       context: context,
@@ -1230,6 +1281,9 @@ class FormularioState extends State<Formulario> {
                         )
                       )
                     );
+                  },
+                  onPressed2: () {
+                    print("funcionou");
                   }
                 )
               )
@@ -1401,7 +1455,7 @@ class _DateTimePicker extends StatelessWidget {
     );
   }
 }
- 
+
 class _InputDropdown extends StatelessWidget {
   const _InputDropdown({
     Key key,
@@ -1435,6 +1489,94 @@ class _InputDropdown extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _InputDropdown2 extends StatelessWidget {
+  const _InputDropdown2({
+    Key key,
+    this.child,
+    this.labelText,
+    this.labelTextPeriod,
+    this.valueText,
+    this.valueStyle,
+    this.isCard,
+    this.onPressed,
+    this.onPressed2 }) : super(key: key);
+ 
+  final String labelText;
+  final String labelTextPeriod;
+  final String valueText;
+  final TextStyle valueStyle;
+  final bool isCard;
+  final VoidCallback onPressed;
+  final VoidCallback onPressed2;
+  final Widget child;
+ 
+  @override
+  Widget build(BuildContext context) {
+    return new InkWell(
+      onTap: onPressed,
+      child: new Stack(
+        children: <Widget>[
+          new InputDecorator(
+            decoration: new InputDecoration(
+              labelText: labelText,
+              isDense: true,
+            ),
+            baseStyle: valueStyle,
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                new Text(valueText, style: valueStyle),
+              ],
+            ),
+          ),
+          !isCard ? new Container() : 
+          new Positioned.fill(
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                new Container(
+                  child: new InkWell(
+                    onTap: onPressed2,
+                    child: new Container(
+                      margin: new EdgeInsets.only(top: 12.0),
+                      child: new Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          new Text(
+                            'lançado na fatura de',
+                            style: new TextStyle(
+                              fontFamily: 'Roboto',
+                              color: Colors.black38,
+                              fontSize:  12.0,
+                              fontWeight: FontWeight.w500,
+                              textBaseline: TextBaseline.alphabetic
+                            )
+                          ),
+                          new Text(
+                            labelTextPeriod,
+                            style: new TextStyle(
+                              fontFamily: 'Roboto',
+                              color: Colors.greenAccent[700],
+                              fontSize:  14.0,
+                              fontWeight: FontWeight.w500,
+                              textBaseline: TextBaseline.alphabetic
+                            )
+                          ),
+                        ],
+                      )
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      )
     );
   }
 }

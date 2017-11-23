@@ -647,7 +647,7 @@ class ItemTagState extends State<ItemTag> with TickerProviderStateMixin {
       onHorizontalDragEnd: _settle,
       child: new Stack(
         children: <Widget>[
-          new Positioned.fill(            
+          new Positioned.fill(
             child: new Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
@@ -655,7 +655,7 @@ class ItemTagState extends State<ItemTag> with TickerProviderStateMixin {
                   decoration: new BoxDecoration(
                     color: new Color(0xFFE57373),
                   ),
-                  child: new IconButton(                          
+                  child: new IconButton(
                     icon: new Icon(Icons.delete),
                     color: new Color(0xFFFFFFFF),
                     onPressed: widget.onPressed3
