@@ -233,8 +233,8 @@ class NumberDisplay extends AnimatedWidget {
       return '0,' + numerosLista[1].toString() + numerosLista[2].toString();
     }
     if(numerosLista.length >= 3) {
-      List<int> inteiroLista = numerosLista.getRange(0, numerosLista.length -2);
-      List<int> decimalLista = numerosLista.getRange(numerosLista.length -2, numerosLista.length);
+      List<int> inteiroLista = numerosLista.sublist(0, numerosLista.length -2);
+      List<int> decimalLista = numerosLista.sublist(numerosLista.length -2, numerosLista.length);
       String inteiroListaString = inteiroLista.map((i) => i.toString()).join('');
       String decimalListaString = decimalLista.map((i) => i.toString()).join('');
  
@@ -602,9 +602,10 @@ class _MyFormState extends State<MyForm> {
     );
   }
 }
+typedef void MyFormCallback2(String result);
 
 class MyForm2 extends StatefulWidget {
-  final MyFormCallback onSubmit;
+  final MyFormCallback2 onSubmit;
 
   MyForm2({this.onSubmit});
 
@@ -612,7 +613,7 @@ class MyForm2 extends StatefulWidget {
   _MyFormState2 createState() => new _MyFormState2();
 }
 
-class _MyFormState2 extends State<MyForm> {
+class _MyFormState2 extends State<MyForm2> {
   int _currentValueDividido = 3;
   int _currentValue = 2;
 
@@ -687,6 +688,7 @@ class FormularioState extends State<Formulario> {
   List<Widget> listaContasDestino = [];
   List<Widget> listaCartoes = [];
   List<Widget> listaContasCartoes = [];
+  List<Widget> faturasLista = [];
   Categoria categoriaDB = new Categoria();
   Tag tagDB = new Tag();
   Conta contaDB = new Conta();
@@ -768,7 +770,7 @@ class FormularioState extends State<Formulario> {
     if(color == const Color(0xffe57373)){
       return 'Despesa ' + fraseLowerCaseList.join(' ');
     } else if(this.color == const Color(0xff9e9e9e)) {
-      return 'Transferência ' + fraseLowerCaseList.join(' ');
+      return 'Transf. ' + fraseLowerCaseList.join(' ');
     } else {
       return 'Receita ' + fraseLowerCaseList.join(' ');
     }
@@ -780,7 +782,7 @@ class FormularioState extends State<Formulario> {
     if(color == const Color(0xffe57373)){
       return 'Despesa ' + fraseLowerCaseList.join(' ');
     } else if(this.color == const Color(0xff9e9e9e)) {
-      return 'Transferência ' + fraseLowerCaseList.join(' ');
+      return 'Transf. ' + fraseLowerCaseList.join(' ');
     } else {
       return 'Receita ' + fraseLowerCaseList.join(' ');
     }
@@ -854,25 +856,38 @@ class FormularioState extends State<Formulario> {
           _valueTextCartao = value.toString();
           if(this.formSubmit['idcartao'] != 0) {
             this.isCard = true;
+
+            var dia = new DateTime.now().day;
+            var mes = new DateTime.now().month;
+            var ano = new DateTime.now().year;
+
+            if(dia >= int.parse(fechamento)) {
+              var month = new DateTime.now().add(new Duration(days: 31)).month;
+              var year = new DateTime.now().add(new Duration(days: 31)).year;
+              this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
+
+            } else {
+              var month = new DateTime.now().month;
+              var year = new DateTime.now().year;
+              this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
+            }
           } else {
             this.isCard = false;
           }
-          var dia = new DateTime.now().day;
-          var mes = new DateTime.now().month;
-          var ano = new DateTime.now().year;
+        });
+      }
+    });
+  }
 
-          if(dia >= int.parse(fechamento)) {
-            var month = new DateTime.now().add(new Duration(days: 31)).month;
-            var year = new DateTime.now().add(new Duration(days: 31)).year;
-            this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
-
-          } else {
-            var month = new DateTime.now().month;
-            var year = new DateTime.now().year;
-            this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
-            print(month);
-            //editar cartao e ver se estoura com dois numeros ex 22 30 ???
-          }
+  void showDialogFaturas<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) { // The value passed to Navigator.pop() or null.
+      if (value != null) {
+        setState(() {
+          this.nomeMes = value.toString();
         });
       }
     });
@@ -1102,6 +1117,80 @@ class FormularioState extends State<Formulario> {
       }
       return this.listaContasDestino;
     }
+
+    List<Widget> buildListaFatura() {
+        var dia = new DateTime.now().day;
+        this.faturasLista = [];
+        if(dia >= int.parse(this.fechamento)) {
+          var mesMiddle = new DateTime.now().add(new Duration(days: 31));
+          var month = new DateTime.now().add(new Duration(days: 31)).month;
+          var year = new DateTime.now().add(new Duration(days: 31)).year;
+
+          var lista = [
+            [mesMiddle.subtract(new Duration(days: 62)).month, 
+            mesMiddle.subtract(new Duration(days: 62)).year],
+
+            [mesMiddle.subtract(new Duration(days: 31)).month,
+            mesMiddle.subtract(new Duration(days: 31)).year],
+
+            [month, year],
+
+            [mesMiddle.add(new Duration(days: 31)).month,
+            mesMiddle.add(new Duration(days: 31)).year],
+
+            [mesMiddle.add(new Duration(days: 62)).month,
+            mesMiddle.add(new Duration(days: 62)).year]
+          ];
+
+          for(var i in lista) {
+            var fatura = capitalize(mesEscolhido(i[0]) + ' de ' + i[1].toString());
+            this.faturasLista.add(
+              new DialogItem(
+                text: fatura,
+                onPressed: () {
+
+                  Navigator.pop(context, fatura);
+                }
+              ),
+            );
+          }
+          return this.faturasLista;
+        } else {
+          var mesMiddle = new DateTime.now();
+          var month = new DateTime.now().month;
+          var year = new DateTime.now().year;
+          
+          var lista = [
+            [mesMiddle.subtract(new Duration(days: 62)).month, 
+            mesMiddle.subtract(new Duration(days: 62)).year],
+
+            [mesMiddle.subtract(new Duration(days: 31)).month,
+            mesMiddle.subtract(new Duration(days: 31)).year],
+
+            [month, year],
+
+            [mesMiddle.add(new Duration(days: 31)).month,
+            mesMiddle.add(new Duration(days: 31)).year],
+
+            [mesMiddle.add(new Duration(days: 62)).month,
+            mesMiddle.add(new Duration(days: 62)).year]
+          ];
+
+          for(var i in lista) {
+            var fatura = capitalize(mesEscolhido(i[0]) + ' de ' + i[1].toString());
+            this.faturasLista.add(
+              new DialogItem(
+                text: fatura,
+                onPressed: () {
+
+                  Navigator.pop(context, fatura);
+                }
+              ),
+            );
+          }
+          return this.faturasLista;
+        }
+      }
  
     return new Container(
       padding: new EdgeInsets.only(right: 24.0, left: 24.0, top: 0.0, bottom: 0.0),
@@ -1283,7 +1372,13 @@ class FormularioState extends State<Formulario> {
                     );
                   },
                   onPressed2: () {
-                    print("funcionou");
+                    showDialogFaturas<String>(
+                      context: context,
+                      child: new SimpleDialog(
+                        title: const Text('Selecione uma fatura'),
+                        children: buildListaFatura()
+                      )
+                    );
                   }
                 )
               )
@@ -1338,7 +1433,7 @@ class FormularioState extends State<Formulario> {
                   color: const Color(0xFFFFFFFF),
                   fontSize: 24.0
                 ),  
-              ),//new Icon(Icons.check, color: new Color(0xFFFFFFFF),),
+              ),
               onPressed: (){
                 
                 if(this.formSubmit['idcategoria'] == 0) {

@@ -649,9 +649,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     );
                                   }
                                 ));
-                                _interstitialAd = createInterstitialAd()..load();
-                                _interstitialAd ??= createInterstitialAd();
-                                _interstitialAd..load()..show();
+                                //_interstitialAd = createInterstitialAd()..load();
+                                //_interstitialAd ??= createInterstitialAd();
+                                //_interstitialAd..load()..show();
                               }
                             },
                             child: new Center(
@@ -729,9 +729,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     );
                                   }
                                 ));
-                                _interstitialAd = createInterstitialAd()..load();
-                                _interstitialAd ??= createInterstitialAd();
-                                _interstitialAd..load()..show();
+                                //_interstitialAd = createInterstitialAd()..load();
+                                //_interstitialAd ??= createInterstitialAd();
+                                //_interstitialAd..load()..show();
                               }
                             },
                             child: new Center(
@@ -808,9 +808,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     );
                                   }
                                 ));
-                                _interstitialAd = createInterstitialAd()..load();
-                                _interstitialAd ??= createInterstitialAd();
-                                _interstitialAd..load()..show();
+                                //_interstitialAd = createInterstitialAd()..load();
+                                //_interstitialAd ??= createInterstitialAd();
+                                //_interstitialAd..load()..show();
                               }
                             },
                             child: new Center(

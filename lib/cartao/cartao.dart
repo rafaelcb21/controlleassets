@@ -1051,7 +1051,7 @@ class NovaCartaoPageState extends State<NovaCartaoPage>{
                             );
                           }
                         });
-                      } else {
+                      } else if(this.editar == true){
                         var limite = _controllerNumber.text.toString();
                         var limiteSanitize = limite.replaceAll(new RegExp(r"[' ']+"), '');
 
