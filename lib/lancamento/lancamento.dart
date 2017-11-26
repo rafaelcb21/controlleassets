@@ -452,7 +452,9 @@ class Teclado extends StatelessWidget {
                   size: 35.0
                 ),
                 onPressed: () {
-                  numeros.value = new List.from(numeros.value)..removeLast();
+                  if(numeros.value.length > 0) {
+                    numeros.value = new List.from(numeros.value)..removeLast();
+                  }
                 },
               ),
             ],
@@ -693,6 +695,7 @@ class FormularioState extends State<Formulario> {
   Tag tagDB = new Tag();
   Conta contaDB = new Conta();
   Cartao cartaoDB = new Cartao();
+  Lancamento lancamentoDB = new Lancamento();
   List listaCategoriasDB = [];
   List listaTagsDB = [];
   List listaContasDB = [];
@@ -710,7 +713,8 @@ class FormularioState extends State<Formulario> {
   final TextEditingController _controller = new TextEditingController();
 
   Map formSubmit = {'tipo':'', 'valor':'' ,'data':new DateTime.now().toString(), 'idcategoria':0,
-    'categoria':'', 'tag':'', 'idtag':0, 'conta':' ', 'idconta':0, 'cartao':' ', 'idcartao':0, 'contaDestino':'','descricao':'', 'repetir':'', 'dividir':''};
+    'categoria':'', 'tag':'', 'idtag':0, 'conta':' ', 'idconta':0, 'contadestino':' ',
+    'idcontadestino':0, 'cartao':' ','idcartao':0, 'descricao':'', 'repetir':'', 'dividir':'', "fatura":''};
     //falta colocar se eh cartao ou nao, e se for qual sera a fatura que sera lancada
     //se for cartao e tiver repeticao lancar o valor nas fatura corretas se for
     //  fixa lancar somente do mes atual ou lancar as parceladas tb somente no mes atual
@@ -834,7 +838,7 @@ class FormularioState extends State<Formulario> {
       case 2: return "Fevereiro"; break;
       case 3: return "Março"; break;
       case 4: return "Abril"; break;
-      case 5: return "May"; break;
+      case 5: return "Maio"; break;
       case 6: return "Junho"; break;
       case 7: return "Julho"; break;
       case 8: return "Agosto"; break;
@@ -856,20 +860,18 @@ class FormularioState extends State<Formulario> {
           _valueTextCartao = value.toString();
           if(this.formSubmit['idcartao'] != 0) {
             this.isCard = true;
-
-            var dia = new DateTime.now().day;
-            var mes = new DateTime.now().month;
-            var ano = new DateTime.now().year;
+            var dia = this._toDate.day;
 
             if(dia >= int.parse(fechamento)) {
-              var month = new DateTime.now().add(new Duration(days: 31)).month;
-              var year = new DateTime.now().add(new Duration(days: 31)).year;
+              var month = this._toDate.add(new Duration(days: 31)).month;
+              var year = this._toDate.add(new Duration(days: 31)).year;
               this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
-
+              this.formSubmit["fatura"] = this.nomeMes;
             } else {
-              var month = new DateTime.now().month;
-              var year = new DateTime.now().year;
+              var month = this._toDate.month;
+              var year = this._toDate.year;
               this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
+              this.formSubmit["fatura"] = this.nomeMes;
             }
           } else {
             this.isCard = false;
@@ -888,6 +890,7 @@ class FormularioState extends State<Formulario> {
       if (value != null) {
         setState(() {
           this.nomeMes = value.toString();
+          this.formSubmit["fatura"] = this.nomeMes;
         });
       }
     });
@@ -1108,8 +1111,9 @@ class FormularioState extends State<Formulario> {
             color: cor,
             text: conta,
             onPressed: () {
-              this.formSubmit['idconta'] = id;
-              this.formSubmit['conta'] = conta;
+              this.formSubmit['idcontadestino'] = id;
+              lancamentoDB.idcontadestino = this.formSubmit['idcontadestino'];
+              this.formSubmit['contadestino'] = conta;
               Navigator.pop(context, conta);
             }
           ),
@@ -1119,12 +1123,12 @@ class FormularioState extends State<Formulario> {
     }
 
     List<Widget> buildListaFatura() {
-        var dia = new DateTime.now().day;
+        var dia = this._toDate.day;
         this.faturasLista = [];
         if(dia >= int.parse(this.fechamento)) {
-          var mesMiddle = new DateTime.now().add(new Duration(days: 31));
-          var month = new DateTime.now().add(new Duration(days: 31)).month;
-          var year = new DateTime.now().add(new Duration(days: 31)).year;
+          var mesMiddle = this._toDate.add(new Duration(days: 31));
+          var month = this._toDate.add(new Duration(days: 31)).month;
+          var year = this._toDate.add(new Duration(days: 31)).year;
 
           var lista = [
             [mesMiddle.subtract(new Duration(days: 62)).month, 
@@ -1156,9 +1160,9 @@ class FormularioState extends State<Formulario> {
           }
           return this.faturasLista;
         } else {
-          var mesMiddle = new DateTime.now();
-          var month = new DateTime.now().month;
-          var year = new DateTime.now().year;
+          var mesMiddle = this._toDate;
+          var month = this._toDate.month;
+          var year = this._toDate.year;
           
           var lista = [
             [mesMiddle.subtract(new Duration(days: 62)).month, 
@@ -1296,8 +1300,23 @@ class FormularioState extends State<Formulario> {
             selectedDate: _toDate,
             selectDate: (DateTime date) {
               setState(() {
-                _toDate = date;
+                this._toDate = date;
                 this.formSubmit['data'] = date.toString();
+
+                if(this.isCard) {
+                  var dia = date.day;                  
+                  if(dia >= int.parse(fechamento)) {
+                    var month = date.add(new Duration(days: 31)).month;
+                    var year = date.add(new Duration(days: 31)).year;
+                    this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
+                    this.formSubmit["fatura"] = this.nomeMes;
+                  } else {
+                    var month = date.month;
+                    var year = date.year;
+                    this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
+                    this.formSubmit["fatura"] = this.nomeMes;
+                  }
+                }
              });
             },
           ),
@@ -1453,7 +1472,40 @@ class FormularioState extends State<Formulario> {
                 }
                 var valor = this.numeroUSA(this.numeros.value);
                 this.formSubmit['valor'] = valor;
+                
+
+
+                lancamentoDB.tipo = this.formSubmit['tipo'];
+                lancamentoDB.idcategoria = this.formSubmit['idcategoria'];
+                lancamentoDB.idtag = this.formSubmit['idtag'];
+                lancamentoDB.idconta = this.formSubmit['idconta'];
+                lancamentoDB.idcartao = this.formSubmit['idcartao'];
+                lancamentoDB.data = this.formSubmit['data'];
+                lancamentoDB.valor = this.formSubmit['valor'];
+                lancamentoDB.descricao = this.formSubmit['descricao'];
+
+                if(this.formSubmit['dividir'].length == 0) {
+                  var listSplit = this.formSubmit['repetir'].split(";");
+                  if(listSplit.length == 2) {
+                    lancamentoDB.tiporepeticao = listSplit[0]; //fixo
+                    lancamentoDB.periodorepeticao = listSplit[1]; //mensal
+                    lancamentoDB.quantidaderepeticao = 0;
+                  } else if(listSplit.length == 3) {
+                    lancamentoDB.tiporepeticao = listSplit[0]; //parcelada
+                    lancamentoDB.quantidaderepeticao = listSplit[1]; //2
+                    lancamentoDB.periodorepeticao = listSplit[2]; //anos
+                    
+                  }
+                } else {
+                  var listSplit = this.formSubmit['dividir'].split(";");
+                  lancamentoDB.tiporepeticao = "dividir";
+                  lancamentoDB.quantidaderepeticao = listSplit[0]; //3
+                  lancamentoDB.periodorepeticao = listSplit[1]; //meses                  
+                }
+
                 print(this.formSubmit);
+
+
                 Navigator.pop(context, true);
               }
             ),

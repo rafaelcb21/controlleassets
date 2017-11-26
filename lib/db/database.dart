@@ -84,8 +84,8 @@ class DatabaseClient {
               valor REAL NOT NULL,
               data TEXT NOT NULL,
               descricao TEXT NOT NULL,
-              fixoparcelado TEXT,
               tiporepeticao TEXT,
+              periodorepeticao TEXT,
               quantidaderepeticao INTEGER,
 
               FOREIGN KEY (idcategoria) REFERENCES categoria (id) 
@@ -587,13 +587,13 @@ class Lancamento {
   double valor;
   String data;
   String descricao;
-  String fixoparcelado;
   String tiporepeticao;
+  String periodorepeticao;
   int quantidaderepeticao;
 
+
   static final columns = ["id", "tipo", "idcategoria", "idtag", "idconta", "idcontadestino", "idcartao",
-                          "valor", "data", "descricao", "fixoparcelado", "tiporepeticao",
-                          "quantidaderepeticao"];
+                          "valor", "data", "descricao", "tiporepeticao", "periodorepeticao", "quantidaderepeticao"];
 
   Map toMap() {
     Map map = {
@@ -606,9 +606,9 @@ class Lancamento {
       "valor" : valor,
       "data" : data,
       "descricao" : descricao,
-      "fixoparcelado" : fixoparcelado,
       "tiporepeticao" : tiporepeticao,
-      "quantidaderepeticao" : quantidaderepeticao
+      "periodorepeticao" : periodorepeticao,
+      "quantidaderepeticao" : quantidaderepeticao,
     };
 
     if (id != null) { map["id"] = id; }
@@ -628,8 +628,8 @@ class Lancamento {
     lancamentoTable.valor = map["valor"];
     lancamentoTable.data = map["data"];
     lancamentoTable.descricao = map["descricao"];
-    lancamentoTable.fixoparcelado = map["fixoparcelado"];
     lancamentoTable.tiporepeticao = map["tiporepeticao"];
+    lancamentoTable.periodorepeticao = map["periodorepeticao"];
     lancamentoTable.quantidaderepeticao = map["quantidaderepeticao"];
 
     return lancamentoTable;
