@@ -634,6 +634,23 @@ class Lancamento {
 
     return lancamentoTable;
   }
+
+  Future upsertLancamento(Lancamento lancamento) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    if (lancamento.id == null) {
+      lancamento.id = await db.insert("lancamento", lancamento.toMap());
+    } else {
+      await db.update("lancamento", lancamento.toMap(),
+        where: "id = ?", whereArgs: [lancamento.id]);
+    }
+
+    await db.close();
+
+    return lancamento;
+  }
 }
 
 

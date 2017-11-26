@@ -924,6 +924,20 @@ class FormularioState extends State<Formulario> {
     });
   }
 
+  void showLancamentoErroDialog<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) { // The value passed to Navigator.pop() or null.
+      if (value != null) {
+        setState(() {
+          _valueTextTag = value.toString();
+        });
+      }
+    });
+  }
+
   //void showDialogRepeat<T>({ BuildContext context, Widget child }) {
   //  showDialog<T>(
   //    context: context,
@@ -1195,7 +1209,7 @@ class FormularioState extends State<Formulario> {
           return this.faturasLista;
         }
       }
- 
+
     return new Container(
       padding: new EdgeInsets.only(right: 24.0, left: 24.0, top: 0.0, bottom: 0.0),
       child: new Column(
@@ -1454,71 +1468,95 @@ class FormularioState extends State<Formulario> {
                 ),  
               ),
               onPressed: (){
-                
-                if(this.formSubmit['idcategoria'] == 0) {
-                  print('Preencha os campos');
-                }
                 this.formSubmit['descricao'] = _controller.text;
-                if(this.color == const Color(0xffe57373)) {
-                  this.formSubmit['tipo'] = 'Despesa';
-                } else if(this.color == const Color(0xff9e9e9e)) {
-                  this.formSubmit['tipo'] = 'Transferência';
+
+                if(
+                  this.formSubmit['idcategoria'] == 0 ||
+                  (this.formSubmit['idconta'] == 0 && this.formSubmit['idcartao']) ||
+                  this.formSubmit['descricao'] == '' ||
+                  _controller.text.trim().length == 0
+                ) {
+                  showLancamentoErroDialog<String>(
+                    context: context,
+                    child: new SimpleDialog(
+                      title: const Text('Erro'),
+                      children: <Widget>[
+                        new Container(
+                          margin: new EdgeInsets.only(left: 24.0),
+                          child: new Row(
+                            children: <Widget>[
+                              new Container(
+                                margin: new EdgeInsets.only(right: 10.0),
+                                child: new Icon(
+                                  Icons.error,
+                                  color: const Color(0xFFE57373)),
+                              ),
+                              new Text(
+                                "Preencha os campos\n- Categoria\n- Conta/Cartão\n- Descrição",
+                                softWrap: true,
+                                style: new TextStyle(
+                                  color: Colors.black45,
+                                  fontSize: 16.0,
+                                  fontFamily: "Roboto",
+                                  fontWeight: FontWeight.w500,
+                                )
+                              )
+                            ],
+                          ),
+                        )
+                      ]
+                    )
+                  );
                 } else {
-                  this.formSubmit['tipo'] = 'Receita';
-                }
-                
-                if(this.formSubmit['tag'] == '' && this.color != const Color(0xff9e9e9e)) {
-                  this.formSubmit['tag'] = this.formSubmit['tipo'] + ' Variável';
-                }
-                var valor = this.numeroUSA(this.numeros.value);
-                this.formSubmit['valor'] = valor;
-                
 
-
-                lancamentoDB.tipo = this.formSubmit['tipo'];
-                lancamentoDB.idcategoria = this.formSubmit['idcategoria'];
-                lancamentoDB.idtag = this.formSubmit['idtag'];
-                lancamentoDB.idconta = this.formSubmit['idconta'];
-                lancamentoDB.idcartao = this.formSubmit['idcartao'];
-                lancamentoDB.data = this.formSubmit['data'];
-                lancamentoDB.valor = this.formSubmit['valor'];
-                lancamentoDB.descricao = this.formSubmit['descricao'];
-
-                if(this.formSubmit['dividir'].length == 0) {
-                  var listSplit = this.formSubmit['repetir'].split(";");
-                  if(listSplit.length == 2) {
-                    lancamentoDB.tiporepeticao = listSplit[0]; //fixo
-                    lancamentoDB.periodorepeticao = listSplit[1]; //mensal
-                    lancamentoDB.quantidaderepeticao = 0;
-                  } else if(listSplit.length == 3) {
-                    lancamentoDB.tiporepeticao = listSplit[0]; //parcelada
-                    lancamentoDB.quantidaderepeticao = listSplit[1]; //2
-                    lancamentoDB.periodorepeticao = listSplit[2]; //anos
-                    
+                  if(this.color == const Color(0xffe57373)) {
+                    this.formSubmit['tipo'] = 'Despesa';
+                  } else if(this.color == const Color(0xff9e9e9e)) {
+                    this.formSubmit['tipo'] = 'Transferência';
+                  } else {
+                    this.formSubmit['tipo'] = 'Receita';
                   }
-                } else {
-                  var listSplit = this.formSubmit['dividir'].split(";");
-                  lancamentoDB.tiporepeticao = "dividir";
-                  lancamentoDB.quantidaderepeticao = listSplit[0]; //3
-                  lancamentoDB.periodorepeticao = listSplit[1]; //meses                  
-                }
+                  
+                  if(this.formSubmit['tag'] == '' && this.color != const Color(0xff9e9e9e)) {
+                    this.formSubmit['tag'] = this.formSubmit['tipo'] + ' Variável';
+                  }
+                  var valor = this.numeroUSA(this.numeros.value);
+                  this.formSubmit['valor'] = valor;
 
-                print(this.formSubmit);
+                  lancamentoDB.tipo = this.formSubmit['tipo'];
+                  lancamentoDB.idcategoria = this.formSubmit['idcategoria'];
+                  lancamentoDB.idtag = this.formSubmit['idtag'];
+                  lancamentoDB.idconta = this.formSubmit['idconta'];
+                  lancamentoDB.idcartao = this.formSubmit['idcartao'];
+                  lancamentoDB.data = this.formSubmit['data'];
+                  lancamentoDB.valor = this.formSubmit['valor'];
+                  lancamentoDB.descricao = this.formSubmit['descricao'];
 
+                  if(this.formSubmit['dividir'].length == 0) {
+                    var listSplit = this.formSubmit['repetir'].split(";");
+                    if(listSplit.length == 2) {
+                      lancamentoDB.tiporepeticao = listSplit[0]; //fixo
+                      lancamentoDB.periodorepeticao = listSplit[1]; //mensal
+                      lancamentoDB.quantidaderepeticao = 0;
+                    } else if(listSplit.length == 3) {
+                      lancamentoDB.tiporepeticao = listSplit[0]; //parcelada
+                      lancamentoDB.quantidaderepeticao = listSplit[1]; //2
+                      lancamentoDB.periodorepeticao = listSplit[2]; //anos                      
+                    }
+                  } else {
+                    var listSplit = this.formSubmit['dividir'].split(";");
+                    lancamentoDB.tiporepeticao = "dividir";
+                    lancamentoDB.quantidaderepeticao = listSplit[0]; //3
+                    lancamentoDB.periodorepeticao = listSplit[1]; //meses                  
+                  }
 
-                Navigator.pop(context, true);
+                  lancamentoDB.upsertLancamento(lancamentoDB);
+                  Navigator.pop(context, true);
+
+                }                
               }
             ),
           )
-          //new TextField(
-          //  maxLines: 1,
-          //  decoration: const InputDecoration(
-          //    labelText: "Descrição",
-          //    isDense: true,
-          //  ),
-          //  style: Theme.of(context).textTheme.title,
-          //)
-              
         ]
       )
     );
