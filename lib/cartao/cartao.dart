@@ -670,7 +670,7 @@ class NovaCartaoPageState extends State<NovaCartaoPage>{
                 controller: _controller,
                 maxLines: 1,
                 decoration: const InputDecoration(
-                  icon: const Icon(Icons.account_balance),
+                  icon: const Icon(Icons.credit_card),
                   labelText: "Nome do cartão",
                 ),
                 style: Theme.of(context).textTheme.title,

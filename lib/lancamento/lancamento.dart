@@ -39,8 +39,8 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
       return '0,' + numerosLista[0].toString() + numerosLista[1].toString();
     }
     if(numerosLista.length >= 3) {
-      List<int> inteiroLista = numerosLista.getRange(0, numerosLista.length -2);
-      List<int> decimalLista = numerosLista.getRange(numerosLista.length -2, numerosLista.length);
+      List<int> inteiroLista = numerosLista.sublist(0, numerosLista.length -2);
+      List<int> decimalLista = numerosLista.sublist(numerosLista.length -2, numerosLista.length);
       String inteiroListaString = inteiroLista.map((i) => i.toString()).join('');
       String decimalListaString = decimalLista.map((i) => i.toString()).join('');
  
@@ -516,8 +516,6 @@ class _MyFormState extends State<MyForm> {
 
   List parceladoList = ['Dias', 'Semanas', 'Quinzenas', 'Meses', 
                           'Bimestres', 'Trimestres', 'Semestres', 'Anos'];
-  
-  
 
   @override
   Widget build(BuildContext context) {
@@ -682,7 +680,7 @@ class FormularioState extends State<Formulario> {
   String _valueText = " ";
   String _valueTextCartao = " ";
   String _valueTextContaDestino = " ";
-  String _valueTextTag = " ";
+  String valueTextTag = " ";
   List<Widget> listaCategorias = [];
   List<Widget> listaTags = [];
   List<Widget> listaContas = [];
@@ -703,6 +701,7 @@ class FormularioState extends State<Formulario> {
   bool isCard = false;
   String fechamento;
   String nomeMes;
+  List<Lancamento> lancamentoList = [];
 
   List cores = [];
   Palette listaCores = new Palette();
@@ -712,9 +711,20 @@ class FormularioState extends State<Formulario> {
   FocusNode _focusNode = new FocusNode();
   final TextEditingController _controller = new TextEditingController();
 
-  Map formSubmit = {'tipo':'', 'valor':'' ,'data':new DateTime.now().toString(), 'idcategoria':0,
+  Map formSubmit = {'tipo':'', 'valor':0.0 ,'data':new DateTime.now().toString(), 'idcategoria':0,
     'categoria':'', 'tag':'', 'idtag':0, 'conta':' ', 'idconta':0, 'contadestino':' ',
     'idcontadestino':0, 'cartao':' ','idcartao':0, 'descricao':'', 'repetir':'', 'dividir':'', "fatura":''};
+  
+  Map periodos = {
+    'Dias': 1,
+    'Semanas': 7,
+    'Quinzenas': 15,
+    'Meses': 30, 
+    'Bimestres': 60,
+    'Trimestres': 90,
+    'Semestres': 180,
+    'Anos': 365
+  };
     //falta colocar se eh cartao ou nao, e se for qual sera a fatura que sera lancada
     //se for cartao e tiver repeticao lancar o valor nas fatura corretas se for
     //  fixa lancar somente do mes atual ou lancar as parceladas tb somente no mes atual
@@ -792,26 +802,26 @@ class FormularioState extends State<Formulario> {
     }
   }
 
-  String numeroUSA(List<int> numerosLista){
+  double numeroUSA(List<int> numerosLista){
     if(numerosLista.length == 0) {
-      return '0.00';
+      return 0.00;
     }
     if(numerosLista.length == 1) {
-      return '0.0' + numerosLista[0].toString();
+      return double.parse('0.0' + numerosLista[0].toString());
     }
     if(numerosLista.length == 2) {
-      return '0.' + numerosLista[0].toString() + numerosLista[1].toString();
+      return double.parse('0.' + numerosLista[0].toString() + numerosLista[1].toString());
     }
     if(numerosLista.length == 3 && numerosLista[0] == 0){
-      return '0.' + numerosLista[1].toString() + numerosLista[2].toString();
+      return double.parse('0.' + numerosLista[1].toString() + numerosLista[2].toString());
     }
     if(numerosLista.length >= 3) {
-      List<int> inteiroLista = numerosLista.getRange(0, numerosLista.length -2);
-      List<int> decimalLista = numerosLista.getRange(numerosLista.length -2, numerosLista.length);
+      List<int> inteiroLista = numerosLista.sublist(0, numerosLista.length -2);
+      List<int> decimalLista = numerosLista.sublist(numerosLista.length -2, numerosLista.length);
       String inteiroListaString = inteiroLista.map((i) => i.toString()).join('');
       String decimalListaString = decimalLista.map((i) => i.toString()).join('');
 
-      var valor = inteiroListaString + '.' + decimalListaString;
+      var valor = double.parse(inteiroListaString + '.' + decimalListaString);
       return valor;
     }
   }
@@ -901,7 +911,7 @@ class FormularioState extends State<Formulario> {
       context: context,
       child: child,
     )
-    .then<Null>((T value) { // The value passed to Navigator.pop() or null.
+    .then<Null>((T value) {
       if (value != null) {
         setState(() {
           _valueTextContaDestino = value.toString();
@@ -915,10 +925,10 @@ class FormularioState extends State<Formulario> {
       context: context,
       child: child,
     )
-    .then<Null>((T value) { // The value passed to Navigator.pop() or null.
+    .then<Null>((T value) {
       if (value != null) {
         setState(() {
-          _valueTextTag = value.toString();
+          this.valueTextTag = value.toString();
         });
       }
     });
@@ -929,31 +939,17 @@ class FormularioState extends State<Formulario> {
       context: context,
       child: child,
     )
-    .then<Null>((T value) { // The value passed to Navigator.pop() or null.
+    .then<Null>((T value) {
       if (value != null) {
         setState(() {
-          _valueTextTag = value.toString();
+          
         });
       }
     });
   }
 
-  //void showDialogRepeat<T>({ BuildContext context, Widget child }) {
-  //  showDialog<T>(
-  //    context: context,
-  //    child: new MyForm(),
-  //  );
-  //}
-
-  //void changeItemType(RadioGroup type) {
-  //  setState(() {
-  //    itemType = type;
-  //  });
-  //}
-
   void onSubmit(String result) {
     this.formSubmit['repetir'] = result;
-    //Navigator.pop(context, 'result');
   }
 
   void onSubmitDividir(String result) {
@@ -1364,9 +1360,9 @@ class FormularioState extends State<Formulario> {
             children: <Widget>[
               new Expanded(
                 flex: 4,
-                child: new _InputDropdown(
+                child: new _InputDropdown3(
                   labelText: 'Tag',
-                  valueText: _valueTextTag,
+                  valueText: this.valueTextTag,
                   valueStyle: valueStyle,
                   onPressed: () {
                     showTagDialog<String>(
@@ -1377,6 +1373,13 @@ class FormularioState extends State<Formulario> {
                       )
                     );
                   },
+                   onPressed2: () {
+                    setState(() {
+                      this.valueTextTag = " ";
+                      this.formSubmit['idtag'] = 0;
+                      this.formSubmit['tag'] = '';
+                    });
+                  }
                 ),
               ),
             ],
@@ -1471,11 +1474,10 @@ class FormularioState extends State<Formulario> {
                 this.formSubmit['descricao'] = _controller.text;
 
                 if(
-                  this.formSubmit['idcategoria'] == 0 ||
-                  (this.formSubmit['idconta'] == 0 && this.formSubmit['idcartao']) ||
-                  this.formSubmit['descricao'] == '' ||
-                  _controller.text.trim().length == 0
-                ) {
+                  this.formSubmit['idconta'] == this.formSubmit['idcontadestino'] &&
+                  this.formSubmit['idconta'] != 0 &&
+                  this.formSubmit['idcontadestino'] != 0
+                  ) {
                   showLancamentoErroDialog<String>(
                     context: context,
                     child: new SimpleDialog(
@@ -1492,7 +1494,7 @@ class FormularioState extends State<Formulario> {
                                   color: const Color(0xFFE57373)),
                               ),
                               new Text(
-                                "Preencha os campos\n- Categoria\n- Conta/Cartão\n- Descrição",
+                                "A conta origem e a\nconta destino\ndevem ser diferentes",
                                 softWrap: true,
                                 style: new TextStyle(
                                   color: Colors.black45,
@@ -1508,52 +1510,168 @@ class FormularioState extends State<Formulario> {
                     )
                   );
                 } else {
-
-                  if(this.color == const Color(0xffe57373)) {
-                    this.formSubmit['tipo'] = 'Despesa';
-                  } else if(this.color == const Color(0xff9e9e9e)) {
-                    this.formSubmit['tipo'] = 'Transferência';
+                  if(
+                    this.formSubmit['idcategoria'] == 0 ||
+                    (this.formSubmit['idconta'] == 0 && this.formSubmit['idcartao']) ||
+                    this.formSubmit['descricao'] == '' ||
+                    _controller.text.trim().length == 0
+                  ) {
+                    showLancamentoErroDialog<String>(
+                      context: context,
+                      child: new SimpleDialog(
+                        title: const Text('Erro'),
+                        children: <Widget>[
+                          new Container(
+                            margin: new EdgeInsets.only(left: 24.0),
+                            child: new Row(
+                              children: <Widget>[
+                                new Container(
+                                  margin: new EdgeInsets.only(right: 10.0),
+                                  child: new Icon(
+                                    Icons.error,
+                                    color: const Color(0xFFE57373)),
+                                ),
+                                new Text(
+                                  "Preencha os campos\n- Categoria\n- Conta/Cartão\n- Descrição",
+                                  softWrap: true,
+                                  style: new TextStyle(
+                                    color: Colors.black45,
+                                    fontSize: 16.0,
+                                    fontFamily: "Roboto",
+                                    fontWeight: FontWeight.w500,
+                                  )
+                                )
+                              ],
+                            ),
+                          )
+                        ]
+                      )
+                    );
                   } else {
-                    this.formSubmit['tipo'] = 'Receita';
-                  }
-                  
-                  if(this.formSubmit['tag'] == '' && this.color != const Color(0xff9e9e9e)) {
-                    this.formSubmit['tag'] = this.formSubmit['tipo'] + ' Variável';
-                  }
-                  var valor = this.numeroUSA(this.numeros.value);
-                  this.formSubmit['valor'] = valor;
 
-                  lancamentoDB.tipo = this.formSubmit['tipo'];
-                  lancamentoDB.idcategoria = this.formSubmit['idcategoria'];
-                  lancamentoDB.idtag = this.formSubmit['idtag'];
-                  lancamentoDB.idconta = this.formSubmit['idconta'];
-                  lancamentoDB.idcartao = this.formSubmit['idcartao'];
-                  lancamentoDB.data = this.formSubmit['data'];
-                  lancamentoDB.valor = this.formSubmit['valor'];
-                  lancamentoDB.descricao = this.formSubmit['descricao'];
-
-                  if(this.formSubmit['dividir'].length == 0) {
-                    var listSplit = this.formSubmit['repetir'].split(";");
-                    if(listSplit.length == 2) {
-                      lancamentoDB.tiporepeticao = listSplit[0]; //fixo
-                      lancamentoDB.periodorepeticao = listSplit[1]; //mensal
-                      lancamentoDB.quantidaderepeticao = 0;
-                    } else if(listSplit.length == 3) {
-                      lancamentoDB.tiporepeticao = listSplit[0]; //parcelada
-                      lancamentoDB.quantidaderepeticao = listSplit[1]; //2
-                      lancamentoDB.periodorepeticao = listSplit[2]; //anos                      
+                    if(this.color == const Color(0xffe57373)) {
+                      this.formSubmit['tipo'] = 'Despesa';
+                    } else if(this.color == const Color(0xff9e9e9e)) {
+                      this.formSubmit['tipo'] = 'Transferência';
+                    } else {
+                      this.formSubmit['tipo'] = 'Receita';
                     }
-                  } else {
-                    var listSplit = this.formSubmit['dividir'].split(";");
-                    lancamentoDB.tiporepeticao = "dividir";
-                    lancamentoDB.quantidaderepeticao = listSplit[0]; //3
-                    lancamentoDB.periodorepeticao = listSplit[1]; //meses                  
+                    
+                    if(this.formSubmit['tag'] == '' && this.color != const Color(0xff9e9e9e)) {
+                      this.formSubmit['tag'] = this.formSubmit['tipo'] + ' Variável';
+                    }
+                    var valor = this.numeroUSA(this.numeros.value);
+                    this.formSubmit['valor'] = valor;
+
+                    lancamentoDB.tipo = this.formSubmit['tipo'];
+                    lancamentoDB.idcategoria = this.formSubmit['idcategoria'];
+                    lancamentoDB.idtag = this.formSubmit['idtag'];
+                    lancamentoDB.idconta = this.formSubmit['idconta'];
+                    lancamentoDB.idcartao = this.formSubmit['idcartao'];
+                    lancamentoDB.data = this.formSubmit['data'];
+                    lancamentoDB.valor = this.formSubmit['valor'];
+                    lancamentoDB.descricao = this.formSubmit['descricao'];
+
+                    if(this.formSubmit['dividir'].length == 0) {
+                      var listSplit = this.formSubmit['repetir'].split(";");
+                      if(listSplit.length == 2) {
+                        lancamentoDB.tiporepeticao = listSplit[0]; //fixo
+                        lancamentoDB.periodorepeticao = listSplit[1]; //mensal
+                        lancamentoDB.quantidaderepeticao = 0.0;
+                      } else if(listSplit.length == 3) {
+                        lancamentoDB.tiporepeticao = listSplit[0]; //parcelada
+                        lancamentoDB.quantidaderepeticao =  double.parse(listSplit[1]); //2
+                        lancamentoDB.periodorepeticao = listSplit[2]; //anos                      
+                      }
+                    } else {
+                      
+                      var listSplit = this.formSubmit['dividir'].split(";");
+
+                      lancamentoDB.tiporepeticao = "dividir";
+                      lancamentoDB.quantidaderepeticao = double.parse(listSplit[0]); //3
+                      lancamentoDB.periodorepeticao = listSplit[1]; //meses                  
+                    }
+                    
+                    if(lancamentoDB.tiporepeticao == 'Parcelada') {
+
+                      for(var i = 1; i <= lancamentoDB.quantidaderepeticao; i++) {
+                        Lancamento lancamento = new Lancamento();
+                        lancamento.tipo = lancamentoDB.tipo;
+                        lancamento.idcategoria = lancamentoDB.idcategoria;
+                        lancamento.idtag = lancamentoDB.idcategoria;
+                        lancamento.idconta = lancamentoDB.idconta;
+                        lancamento.idcontadestino = lancamentoDB.idcontadestino;
+                        lancamento.idcartao = lancamentoDB.idcartao;
+                        lancamento.valor = lancamentoDB.valor;
+                        lancamento.descricao = lancamentoDB.descricao;
+                        lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
+                        lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao; //3
+                        lancamento.periodorepeticao = lancamentoDB.periodorepeticao; //meses
+                        lancamento.pago = 0;
+                        var days = i * this.periodos[lancamentoDB.periodorepeticao];                        
+                        lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
+
+                        lancamentoList.add(lancamento);
+                      }
+                      lancamentoDB.upsertLancamento(lancamentoList);
+                      //print(lancamentoDB.data);
+                      //print(this.formSubmit["fatura"]);
+                      //print(lancamentoDB.tiporepeticao);
+                      //print(lancamentoDB.quantidaderepeticao);
+                      //print(lancamentoDB.periodorepeticao);
+                      //print(this.periodos[lancamentoDB.periodorepeticao]);
+
+                      ///data/user/0/com.apps.controlleassets/app_flutter/database.db
+                      ///
+                      ///PAGO OU NAO E COLOCAR A FATURA
+
+                    } else if (lancamentoDB.tiporepeticao == 'dividir') {
+
+                      num valorDivisao = lancamentoDB.valor / lancamentoDB.quantidaderepeticao;
+                      for(var i = 1; i <= lancamentoDB.quantidaderepeticao; i++) {
+                        Lancamento lancamento = new Lancamento();
+                        lancamento.tipo = lancamentoDB.tipo;
+                        lancamento.idcategoria = lancamentoDB.idcategoria;
+                        lancamento.idtag = lancamentoDB.idcategoria;
+                        lancamento.idconta = lancamentoDB.idconta;
+                        lancamento.idcontadestino = lancamentoDB.idcontadestino;
+                        lancamento.idcartao = lancamentoDB.idcartao;
+                        lancamento.valor = valorDivisao;
+                        lancamento.descricao = lancamentoDB.descricao;
+                        lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
+                        lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
+                        lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
+                        lancamento.pago = 0;
+
+                        var days = i * this.periodos[lancamentoDB.periodorepeticao];                        
+                        lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
+
+                        lancamentoList.add(lancamento);
+                      }
+                      lancamentoDB.upsertLancamento(lancamentoList);
+
+                    } else {
+                      Lancamento lancamento = new Lancamento();
+                      lancamento.tipo = lancamentoDB.tipo;
+                      lancamento.idcategoria = lancamentoDB.idcategoria;
+                      lancamento.idtag = lancamentoDB.idcategoria;
+                      lancamento.idconta = lancamentoDB.idconta;
+                      lancamento.idcontadestino = lancamentoDB.idcontadestino;
+                      lancamento.idcartao = lancamentoDB.idcartao;
+                      lancamento.valor = lancamentoDB.valor;
+                      lancamento.descricao = lancamentoDB.descricao;
+                      lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
+                      lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao; //3
+                      lancamento.periodorepeticao = lancamentoDB.periodorepeticao; //meses                      
+                      lancamento.data = lancamentoDB.data;
+                      lancamento.pago = 0;
+                      lancamentoList.add(lancamento);
+                      lancamentoDB.upsertLancamento(lancamentoList);
+                    }
+                    lancamentoList = [];
+                    Navigator.pop(context, true);
                   }
-
-                  lancamentoDB.upsertLancamento(lancamentoDB);
-                  Navigator.pop(context, true);
-
-                }                
+                }
               }
             ),
           )
@@ -1751,6 +1869,78 @@ class _InputDropdown2 extends StatelessWidget {
                               fontWeight: FontWeight.w500,
                               textBaseline: TextBaseline.alphabetic
                             )
+                          ),
+                        ],
+                      )
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      )
+    );
+  }
+}
+
+class _InputDropdown3 extends StatelessWidget {
+  const _InputDropdown3({
+    Key key,
+    this.child,
+    this.labelText,
+    this.valueText,
+    this.valueStyle,
+    this.onPressed,
+    this.onPressed2 }) : super(key: key);
+ 
+  final String labelText;
+  final String valueText;
+  final TextStyle valueStyle;
+  final VoidCallback onPressed;
+  final VoidCallback onPressed2;
+  final Widget child;
+ 
+  @override
+  Widget build(BuildContext context) {
+    return new InkWell(
+      onTap: onPressed,
+      child: new Stack(
+        children: <Widget>[
+          new InputDecorator(
+            decoration: new InputDecoration(
+              labelText: labelText,
+              isDense: true,
+            ),
+            baseStyle: valueStyle,
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                new Text(valueText, style: valueStyle),
+              ],
+            ),
+          ),
+          valueText == " " ? new Container() :
+          new Positioned.fill(
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                new Container(
+                  child: new GestureDetector(
+                    onTap: onPressed2,
+                    child: new Container(
+                      margin: new EdgeInsets.only(top: 12.0),
+                      child: new Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          new Container(
+                            margin: new EdgeInsets.only(top: 16.0, bottom: 8.0, left: 8.0),
+                            child: new Icon(
+                              Icons.cancel,
+                              size: 18.0,
+                              color: Colors.grey[400],
+                            ),
                           ),
                         ],
                       )

@@ -87,6 +87,8 @@ class DatabaseClient {
               tiporepeticao TEXT,
               periodorepeticao TEXT,
               quantidaderepeticao INTEGER,
+              fatura TEXT,
+              pago INTEGER NOT NULL,
 
               FOREIGN KEY (idcategoria) REFERENCES categoria (id) 
                 ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -584,16 +586,19 @@ class Lancamento {
   int idconta;
   int idcontadestino;
   int idcartao;
-  double valor;
+  num valor;
   String data;
   String descricao;
   String tiporepeticao;
   String periodorepeticao;
-  int quantidaderepeticao;
+  num quantidaderepeticao;
+  String fatura;
+  int pago;
 
 
   static final columns = ["id", "tipo", "idcategoria", "idtag", "idconta", "idcontadestino", "idcartao",
-                          "valor", "data", "descricao", "tiporepeticao", "periodorepeticao", "quantidaderepeticao"];
+                          "valor", "data", "descricao", "tiporepeticao", "periodorepeticao", "quantidaderepeticao",
+                          "fatura", "pago"];
 
   Map toMap() {
     Map map = {
@@ -609,6 +614,8 @@ class Lancamento {
       "tiporepeticao" : tiporepeticao,
       "periodorepeticao" : periodorepeticao,
       "quantidaderepeticao" : quantidaderepeticao,
+      "fatura": fatura,
+      "pago": pago
     };
 
     if (id != null) { map["id"] = id; }
@@ -631,11 +638,32 @@ class Lancamento {
     lancamentoTable.tiporepeticao = map["tiporepeticao"];
     lancamentoTable.periodorepeticao = map["periodorepeticao"];
     lancamentoTable.quantidaderepeticao = map["quantidaderepeticao"];
+    lancamentoTable.fatura = map["fatura"];
+    lancamentoTable.pago = map["pago"];
 
     return lancamentoTable;
   }
 
-  Future upsertLancamento(Lancamento lancamento) async {
+  Future upsertLancamento(List<Lancamento> list) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    for(var lancamento in list) {
+      if (lancamento.id == null) {
+        lancamento.id = await db.insert("lancamento", lancamento.toMap());
+      } else {
+        await db.update("lancamento", lancamento.toMap(),
+          where: "id = ?", whereArgs: [lancamento.id]);
+      }
+    }
+
+    await db.close();
+
+    return list;
+  }
+
+  Future upsertLancamentoRepetirParcela(Lancamento lancamento) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
