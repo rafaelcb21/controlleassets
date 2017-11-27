@@ -12,14 +12,18 @@ import '../palette/palette.dart';
 
 class LancamentoPage extends StatefulWidget {
   final Color color;
-  LancamentoPage(this.color);
-  LancamentoPageStatus createState() => new LancamentoPageStatus(this.color);
+  final bool editar;
+  final Lancamento lancamentoDB;
+  LancamentoPage(this.editar, lancamentoDB, this.color);
+  LancamentoPageStatus createState() => new LancamentoPageStatus(this.editar, lancamentoDB, this.color);
 }
  
 class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStateMixin{
-  LancamentoPageStatus(this.color);
+  LancamentoPageStatus(this.editar, lancamentoDB, this.color);
   final Color color;
-  ValueNotifier<List<int>> numeros = new ValueNotifier<List<int>>(<int>[]);
+  final bool editar;
+  final Lancamento lancamentoDB;
+  ValueNotifier<List<int>> numeros;
  
   AnimationController _controller;
   //AnimationController _controller2;
@@ -53,6 +57,17 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
  
   @override
   void initState() {
+
+    if(this.editar) {
+      List<String> x = lancamentoDB.valor.toString().split(".");     
+      List<String> y = new List.from( x[0].split(""))..addAll(x[1].split(""));
+      List<int> numbersList = y.map((i) => int.parse(i));
+      ValueNotifier<List<int>> numeros = new ValueNotifier<List<int>>(numbersList);
+      action();
+    } else {
+      this.numeros = new ValueNotifier<List<int>>(<int>[]);
+    }
+
     _controller = new AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 180),
@@ -133,7 +148,7 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
                     ),
                     new AnimatedBuilder(
                       animation: _frontScale,
-                      child: new Formulario(this.color, this.numeros),
+                      child: new Formulario(this.color, this.editar, lancamentoDB, this.numeros),
                       builder: (BuildContext context, Widget child) {
                         final Matrix4 transform = new Matrix4.identity()
                           ..scale(1.0, _frontScale.value, 1.0);
@@ -487,194 +502,22 @@ class Teclado extends StatelessWidget {
 
 class Formulario extends StatefulWidget {
   final Color color;
+  final bool editar;
+  final Lancamento lancamentoDBEditar;
   final ValueNotifier<List<int>> numeros;
 
-  Formulario(this.color, this.numeros);
+  Formulario(this.color, this.editar, this.lancamentoDBEditar, this.numeros);
   @override
-  FormularioState createState() => new FormularioState(this.color, this.numeros);
-}
-
-typedef void MyFormCallback(String result);
-
-class MyForm extends StatefulWidget {
-  final MyFormCallback onSubmit;
-
-  MyForm({this.onSubmit});
-
-  @override
-  _MyFormState createState() => new _MyFormState();
-}
-
-class _MyFormState extends State<MyForm> {
-  String value = "Fixa";
-  int _currentValueFixo = 3;
-  int _currentValueParcelado = 3;
-  int _currentValue = 2;
-
-  List fixoList = ['Diária', 'Semanal', 'Quinzenal', 'Mensal', 
-                'Bimestral', 'Trimestral', 'Semestral', 'Anual'];
-
-  List parceladoList = ['Dias', 'Semanas', 'Quinzenas', 'Meses', 
-                          'Bimestres', 'Trimestres', 'Semestres', 'Anos'];
-
-  @override
-  Widget build(BuildContext context) {
-    return new SimpleDialog(
-      title: new Text("Repetir"),
-      children: <Widget>[
-        new Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new Radio(
-              groupValue: value,
-              onChanged: (value) => setState(() => this.value = value),
-              value: "Fixa",
-            ),
-            const Text("Fixa"),
-            new Radio(
-              groupValue: value,
-              onChanged: (value) => setState(() => this.value = value),
-              value: "Parcelada",
-            ),
-            const Text("Parcelada"),
-          ],
-        ),
-        this.value == "Fixa"
-        ?
-          new Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              new TextPicker(
-                initialValue: _currentValueFixo,
-                listName: this.fixoList,
-                onChanged: (newValue) =>
-                  setState(() => _currentValueFixo = newValue)
-              ),
-            ],
-          )
-        :
-          new Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              new NumberPicker.integer(
-                initialValue: _currentValue,
-                minValue: 2,
-                maxValue: 360,
-                onChanged: (newValue) =>
-                    setState(() => _currentValue = newValue)),
-
-              new TextPicker(
-                initialValue: _currentValueParcelado,
-                listName: this.parceladoList,
-                onChanged: (newValue) =>
-                  setState(() => _currentValueParcelado = newValue)
-              ),
-            ],
-          ),
-
-        new FlatButton(
-          onPressed: () {
-            Navigator.pop(context);
-            if(value == 'Fixa') {
-              widget.onSubmit(value + ';' + this.fixoList[_currentValueFixo]);
-            } else {
-              widget.onSubmit(value + ';' +  _currentValue.toString() + ';' + 
-                parceladoList[_currentValueParcelado]);
-            }
-            
-          },
-          child: new Container(
-            margin: new EdgeInsets.only(right: 10.0),
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                new Text(
-                  "OK",
-                  style: new TextStyle(
-                    fontSize: 16.0
-                  ),
-                ),
-              ],
-            ),
-          )
-        )
-      ],
-    );
-  }
-}
-typedef void MyFormCallback2(String result);
-
-class MyForm2 extends StatefulWidget {
-  final MyFormCallback2 onSubmit;
-
-  MyForm2({this.onSubmit});
-
-  @override
-  _MyFormState2 createState() => new _MyFormState2();
-}
-
-class _MyFormState2 extends State<MyForm2> {
-  int _currentValueDividido = 3;
-  int _currentValue = 2;
-
-  List periodoList = ['Dias', 'Semanas', 'Quinzenas', 'Meses', 
-                          'Bimestres', 'Trimestres', 'Semestres', 'Anos'];  
-
-  @override
-  Widget build(BuildContext context) {
-    return new SimpleDialog(
-      title: new Text("Dividir"),
-      children: <Widget>[
-        new Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new NumberPicker.integer(
-              initialValue: _currentValue,
-              minValue: 2,
-              maxValue: 360,
-              onChanged: (newValue) =>
-                  setState(() => _currentValue = newValue)),
-
-            new TextPicker(
-              initialValue: _currentValueDividido,
-              listName: this.periodoList,
-              onChanged: (newValue) =>
-                setState(() => _currentValueDividido = newValue)
-            ),
-          ],
-        ),
-
-        new FlatButton(
-          onPressed: () {
-            Navigator.pop(context);
-            widget.onSubmit(_currentValue.toString() + ';' + 
-              periodoList[_currentValueDividido]);
-          },
-          child: new Container(
-            margin: new EdgeInsets.only(right: 10.0),
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                new Text(
-                  "OK",
-                  style: new TextStyle(
-                    fontSize: 16.0
-                  ),
-                ),
-              ],
-            ),
-          )
-        )
-      ],
-    );
-  }
+  FormularioState createState() => new FormularioState(this.color, this.editar, this.lancamentoDBEditar, this.numeros);
 }
 
 class FormularioState extends State<Formulario> {
   final Color color;
+  final bool editar;
+  final Lancamento lancamentoDBEditar;
   final ValueNotifier<List<int>> numeros;
 
-  FormularioState(this.color, this.numeros);
+  FormularioState(this.color, this.editar, lancamentoDBEditar, this.numeros);
   //RadioGroup itemType = RadioGroup.fixo;
   DateTime _toDate = new DateTime.now();
   String _valueText = " ";
@@ -704,8 +547,7 @@ class FormularioState extends State<Formulario> {
   List<Lancamento> lancamentoList = [];
 
   List cores = [];
-  Palette listaCores = new Palette();
-  
+  Palette listaCores = new Palette();  
   
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   FocusNode _focusNode = new FocusNode();
@@ -725,15 +567,13 @@ class FormularioState extends State<Formulario> {
     'Semestres': 180,
     'Anos': 365
   };
-    //falta colocar se eh cartao ou nao, e se for qual sera a fatura que sera lancada
-    //se for cartao e tiver repeticao lancar o valor nas fatura corretas se for
-    //  fixa lancar somente do mes atual ou lancar as parceladas tb somente no mes atual
-    //conta destino nao pode ser igual a conta origem
-    //se tiver repeticao e for fixa lancara somente do mes atual,
-    //  e qdo for para o mes seguinte ou no relatorio lancara as repeticoes que nao
-    //  foram lancadas
+
   void initState(){
     this.cores = listaCores.cores;
+
+    if(!this.editar) {
+      lancamentoDB.pago = 0;
+    }
 
     if(color == const Color(0xFFE57373)){
       tagDB.getTagGroup('receita').then((list) {
@@ -1641,7 +1481,6 @@ class FormularioState extends State<Formulario> {
                         lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
                         lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                         lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
-                        lancamento.pago = 0;
 
                         var days = i * this.periodos[lancamentoDB.periodorepeticao];                        
                         lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
@@ -1664,7 +1503,6 @@ class FormularioState extends State<Formulario> {
                       lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao; //3
                       lancamento.periodorepeticao = lancamentoDB.periodorepeticao; //meses                      
                       lancamento.data = lancamentoDB.data;
-                      lancamento.pago = 0;
                       lancamentoList.add(lancamento);
                       lancamentoDB.upsertLancamento(lancamentoList);
                     }
@@ -1680,7 +1518,183 @@ class FormularioState extends State<Formulario> {
     );
   }
 }
- 
+
+typedef void MyFormCallback(String result);
+
+class MyForm extends StatefulWidget {
+  final MyFormCallback onSubmit;
+
+  MyForm({this.onSubmit});
+
+  @override
+  _MyFormState createState() => new _MyFormState();
+}
+
+class _MyFormState extends State<MyForm> {
+  String value = "Fixa";
+  int _currentValueFixo = 3;
+  int _currentValueParcelado = 3;
+  int _currentValue = 2;
+
+  List fixoList = ['Diária', 'Semanal', 'Quinzenal', 'Mensal', 
+                'Bimestral', 'Trimestral', 'Semestral', 'Anual'];
+
+  List parceladoList = ['Dias', 'Semanas', 'Quinzenas', 'Meses', 
+                          'Bimestres', 'Trimestres', 'Semestres', 'Anos'];
+
+  @override
+  Widget build(BuildContext context) {
+    return new SimpleDialog(
+      title: new Text("Repetir"),
+      children: <Widget>[
+        new Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Radio(
+              groupValue: value,
+              onChanged: (value) => setState(() => this.value = value),
+              value: "Fixa",
+            ),
+            const Text("Fixa"),
+            new Radio(
+              groupValue: value,
+              onChanged: (value) => setState(() => this.value = value),
+              value: "Parcelada",
+            ),
+            const Text("Parcelada"),
+          ],
+        ),
+        this.value == "Fixa"
+        ?
+          new Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              new TextPicker(
+                initialValue: _currentValueFixo,
+                listName: this.fixoList,
+                onChanged: (newValue) =>
+                  setState(() => _currentValueFixo = newValue)
+              ),
+            ],
+          )
+        :
+          new Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              new NumberPicker.integer(
+                initialValue: _currentValue,
+                minValue: 2,
+                maxValue: 360,
+                onChanged: (newValue) =>
+                    setState(() => _currentValue = newValue)),
+
+              new TextPicker(
+                initialValue: _currentValueParcelado,
+                listName: this.parceladoList,
+                onChanged: (newValue) =>
+                  setState(() => _currentValueParcelado = newValue)
+              ),
+            ],
+          ),
+
+        new FlatButton(
+          onPressed: () {
+            Navigator.pop(context);
+            if(value == 'Fixa') {
+              widget.onSubmit(value + ';' + this.fixoList[_currentValueFixo]);
+            } else {
+              widget.onSubmit(value + ';' +  _currentValue.toString() + ';' + 
+                parceladoList[_currentValueParcelado]);
+            }
+            
+          },
+          child: new Container(
+            margin: new EdgeInsets.only(right: 10.0),
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                new Text(
+                  "OK",
+                  style: new TextStyle(
+                    fontSize: 16.0
+                  ),
+                ),
+              ],
+            ),
+          )
+        )
+      ],
+    );
+  }
+}
+typedef void MyFormCallback2(String result);
+
+class MyForm2 extends StatefulWidget {
+  final MyFormCallback2 onSubmit;
+
+  MyForm2({this.onSubmit});
+
+  @override
+  _MyFormState2 createState() => new _MyFormState2();
+}
+
+class _MyFormState2 extends State<MyForm2> {
+  int _currentValueDividido = 3;
+  int _currentValue = 2;
+
+  List periodoList = ['Dias', 'Semanas', 'Quinzenas', 'Meses', 
+                          'Bimestres', 'Trimestres', 'Semestres', 'Anos'];  
+
+  @override
+  Widget build(BuildContext context) {
+    return new SimpleDialog(
+      title: new Text("Dividir"),
+      children: <Widget>[
+        new Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new NumberPicker.integer(
+              initialValue: _currentValue,
+              minValue: 2,
+              maxValue: 360,
+              onChanged: (newValue) =>
+                  setState(() => _currentValue = newValue)),
+
+            new TextPicker(
+              initialValue: _currentValueDividido,
+              listName: this.periodoList,
+              onChanged: (newValue) =>
+                setState(() => _currentValueDividido = newValue)
+            ),
+          ],
+        ),
+
+        new FlatButton(
+          onPressed: () {
+            Navigator.pop(context);
+            widget.onSubmit(_currentValue.toString() + ';' + 
+              periodoList[_currentValueDividido]);
+          },
+          child: new Container(
+            margin: new EdgeInsets.only(right: 10.0),
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                new Text(
+                  "OK",
+                  style: new TextStyle(
+                    fontSize: 16.0
+                  ),
+                ),
+              ],
+            ),
+          )
+        )
+      ],
+    );
+  }
+}
+
 class DialogItem extends StatelessWidget {
   DialogItem({ Key key, this.icon, this.size, this.color, this.text, this.onPressed }) : super(key: key);
  

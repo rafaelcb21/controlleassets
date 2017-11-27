@@ -10,6 +10,7 @@ class DatabaseClient {
   Future create() async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
+    print(dbPath);
     _db = await openDatabase(dbPath, version: 1, onCreate: this._create);
   }
 
