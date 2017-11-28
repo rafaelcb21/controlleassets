@@ -543,6 +543,7 @@ class FormularioState extends State<Formulario> {
   List listaCartoesDB = [];
   bool isCard = false;
   String fechamento;
+  String vencimento;
   String nomeMes;
   List<Lancamento> lancamentoList = [];
 
@@ -699,6 +700,48 @@ class FormularioState extends State<Formulario> {
     }
   }
 
+  String lancarNaFatura(String fechamento, String vencimento, DateTime diaLancamento) {
+    int dia = diaLancamento.day;
+    int mes = diaLancamento.month;
+    int ano = diaLancamento.year;
+    DateTime vencimentoDefinido;
+    DateTime fechamentoDefinido;
+
+    DateTime diaVencimento = new DateTime(ano, mes, int.parse(vencimento));    
+    if(diaVencimento.isBefore(diaLancamento)) {
+      if(mes < 12) {
+        vencimentoDefinido = new DateTime(ano, mes + 1, int.parse(vencimento));
+      } else if (mes == 12) {
+        vencimentoDefinido = new DateTime(ano + 1, 1, int.parse(vencimento));
+      }      
+    } else {
+      vencimentoDefinido = diaVencimento;
+    }
+
+    DateTime diaFechamento = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
+    if(vencimentoDefinido.isBefore(diaFechamento)) {
+      if(vencimentoDefinido.month == 1) {
+        fechamentoDefinido = new DateTime(vencimentoDefinido.year - 1, 12, int.parse(fechamento));
+      } else {
+        fechamentoDefinido = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month - 1, int.parse(fechamento));
+      }      
+    } else {
+      fechamentoDefinido = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
+    }
+
+    if(diaLancamento.isAfter(fechamentoDefinido)) {
+      if(vencimentoDefinido.month < 12) {        
+        return capitalize(mesEscolhido(vencimentoDefinido.month + 1) + ' de ' + ano.toString());
+      } else {
+        return "Janeiro" + ' de ' + (ano + 1).toString();
+      }
+    } else if(diaLancamento.isBefore(fechamentoDefinido)) {
+      return capitalize(mesEscolhido(vencimentoDefinido.month) + ' de ' + ano.toString());
+    }
+
+    
+  }
+
   void showDialogCartao<T>({ BuildContext context, Widget child }) {
     showDialog<T>(
       context: context,
@@ -710,19 +753,10 @@ class FormularioState extends State<Formulario> {
           _valueTextCartao = value.toString();
           if(this.formSubmit['idcartao'] != 0) {
             this.isCard = true;
-            var dia = this._toDate.day;
 
-            if(dia >= int.parse(fechamento)) {
-              var month = this._toDate.add(new Duration(days: 31)).month;
-              var year = this._toDate.add(new Duration(days: 31)).year;
-              this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
-              this.formSubmit["fatura"] = this.nomeMes;
-            } else {
-              var month = this._toDate.month;
-              var year = this._toDate.year;
-              this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
-              this.formSubmit["fatura"] = this.nomeMes;
-            }
+            this.nomeMes = lancarNaFatura(this.fechamento, this.vencimento, this._toDate);
+            this.formSubmit["fatura"] = this.nomeMes;
+
           } else {
             this.isCard = false;
           }
@@ -918,6 +952,7 @@ class FormularioState extends State<Formulario> {
         var cartao = i['cartao'];
         var cor = this.cores[i['cor']];
         var fechamento = i['fechamento'];
+        var vencimento = i['vencimento'];
 
         this.listaCartoes.add(
           new DialogItem(
@@ -928,6 +963,7 @@ class FormularioState extends State<Formulario> {
               this.formSubmit['idcartao'] = id;
               this.formSubmit['cartao'] = cartao;
               this.fechamento = fechamento;
+              this.vencimento = vencimento;
               this.formSubmit['idconta'] = 0;
               this.formSubmit['conta'] = ' ';
               Navigator.pop(context, cartao);
@@ -975,6 +1011,7 @@ class FormularioState extends State<Formulario> {
     List<Widget> buildListaFatura() {
         var dia = this._toDate.day;
         this.faturasLista = [];
+        
         if(dia >= int.parse(this.fechamento)) {
           var mesMiddle = this._toDate.add(new Duration(days: 31));
           var month = this._toDate.add(new Duration(days: 31)).month;
@@ -1154,18 +1191,22 @@ class FormularioState extends State<Formulario> {
                 this.formSubmit['data'] = date.toString();
 
                 if(this.isCard) {
-                  var dia = date.day;                  
-                  if(dia >= int.parse(fechamento)) {
-                    var month = date.add(new Duration(days: 31)).month;
-                    var year = date.add(new Duration(days: 31)).year;
-                    this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
-                    this.formSubmit["fatura"] = this.nomeMes;
-                  } else {
-                    var month = date.month;
-                    var year = date.year;
-                    this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
-                    this.formSubmit["fatura"] = this.nomeMes;
-                  }
+                  //var dia = date.day;
+
+                  this.nomeMes = lancarNaFatura(this.fechamento, this.vencimento, this._toDate);
+                  this.formSubmit["fatura"] = this.nomeMes;
+
+                  //if(dia >= int.parse(fechamento)) {
+                  //  var month = date.add(new Duration(days: 31)).month;
+                  //  var year = date.add(new Duration(days: 31)).year;
+                  //  this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
+                  //  this.formSubmit["fatura"] = this.nomeMes;
+                  //} else {
+                  //  var month = date.month;
+                  //  var year = date.year;
+                  //  this.nomeMes = capitalize(mesEscolhido(month) + ' de ' + year.toString());
+                  //  this.formSubmit["fatura"] = this.nomeMes;
+                  //}
                 }
              });
             },
@@ -1408,6 +1449,7 @@ class FormularioState extends State<Formulario> {
                     lancamentoDB.idtag = this.formSubmit['idtag'];
                     lancamentoDB.idconta = this.formSubmit['idconta'];
                     lancamentoDB.idcartao = this.formSubmit['idcartao'];
+
                     lancamentoDB.data = this.formSubmit['data'];
                     lancamentoDB.valor = this.formSubmit['valor'];
                     lancamentoDB.descricao = this.formSubmit['descricao'];
@@ -1431,10 +1473,56 @@ class FormularioState extends State<Formulario> {
                       lancamentoDB.quantidaderepeticao = double.parse(listSplit[0]); //3
                       lancamentoDB.periodorepeticao = listSplit[1]; //meses                  
                     }
-                    
-                    if(lancamentoDB.tiporepeticao == 'Parcelada') {
 
-                      for(var i = 1; i <= lancamentoDB.quantidaderepeticao; i++) {
+                    if(lancamentoDB.idcartao == 0) {
+                      if(lancamentoDB.tiporepeticao == 'Parcelada') {
+
+                        for(var i = 0; i < lancamentoDB.quantidaderepeticao; i++) {
+                          Lancamento lancamento = new Lancamento();
+                          lancamento.tipo = lancamentoDB.tipo;
+                          lancamento.idcategoria = lancamentoDB.idcategoria;
+                          lancamento.idtag = lancamentoDB.idcategoria;
+                          lancamento.idconta = lancamentoDB.idconta;
+                          lancamento.idcontadestino = lancamentoDB.idcontadestino;
+                          lancamento.idcartao = lancamentoDB.idcartao;
+                          lancamento.valor = lancamentoDB.valor;
+                          lancamento.descricao = lancamentoDB.descricao;
+                          lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
+                          lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao; //3
+                          lancamento.periodorepeticao = lancamentoDB.periodorepeticao; //meses
+                          lancamento.pago = 0;
+                          var days = i * this.periodos[lancamentoDB.periodorepeticao];                        
+                          lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
+
+                          lancamentoList.add(lancamento);
+                        }
+                        lancamentoDB.upsertLancamento(lancamentoList);
+
+                      } else if (lancamentoDB.tiporepeticao == 'dividir') {
+
+                        num valorDivisao = lancamentoDB.valor / lancamentoDB.quantidaderepeticao;
+                        for(var i = 1; i <= lancamentoDB.quantidaderepeticao; i++) {
+                          Lancamento lancamento = new Lancamento();
+                          lancamento.tipo = lancamentoDB.tipo;
+                          lancamento.idcategoria = lancamentoDB.idcategoria;
+                          lancamento.idtag = lancamentoDB.idcategoria;
+                          lancamento.idconta = lancamentoDB.idconta;
+                          lancamento.idcontadestino = lancamentoDB.idcontadestino;
+                          lancamento.idcartao = lancamentoDB.idcartao;
+                          lancamento.valor = valorDivisao;
+                          lancamento.descricao = lancamentoDB.descricao;
+                          lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
+                          lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
+                          lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
+
+                          var days = i * this.periodos[lancamentoDB.periodorepeticao];                        
+                          lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
+
+                          lancamentoList.add(lancamento);
+                        }
+                        lancamentoDB.upsertLancamento(lancamentoList);
+
+                      } else {
                         Lancamento lancamento = new Lancamento();
                         lancamento.tipo = lancamentoDB.tipo;
                         lancamento.idcategoria = lancamentoDB.idcategoria;
@@ -1447,28 +1535,68 @@ class FormularioState extends State<Formulario> {
                         lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
                         lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao; //3
                         lancamento.periodorepeticao = lancamentoDB.periodorepeticao; //meses
-                        lancamento.pago = 0;
-                        var days = i * this.periodos[lancamentoDB.periodorepeticao];                        
-                        lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
-
+                        lancamento.data = lancamentoDB.data;
                         lancamentoList.add(lancamento);
+                        lancamentoDB.upsertLancamento(lancamentoList);
                       }
-                      lancamentoDB.upsertLancamento(lancamentoList);
-                      //print(lancamentoDB.data);
-                      //print(this.formSubmit["fatura"]);
-                      //print(lancamentoDB.tiporepeticao);
-                      //print(lancamentoDB.quantidaderepeticao);
-                      //print(lancamentoDB.periodorepeticao);
-                      //print(this.periodos[lancamentoDB.periodorepeticao]);
+                    } else {
+                      lancamentoDB.fatura = this.formSubmit["fatura"];
+                       if(lancamentoDB.tiporepeticao == 'Parcelada') {
 
-                      ///data/user/0/com.apps.controlleassets/app_flutter/database.db
-                      ///
-                      ///PAGO OU NAO E COLOCAR A FATURA
+                        for(var i = 0; i < lancamentoDB.quantidaderepeticao; i++) {
+                          Lancamento lancamento = new Lancamento();
+                          lancamento.tipo = lancamentoDB.tipo;
+                          lancamento.idcategoria = lancamentoDB.idcategoria;
+                          lancamento.idtag = lancamentoDB.idcategoria;
+                          lancamento.idconta = lancamentoDB.idconta;
+                          lancamento.idcontadestino = lancamentoDB.idcontadestino;
+                          lancamento.idcartao = lancamentoDB.idcartao;
+                          lancamento.valor = lancamentoDB.valor;
+                          lancamento.descricao = lancamentoDB.descricao;
+                          lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
+                          lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao; //3
+                          lancamento.periodorepeticao = lancamentoDB.periodorepeticao; //meses
+                          lancamento.pago = 0;
+                          var days = i * this.periodos[lancamentoDB.periodorepeticao];
+                          DateTime dataFaturaFunction = DateTime.parse(lancamentoDB.data).add(new Duration(days: days));
+                          lancamento.data = dataFaturaFunction.toString();
 
-                    } else if (lancamentoDB.tiporepeticao == 'dividir') {
+                          var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                          this.formSubmit["fatura"] = resultado;
 
-                      num valorDivisao = lancamentoDB.valor / lancamentoDB.quantidaderepeticao;
-                      for(var i = 1; i <= lancamentoDB.quantidaderepeticao; i++) {
+                          lancamentoList.add(lancamento);
+                        }
+                        lancamentoDB.upsertLancamento(lancamentoList);
+
+                      } else if (lancamentoDB.tiporepeticao == 'dividir') {
+
+                        num valorDivisao = lancamentoDB.valor / lancamentoDB.quantidaderepeticao;
+                        for(var i = 1; i <= lancamentoDB.quantidaderepeticao; i++) {
+                          Lancamento lancamento = new Lancamento();
+                          lancamento.tipo = lancamentoDB.tipo;
+                          lancamento.idcategoria = lancamentoDB.idcategoria;
+                          lancamento.idtag = lancamentoDB.idcategoria;
+                          lancamento.idconta = lancamentoDB.idconta;
+                          lancamento.idcontadestino = lancamentoDB.idcontadestino;
+                          lancamento.idcartao = lancamentoDB.idcartao;
+                          lancamento.valor = valorDivisao;
+                          lancamento.descricao = lancamentoDB.descricao;
+                          lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
+                          lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
+                          lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
+
+                          var days = i * this.periodos[lancamentoDB.periodorepeticao];                        
+                          DateTime dataFaturaFunction = DateTime.parse(lancamentoDB.data).add(new Duration(days: days));
+                          lancamento.data = dataFaturaFunction.toString();
+
+                          var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                          this.formSubmit["fatura"] = resultado;
+
+                          lancamentoList.add(lancamento);
+                        }
+                        lancamentoDB.upsertLancamento(lancamentoList);
+
+                      } else {
                         Lancamento lancamento = new Lancamento();
                         lancamento.tipo = lancamentoDB.tipo;
                         lancamento.idcategoria = lancamentoDB.idcategoria;
@@ -1476,35 +1604,15 @@ class FormularioState extends State<Formulario> {
                         lancamento.idconta = lancamentoDB.idconta;
                         lancamento.idcontadestino = lancamentoDB.idcontadestino;
                         lancamento.idcartao = lancamentoDB.idcartao;
-                        lancamento.valor = valorDivisao;
+                        lancamento.valor = lancamentoDB.valor;
                         lancamento.descricao = lancamentoDB.descricao;
                         lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
-                        lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
-                        lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
-
-                        var days = i * this.periodos[lancamentoDB.periodorepeticao];                        
-                        lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
-
+                        lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao; //3
+                        lancamento.periodorepeticao = lancamentoDB.periodorepeticao; //meses                      
+                        lancamento.data = lancamentoDB.data;
                         lancamentoList.add(lancamento);
+                        lancamentoDB.upsertLancamento(lancamentoList);
                       }
-                      lancamentoDB.upsertLancamento(lancamentoList);
-
-                    } else {
-                      Lancamento lancamento = new Lancamento();
-                      lancamento.tipo = lancamentoDB.tipo;
-                      lancamento.idcategoria = lancamentoDB.idcategoria;
-                      lancamento.idtag = lancamentoDB.idcategoria;
-                      lancamento.idconta = lancamentoDB.idconta;
-                      lancamento.idcontadestino = lancamentoDB.idcontadestino;
-                      lancamento.idcartao = lancamentoDB.idcartao;
-                      lancamento.valor = lancamentoDB.valor;
-                      lancamento.descricao = lancamentoDB.descricao;
-                      lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
-                      lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao; //3
-                      lancamento.periodorepeticao = lancamentoDB.periodorepeticao; //meses                      
-                      lancamento.data = lancamentoDB.data;
-                      lancamentoList.add(lancamento);
-                      lancamentoDB.upsertLancamento(lancamentoList);
                     }
                     lancamentoList = [];
                     Navigator.pop(context, true);
