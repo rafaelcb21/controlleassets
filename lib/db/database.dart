@@ -645,12 +645,36 @@ class Lancamento {
     return lancamentoTable;
   }
 
+  Future getLancamento() async {
+      Directory path = await getApplicationDocumentsDirectory();
+      String dbPath = join(path.path, "database.db");
+      Database db = await openDatabase(dbPath);
+      List lista = await db.rawQuery("SELECT * FROM lancamento");
+      await db.close();
+      return lista;
+    }
+
   Future upsertLancamento(List<Lancamento> list) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
     for(var lancamento in list) {
+      print(lancamento.tipo);
+      print(lancamento.idcategoria);
+      print(lancamento.idtag);
+      print(lancamento.idconta);
+      print(lancamento.idcontadestino);
+      print(lancamento.idcartao);
+      print(lancamento.valor);
+      print(lancamento.descricao);
+      print(lancamento.tiporepeticao);
+      print(lancamento.quantidaderepeticao);
+      print(lancamento.periodorepeticao);
+      print(lancamento.data);
+      print(lancamento.fatura);
+      print(lancamento.pago);
+
       if (lancamento.id == null) {
         lancamento.id = await db.insert("lancamento", lancamento.toMap());
       } else {
@@ -658,7 +682,6 @@ class Lancamento {
           where: "id = ?", whereArgs: [lancamento.id]);
       }
     }
-
     await db.close();
 
     return list;

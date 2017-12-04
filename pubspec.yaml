@@ -2,6 +2,7 @@ name: controlleassets
 description: A new Flutter project.
 
 dependencies:
+  intl: "^0.15.2"
   numberpicker: "^0.1.0"
   flutter:
     sdk: flutter
