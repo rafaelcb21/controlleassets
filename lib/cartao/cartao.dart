@@ -743,7 +743,7 @@ class NovaCartaoPageState extends State<NovaCartaoPage>{
                   style: Theme.of(context).textTheme.title,
                   decoration: new InputDecoration(
                     labelText: "Limite",
-                    icon: const Icon(Icons.attach_money),
+                    icon: const Icon(Icons.attach_money)
                   ),
                 ),
               ),
@@ -804,7 +804,7 @@ class NovaCartaoPageState extends State<NovaCartaoPage>{
             ),
 
             new Container( //fechamento e vencimento
-              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 32.0),
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 16.0),
               child: new Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
