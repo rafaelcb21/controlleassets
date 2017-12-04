@@ -738,9 +738,7 @@ class FormularioState extends State<Formulario> {
       }
     } else if(diaLancamento.isBefore(fechamentoDefinido)) {
       return capitalize(mesEscolhido(vencimentoDefinido.month) + ' de ' + ano.toString());
-    }
-
-    
+    }    
   }
 
   void showDialogCartao<T>({ BuildContext context, Widget child }) {
@@ -1713,24 +1711,17 @@ class FormularioState extends State<Formulario> {
                         lancamento.pago = lancamentoDB.pago;
                         lancamentoList.add(lancamento);
                         
-                        print(lancamento.tipo);
-                        print(lancamento.idcategoria);
-                        print(lancamento.idtag);
-                        print(lancamento.idconta);
-                        print(lancamento.idcontadestino);
-                        print(lancamento.idcartao);
-                        print(lancamento.valor);
-                        print(lancamento.descricao);
-                        print(lancamento.tiporepeticao);
-                        print(lancamento.quantidaderepeticao);
-                        print(lancamento.periodorepeticao);
-                        print(lancamento.data);
-                        print('2');
                         lancamentoDB.upsertLancamento(lancamentoList);
                       }
                     } else { //lancamento de cartão
                       lancamentoDB.fatura = this.formSubmit["fatura"];
                        if(lancamentoDB.tiporepeticao == 'Parcelada') { //cartão parcelado
+
+                        List mesesLista = listaDosMeses(
+                          lancamentoDB.quantidaderepeticao,
+                          lancamentoDB.data,
+                          lancamentoDB.periodorepeticao
+                        );
 
                         for(var i = 0; i < lancamentoDB.quantidaderepeticao; i++) {
                           Lancamento lancamento = new Lancamento();
@@ -1743,22 +1734,72 @@ class FormularioState extends State<Formulario> {
                           lancamento.valor = lancamentoDB.valor;
                           lancamento.descricao = lancamentoDB.descricao;
                           lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
-                          lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao; //3
-                          lancamento.periodorepeticao = lancamentoDB.periodorepeticao; //meses
+                          lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
+                          lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
                           lancamento.pago = lancamentoDB.pago;
-                          var days = i * this.periodos[lancamentoDB.periodorepeticao];
-                          DateTime dataFaturaFunction = DateTime.parse(lancamentoDB.data).add(new Duration(days: days));
-                          lancamento.data = dataFaturaFunction.toString();
 
-                          var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
-                          this.formSubmit["fatura"] = resultado;
-
+                          if(
+                            lancamentoDB.periodorepeticao == 'Dias' ||
+                            lancamentoDB.periodorepeticao == 'Semanas' ||
+                            lancamentoDB.periodorepeticao == 'Quinzenas' 
+                          ) {
+                            int days = i * this.periodos[lancamentoDB.periodorepeticao];
+                            lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
+                            DateTime dataFaturaFunction = DateTime.parse(lancamentoDB.data).add(new Duration(days: days));
+                            var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                            this.formSubmit["fatura"] = resultado;
+                            lancamento.fatura = this.formSubmit["fatura"];
+                          
+                          } else if(lancamentoDB.periodorepeticao == 'Anos') {
+                            int days = i * this.periodos[lancamentoDB.periodorepeticao];
+                            int _dia = int.parse(lancamentoDB.data.substring(8,10));
+                            int _mes = int.parse(lancamentoDB.data.substring(5,7));
+                            int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
+                            
+                            if(_dia == 29 && _mes == 2) {
+                              lancamento.data = new DateTime(_ano, _mes + 1, 0).toString();
+                              DateTime dataFaturaFunction = new DateTime(_ano, _mes + 1, 0);
+                              var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                              this.formSubmit["fatura"] = resultado;
+                              lancamento.fatura = this.formSubmit["fatura"];
+                            } else {
+                              lancamento.data = new DateTime(_ano, _mes, _dia).toString();
+                              DateTime dataFaturaFunction = new DateTime(_ano, _mes + 1, 0);
+                              var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                              this.formSubmit["fatura"] = resultado;
+                              lancamento.fatura = this.formSubmit["fatura"];
+                            }
+                          } else {
+                            int days = i * this.periodos[lancamentoDB.periodorepeticao];
+                            int _dia = int.parse(lancamentoDB.data.substring(8,10));
+                            int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
+                            
+                            if((_dia > 28 && mesesLista[i] == 2) || _dia == 31) {
+                              lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString();
+                              DateTime dataFaturaFunction = new DateTime(_ano, mesesLista[i] + 1, 0);
+                              var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                              this.formSubmit["fatura"] = resultado;
+                              lancamento.fatura = this.formSubmit["fatura"];
+                            } else {
+                              lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString();
+                              DateTime dataFaturaFunction = new DateTime(_ano, mesesLista[i], _dia);
+                              var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                              this.formSubmit["fatura"] = resultado;
+                              lancamento.fatura = this.formSubmit["fatura"];
+                            } 
+                          }
                           lancamentoList.add(lancamento);
-                        }
-                        print('3');
+                        } //for 
+
                         lancamentoDB.upsertLancamento(lancamentoList);
 
                       } else if (lancamentoDB.tiporepeticao == 'dividir') { //cartão dividido
+
+                        List mesesLista = listaDosMeses(
+                          lancamentoDB.quantidaderepeticao,
+                          lancamentoDB.data,
+                          lancamentoDB.periodorepeticao
+                        );
 
                         num valorDivisao = lancamentoDB.valor / lancamentoDB.quantidaderepeticao;
                         for(var i = 0; i < lancamentoDB.quantidaderepeticao; i++) {
@@ -1775,17 +1816,60 @@ class FormularioState extends State<Formulario> {
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                           lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
                           lancamento.pago = lancamentoDB.pago;
-
-                          var days = i * this.periodos[lancamentoDB.periodorepeticao];                        
-                          DateTime dataFaturaFunction = DateTime.parse(lancamentoDB.data).add(new Duration(days: days));
-                          lancamento.data = dataFaturaFunction.toString();
-
-                          var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
-                          this.formSubmit["fatura"] = resultado;
-
+                          
+                          if(
+                            lancamentoDB.periodorepeticao == 'Dias' ||
+                            lancamentoDB.periodorepeticao == 'Semanas' ||
+                            lancamentoDB.periodorepeticao == 'Quinzenas' 
+                          ) {
+                            int days = i * this.periodos[lancamentoDB.periodorepeticao];
+                            lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
+                            DateTime dataFaturaFunction = DateTime.parse(lancamentoDB.data).add(new Duration(days: days));
+                            var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                            this.formSubmit["fatura"] = resultado;
+                            lancamento.fatura = this.formSubmit["fatura"];
+                          
+                          } else if(lancamentoDB.periodorepeticao == 'Anos') {
+                            int days = i * this.periodos[lancamentoDB.periodorepeticao];
+                            int _dia = int.parse(lancamentoDB.data.substring(8,10));
+                            int _mes = int.parse(lancamentoDB.data.substring(5,7));
+                            int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
+                            
+                            if(_dia == 29 && _mes == 2) {
+                              lancamento.data = new DateTime(_ano, _mes + 1, 0).toString();
+                              DateTime dataFaturaFunction = new DateTime(_ano, _mes + 1, 0);
+                              var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                              this.formSubmit["fatura"] = resultado;
+                              lancamento.fatura = this.formSubmit["fatura"];
+                            } else {
+                              lancamento.data = new DateTime(_ano, _mes, _dia).toString();
+                              DateTime dataFaturaFunction = new DateTime(_ano, _mes + 1, 0);
+                              var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                              this.formSubmit["fatura"] = resultado;
+                              lancamento.fatura = this.formSubmit["fatura"];
+                            }
+                          } else {
+                            int days = i * this.periodos[lancamentoDB.periodorepeticao];
+                            int _dia = int.parse(lancamentoDB.data.substring(8,10));
+                            int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
+                            
+                            if((_dia > 28 && mesesLista[i] == 2) || _dia == 31) {
+                              lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString();
+                              DateTime dataFaturaFunction = new DateTime(_ano, mesesLista[i] + 1, 0);
+                              var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                              this.formSubmit["fatura"] = resultado;
+                              lancamento.fatura = this.formSubmit["fatura"];
+                            } else {
+                              lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString();
+                              DateTime dataFaturaFunction = new DateTime(_ano, mesesLista[i], _dia);
+                              var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                              this.formSubmit["fatura"] = resultado;
+                              lancamento.fatura = this.formSubmit["fatura"];
+                            } 
+                          }
                           lancamentoList.add(lancamento);
-                        }
-                        print('4');
+                        } //for 
+
                         lancamentoDB.upsertLancamento(lancamentoList);
 
                       } else { //lancamento de cartao não parcelado e nem dividido
@@ -1799,13 +1883,12 @@ class FormularioState extends State<Formulario> {
                         lancamento.valor = lancamentoDB.valor;
                         lancamento.descricao = lancamentoDB.descricao;
                         lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
-                        lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao; //3
-                        lancamento.periodorepeticao = lancamentoDB.periodorepeticao; //meses                      
+                        lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
+                        lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
                         lancamento.data = lancamentoDB.data;
                         lancamento.pago = lancamentoDB.pago;
 
                         lancamentoList.add(lancamento);
-                        print('5');
                         lancamentoDB.upsertLancamento(lancamentoList);
                       }
                     }

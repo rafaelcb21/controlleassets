@@ -660,21 +660,6 @@ class Lancamento {
     Database db = await openDatabase(dbPath);
 
     for(var lancamento in list) {
-      print(lancamento.tipo);
-      print(lancamento.idcategoria);
-      print(lancamento.idtag);
-      print(lancamento.idconta);
-      print(lancamento.idcontadestino);
-      print(lancamento.idcartao);
-      print(lancamento.valor);
-      print(lancamento.descricao);
-      print(lancamento.tiporepeticao);
-      print(lancamento.quantidaderepeticao);
-      print(lancamento.periodorepeticao);
-      print(lancamento.data);
-      print(lancamento.fatura);
-      print(lancamento.pago);
-
       if (lancamento.id == null) {
         lancamento.id = await db.insert("lancamento", lancamento.toMap());
       } else {
