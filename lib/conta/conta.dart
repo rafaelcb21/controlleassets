@@ -462,7 +462,7 @@ class NovaContaPageState extends State<NovaContaPage>{
             ),
             
             new Container( //cor
-              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 16.0),
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 36.0),
               child: new Row(
                 children: <Widget>[
                   new Icon(
@@ -517,7 +517,7 @@ class NovaContaPageState extends State<NovaContaPage>{
             ),
 
             new Container( //tipo
-              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 32.0),
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 40.0),
               child: new Row(
                 children: <Widget>[
                   new Icon(

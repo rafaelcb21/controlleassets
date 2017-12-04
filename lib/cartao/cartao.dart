@@ -678,7 +678,7 @@ class NovaCartaoPageState extends State<NovaCartaoPage>{
             ),
             
             new Container( //cor
-              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 16.0),
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 36.0),
               child: new Row(
                 children: <Widget>[
                   new Icon(
@@ -750,7 +750,7 @@ class NovaCartaoPageState extends State<NovaCartaoPage>{
             ),
 
             new Container( //conta para pagamento
-              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 16.0),
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 40.0),
               child: new Row(
                 children: <Widget>[
                   new Icon(
@@ -804,7 +804,7 @@ class NovaCartaoPageState extends State<NovaCartaoPage>{
             ),
 
             new Container( //fechamento e vencimento
-              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 16.0),
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 40.0),
               child: new Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
