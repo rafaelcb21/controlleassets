@@ -44,7 +44,7 @@ class TagPageState extends State<TagPage>{
 
         this.listaTags.add(
           new ItemTag(
-            key: new Key(i),
+            key: new ObjectKey(i),
             id: id,
             tag: tag,
             relacionada: relacionada,
@@ -58,7 +58,7 @@ class TagPageState extends State<TagPage>{
               tagEditar.relacionada = relacionada;
               tagEditar.cor = numeroCor;
               tagEditar.ativada = ativada;
-
+ 
               await Navigator.of(context).push(new PageRouteBuilder(
                 opaque: false,
                 pageBuilder: (BuildContext context, _, __) {
@@ -386,7 +386,7 @@ class NovaTagPageState extends State<NovaTagPage>{
             ),
             
             new Container(
-              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 16.0),
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 31.0),
               child: new Row(
                 children: <Widget>[
                   new Icon(

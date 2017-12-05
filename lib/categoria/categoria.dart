@@ -54,7 +54,7 @@ class CategoriaPageState extends State<CategoriaPage>{
 
         this.listaCategorias.add(
           new ItemCategoria(
-            key: new Key(i[0]),
+            key: new ObjectKey(i[0]),
             filho: false,
             temFilhos: temFilhos,
             id: id,
@@ -196,7 +196,7 @@ class CategoriaPageState extends State<CategoriaPage>{
             this.listaCategorias.add(
               //new ItemCategoria(true, id2, categoria2, cor2, numeroCor2, idcategoriapai2, ativada2)
               new ItemCategoria(
-                key: new Key(y),
+                key: new ObjectKey(y),
                 filho: true,
                 temFilhos: false,
                 id: id2,
@@ -256,15 +256,14 @@ class CategoriaPageState extends State<CategoriaPage>{
                     child: new AlertDialog(
                       title: const Text('Deletar Categoria'),
                       content: new Text(
-                        temFilhos ? 'Deseja deletar essa categoria e seus filhos?'
-                          : 'Deseja deletar essa categoria?',
-                          softWrap: true,
-                          style: new TextStyle(
-                            color: Colors.black45,
-                            fontSize: 16.0,
-                            fontFamily: "Roboto",
-                            fontWeight: FontWeight.w500,
-                          )
+                        'Deseja deletar essa categoria?',
+                        softWrap: true,
+                        style: new TextStyle(
+                          color: Colors.black45,
+                          fontSize: 16.0,
+                          fontFamily: "Roboto",
+                          fontWeight: FontWeight.w500,
+                        )
                       ),
                       actions: <Widget>[
                         new FlatButton(
@@ -276,7 +275,7 @@ class CategoriaPageState extends State<CategoriaPage>{
                         new FlatButton(
                           child: const Text('OK'),
                           onPressed: () {
-                            categoriaDB.deleteCategoria(listaDelete).then(
+                            categoriaDB.deleteCategoria([id2]).then(
                               (list) {
                                 setState(() {
                                   this.listaDB = list;
@@ -645,7 +644,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
             ),
             this.value == "Categoria principal" ?
             new Container(
-              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 16.0),
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 31.0),
               child: new Row(
                 children: <Widget>[
                   new Icon(
@@ -700,7 +699,7 @@ class NovaCategoriaPageState extends State<NovaCategoriaPage>{
             ) :
 
             new Container(
-              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 16.0),
+              margin: new EdgeInsets.only(left: 12.0, right: 16.0, top: 31.0),
               child: new Row(
                 children: <Widget>[
                   new Icon(
