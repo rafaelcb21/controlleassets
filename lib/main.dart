@@ -349,7 +349,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         //  )
         //],
       ),
-      drawer: new Drawer(
+      drawer: !_isRotated ? new Drawer() : new Drawer(
         child: new ListView(
           children: <Widget>[
             //new DrawerHeader(

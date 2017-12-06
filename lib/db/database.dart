@@ -428,6 +428,21 @@ class Conta {
     return lista; 
   }
 
+  Future getSaldoById(id) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    List listaReceitaById = await db.rawQuery("SELECT SUM(valor) FROM 'lancamento' WHERE idconta = ? AND pago = 1 AND tipo = 'Receita'", [id]);
+    List listaDespesaById = await db.rawQuery("SELECT SUM(valor) FROM 'lancamento' WHERE idconta = ? AND pago = 1 AND tipo = 'Despesa'", [id]);
+   
+    await db.close();
+
+    return listaReceitaById; 
+  }
+
+
+
   Future getAllContaAtivas() async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
