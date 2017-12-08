@@ -652,7 +652,7 @@ class NovaContaPageState extends State<NovaContaPage>{
                           var saldoSanitize2 = saldoSanitize.replaceAll(new RegExp(r","), '.');
                           contaDB.saldoinicial = double.parse(saldoSanitize2);
 
-                          if(validarText.length > 0 && this.tamanhoList == false) {
+                          if((validarText.length > 0 && this.tamanhoList == false) || this.editar == true) {
                             contaDB.upsertConta(contaDB);
                             Navigator.pop(context);
                           } else { 

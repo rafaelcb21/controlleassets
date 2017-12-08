@@ -2,7 +2,6 @@ import "package:flutter/material.dart";
 
 import './db/database.dart';
 import "home/card_saldo.dart";
-import "home/card_contas.dart";
 import "home/card_cartoes.dart";
 import "home/card_alertas.dart";
 import "lancamento/lancamento.dart";
@@ -72,22 +71,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List cores = [];
   Palette listaCores = new Palette();
   Conta contaDB = new Conta();
+  bool cardContaNew;
 
   AnimationController _controller;
   Animation<double> _animation;
   Animation<double> _animation2;
   Animation<double> _animation3;
 
-  createdb() async {
-    await db.create().then((lista) {
-      setState(() {
-        this.listaDB = lista;
-        print(lista);
-      });
-    });
-  }
-
-  static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
+ static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
     testDevices: testDevice != null ? <String>[testDevice] : null,
     keywords: <String>['foo', 'bar'],
     contentUrl: 'http://foo.com/bar.html',
@@ -151,7 +142,19 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
     _controller.reverse();
     
-    createdb();
+    db.create().then((lista) {
+      setState(() {
+        if(lista.length > 0) {
+          this.listaDB = lista;
+          this.cardContaNew = false;
+        } else {
+          this.listaDB = lista;
+          this.cardContaNew = true;
+        }
+        
+      });
+    });
+
     super.initState();
     
   }
@@ -230,177 +233,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return new Scaffold( 
       appBar: new AppBar(
         backgroundColor: azulAppbar,
-        //actions: <Widget>[
-        //  new IconButton(
-        //    icon: const Icon(Icons.add_circle),
-        //    color: new Color(0xFFFFFFFF),
-        //    onPressed: () {
-        //      showDialog(
-        //        context: context,
-        //        child: new SimpleDialog(
-        //          children: <Widget>[
-        //            new FlatButton(
-        //              textColor: new Color(0xFF9E9E9E),
-        //              child: new Row(
-        //                children: <Widget>[
-        //                  new Icon(
-        //                    Icons.add_circle,
-        //                    size: 24.0
-        //                  ),
-        //                  new Container(
-        //                    padding: new EdgeInsets.only(left: 16.0),
-        //                    child: new Text(
-        //                      'transferência',
-        //                      style: new TextStyle(
-        //                        fontFamily: 'Roboto',
-        //                        fontSize: 16.0
-        //                      ),
-        //                    ),
-        //                  )
-        //                ],
-        //              ),
-        //              onPressed: () async {
-        //                //_bannerAd?.dispose();
-        //                //_bannerAd = null;
-        //                Navigator.pop(context);
-        //                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
-        //                  opaque: false,
-        //                  pageBuilder: (BuildContext context, _, __) {
-        //                    return new LancamentoPage(new Color(0xFF9E9E9E));
-        //                  },
-        //                  transitionsBuilder: (
-        //                    BuildContext context,
-        //                    Animation<double> animation,
-        //                    Animation<double> secondaryAnimation,
-        //                    Widget child,
-        //                  ) {
-        //                    return new SlideTransition(
-        //                      position: new Tween<Offset>(
-        //                        begin:  const Offset(1.0, 0.0),
-        //                        end: Offset.zero,
-        //                      ).animate(animation),
-        //                      child: child,
-        //                    );
-        //                  }
-        //                ));
-        //                _interstitialAd = createInterstitialAd()..load();
-        //                _interstitialAd ??= createInterstitialAd();
-        //                _interstitialAd..load()..show();
-        //                  //_bannerAd ??= createBannerAd();
-        //                  //_bannerAd..load()..show();
-        //                
-        //              },
-        //            ),
-        //            new FlatButton(
-        //              textColor: new Color(0xFF00BFA5),
-        //              child: new Row(
-        //                children: <Widget>[
-        //                  new Icon(
-        //                    Icons.add_circle,
-        //                    size: 24.0
-        //                  ),
-        //                  new Container(
-        //                    padding: new EdgeInsets.only(left: 16.0),
-        //                    child: new Text(
-        //                      'receita',
-        //                      style: new TextStyle(
-        //                        fontFamily: 'Roboto',
-        //                        fontSize: 16.0
-        //                      ),
-        //                    ),
-        //                  )
-        //                ],
-        //              ),                
-        //              onPressed: () async {
-        //                //_bannerAd?.dispose();
-        //                //_bannerAd = null;
-        //                Navigator.pop(context);
-        //                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
-        //                  opaque: false,
-        //                  pageBuilder: (BuildContext context, _, __) {
-        //                    return new LancamentoPage(new Color(0xFF00BFA5));
-        //                  },
-        //                  transitionsBuilder: (
-        //                    BuildContext context,
-        //                    Animation<double> animation,
-        //                    Animation<double> secondaryAnimation,
-        //                    Widget child,
-        //                  ) {
-        //                    return new SlideTransition(
-        //                      position: new Tween<Offset>(
-        //                        begin:  const Offset(1.0, 0.0),
-        //                        end: Offset.zero,
-        //                      ).animate(animation),
-        //                      child: child,
-        //                    );
-        //                  }
-        //                ));
-        //                _interstitialAd = createInterstitialAd()..load();
-        //                _interstitialAd ??= createInterstitialAd();
-        //                _interstitialAd..load()..show();
-        //                  //_bannerAd ??= createBannerAd();
-        //                  //_bannerAd..load()..show();
-        //                
-        //              },
-        //            ),
-        //            new FlatButton(
-        //              textColor: new Color(0xFFE57373),
-        //              child: new Row(
-        //                children: <Widget>[
-        //                  new Icon(
-        //                    Icons.add_circle,
-        //                    size: 24.0
-        //                  ),
-        //                  new Container(
-        //                    padding: new EdgeInsets.only(left: 16.0),
-        //                    child: new Text(
-        //                      'despesa',
-        //                      style: new TextStyle(
-        //                        fontFamily: 'Roboto',
-        //                        fontSize: 16.0
-        //                      ),
-        //                    ),
-        //                  )
-        //                ],
-        //              ),                
-        //              onPressed: () async {
-        //                //_bannerAd?.dispose();
-        //                //_bannerAd = null;
-        //                Navigator.pop(context);
-        //                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
-        //                  opaque: false,
-        //                  pageBuilder: (BuildContext context, _, __) {
-        //                    return new LancamentoPage(new Color(0xFFE57373));
-        //                  },
-        //                  transitionsBuilder: (
-        //                    BuildContext context,
-        //                    Animation<double> animation,
-        //                    Animation<double> secondaryAnimation,
-        //                    Widget child,
-        //                  ) {
-        //                    return new SlideTransition(
-        //                      position: new Tween<Offset>(
-        //                        begin:  const Offset(1.0, 0.0),
-        //                        end: Offset.zero,
-        //                      ).animate(animation),
-        //                      child: child,
-        //                    );
-        //                  }
-        //                ));
-        //                  _interstitialAd = createInterstitialAd()..load();
-        //                  _interstitialAd ??= createInterstitialAd();
-        //                  _interstitialAd..load()..show();
-        //                  //_bannerAd ??= createBannerAd();
-        //                  //_bannerAd..load()..show();
-        //                
-        //              },
-        //            ),
-        //          ],
-        //        )
-        //      );
-        //    },
-        //  )
-        //],
       ),
       drawer: !_isRotated ? new Drawer() : new Drawer(
         child: new ListView(
@@ -416,9 +248,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               height: 80.0,
             ),
             new ListTile(
-              onTap: (){
+              onTap: () async {
                 Navigator.pop(context);
-                Navigator.of(context).push(new PageRouteBuilder(
+                await Navigator.of(context).push(new PageRouteBuilder(
                   opaque: false,
                   pageBuilder: (BuildContext context, _, __) {
                     return new ContaPage();
@@ -438,6 +270,18 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     );
                   }
                 ));
+
+                contaDB.getAllContaAtivas().then(
+                  (list) {
+                    if(list.length > 0) {
+                      this.listaDB = list;
+                      this.cardContaNew = false;
+                    } else {
+                      this.listaDB = list;
+                      this.cardContaNew = true;
+                    }
+                  }
+                );
               },
               leading: new Icon(
                 Icons.account_balance,
@@ -473,15 +317,6 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     );
                   }
                 ));
-
-                contaDB.getAllContaAtivas().then(
-                  (list) {
-                    setState(() {
-                      this.listaDB = list;
-                      print(list);
-                    });
-                  }
-                );
               },
               leading: new Icon(
                 Icons.credit_card,
@@ -622,14 +457,77 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         children: <Widget>[
           new ListView  (
             children: <Widget>[  
-              new CardSaldo(),         
-              new Container(
+              new CardSaldo(),
+
+              this.cardContaNew ? 
+              new Container( // Card Contas
+                padding: new EdgeInsets.only(bottom: 6.0, right: 6.0, left: 6.0),
+                child: new  Card(
+                  child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      new Container(
+                        padding: new EdgeInsets.only(bottom: 8.0, top: 26.0),
+                        child: new Icon(
+                          Icons.account_balance,
+                          color: cinzaDrawer,
+                          size: 40.0
+                        ),
+                      ),
+                      
+                      new GestureDetector(
+                        child: new Container(
+                          padding: new EdgeInsets.only(bottom: 26.0, top: 8.0),
+                          child: new Chip(label: const Text('Adicionar contas')),
+                        ),                        
+                        onTap:  () async {
+                          Navigator.pop(context);
+                          await Navigator.of(context).push(new PageRouteBuilder(
+                            opaque: false,
+                            pageBuilder: (BuildContext context, _, __) {
+                              return new ContaPage();
+                            },
+                            transitionsBuilder: (
+                                BuildContext context,
+                                Animation<double> animation,
+                                Animation<double> secondaryAnimation,
+                                Widget child,
+                            ) {
+                              return new SlideTransition(
+                                position: new Tween<Offset>(
+                                  begin:  const Offset(1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              );
+                            }
+                          ));
+
+                          contaDB.getAllContaAtivas().then(
+                            (list) {
+                              if(list.length > 0) {
+                                this.listaDB = list;
+                                //this.cardContaNew = false;
+                              } else {
+                                this.listaDB = list;
+                                //this.cardContaNew = true;
+                              }
+                            }
+                          );
+                        },
+                      )                      
+                    ]                    
+                  ),
+                ),
+              )
+              :
+              new Container( // Card Contas
                 padding: new EdgeInsets.only(bottom: 6.0, right: 6.0, left: 6.0),
                 child: new  Card(
                   child: new Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: buildListaContas(this.listaDB)
-                    
+                    children: buildListaContas(this.listaDB)                    
                   ),
                 ),
               ),
