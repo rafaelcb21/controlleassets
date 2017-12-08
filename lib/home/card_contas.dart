@@ -3,8 +3,10 @@ import '../db/database.dart';
 import '../palette/palette.dart';
 
 class CardContas extends StatefulWidget {
+  CardContas(this.listaContas);
+  List listaContas;
   @override
-  CardContasState createState() => new CardContasState();
+  CardContasState createState() => new CardContasState(this.listaContas);
 }
 
 class CardContasState extends State<CardContas> {
@@ -12,19 +14,26 @@ class CardContasState extends State<CardContas> {
   List<Widget> listaContas = [];
   List cores = [];
   Palette listaCores = new Palette();
+  List listaContasInicio;
+  CardContasState(this.listaContasInicio);  
   
   @override
   void initState() {
     this.cores = listaCores.cores;
-    Conta contaDB = new Conta();
-    contaDB.getAllContaAtivas().then(
-      (list) {
-        setState(() {
-          this.listaDB = list;
-          print(list);
-        });
-      }
-    );
+    setState(() {
+      this.listaDB = this.listaContasInicio;
+      print(listaDB);
+    });
+
+    //Conta contaDB = new Conta();
+    //contaDB.getAllContaAtivas().then(
+    //  (list) {
+    //    setState(() {
+    //      this.listaDB = list;
+    //      print(list);
+    //    });
+    //  }
+    //);
   }
 
   @override

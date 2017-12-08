@@ -10,6 +10,7 @@ import "categoria/categoria.dart";
 import "conta/conta.dart";
 import "cartao/cartao.dart";
 import "tag/tag.dart";
+import 'palette/palette.dart';
 import 'package:flutter/animation.dart';
 import 'dart:ui' as ui;
 import 'package:intl/intl.dart';
@@ -64,8 +65,13 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   DatabaseClient db = new DatabaseClient();
+  List listaContas = [];
+  List listaDB = [];
   int _angle = 90;
   bool _isRotated = true;
+  List cores = [];
+  Palette listaCores = new Palette();
+  Conta contaDB = new Conta();
 
   AnimationController _controller;
   Animation<double> _animation;
@@ -73,9 +79,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Animation<double> _animation3;
 
   createdb() async {
-    await db.create();
+    await db.create().then((lista) {
+      setState(() {
+        this.listaDB = lista;
+        print(lista);
+      });
+    });
   }
-
 
   static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
     testDevices: testDevice != null ? <String>[testDevice] : null,
@@ -111,7 +121,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    
+    this.cores = listaCores.cores;
     FirebaseAdMob.instance.initialize(appId: appId);
     //_bannerAd = createBannerAd()..load();
     //_bannerAd ??= createBannerAd();
@@ -141,8 +151,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
     _controller.reverse();
     
-    super.initState();
     createdb();
+    super.initState();
+    
   }
 
   @override
@@ -172,6 +183,48 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           _controller.reverse(from: 1.0);
         }
       });
+    }
+
+    List<Widget> buildListaContas(list) {
+      this.listaContas = [
+        new Container(
+          padding: new EdgeInsets.only(left: 18.0, top: 18.0),
+          child: new Text(
+          'Contas',
+            style: new TextStyle(
+              fontSize: 14.0,
+              fontFamily: 'Roboto',
+              color: new Color(0xFF757575),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ];
+
+      for(var i in list) {
+        var id = i['id'];
+        var conta = i['conta'];
+        var tipo = i['tipo'];
+        var saldoinicial = i['saldoinicial'];
+        var cor = this.cores[i['cor']];
+        var numeroCor = i['cor'];
+        var ativada = i['ativada'];
+
+        this.listaContas.add(
+          new ItemConta(
+            id: id,
+            conta: conta,
+            tipo: tipo,
+            saldoinicial: saldoinicial,
+            cor: cor,
+            numeroCor: numeroCor,
+            ativada: ativada,
+            onPressed: () {}
+          )
+        );
+      }
+
+      return this.listaContas;
     }
 
     return new Scaffold( 
@@ -398,9 +451,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               )
             ),
             new ListTile(
-              onTap: (){
+              onTap: () async {
                 Navigator.pop(context);
-                Navigator.of(context).push(new PageRouteBuilder(
+                await Navigator.of(context).push(new PageRouteBuilder(
                   opaque: false,
                   pageBuilder: (BuildContext context, _, __) {
                     return new CartaoPage();
@@ -420,6 +473,15 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     );
                   }
                 ));
+
+                contaDB.getAllContaAtivas().then(
+                  (list) {
+                    setState(() {
+                      this.listaDB = list;
+                      print(list);
+                    });
+                  }
+                );
               },
               leading: new Icon(
                 Icons.credit_card,
@@ -559,9 +621,20 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       body: new Stack(
         children: <Widget>[
           new ListView  (
-            children: <Widget>[           
-              new CardSaldo(),
-              new CardContas(),
+            children: <Widget>[  
+              new CardSaldo(),         
+              new Container(
+                padding: new EdgeInsets.only(bottom: 6.0, right: 6.0, left: 6.0),
+                child: new  Card(
+                  child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: buildListaContas(this.listaDB)
+                    
+                  ),
+                ),
+              ),
+
+              //new CardContas(this.listaContas),
               new CardCartoes(),
               new CardAlertas(),
               new Container(
@@ -883,3 +956,78 @@ class Sky extends CustomPainter {
     return _width != oldDelegate._width || _rectHeight != oldDelegate._rectHeight;
   }
 }
+
+class ItemConta extends StatefulWidget {
+   
+  final int id;
+  final String conta;
+  final String tipo;
+  final double saldoinicial;
+  final int numeroCor;
+  final Color cor;
+  final int ativada;
+  final VoidCallback onPressed;
+
+  ItemConta({
+    this.id,
+    this.conta,
+    this.tipo,
+    this.saldoinicial,
+    this.cor,
+    this.numeroCor,
+    this.ativada,
+    this.onPressed,
+  });
+
+  @override
+  ItemContaState createState() => new ItemContaState();
+}
+
+class ItemContaState extends State<ItemConta> {
+  ItemContaState();
+  Conta contaDB = new Conta();
+
+  @override
+  Widget build(BuildContext context) {
+    return new GestureDetector(
+      child: new InkWell(
+        onTap: () {
+          print('contascontas');
+        },
+        child: new ListTile(
+          leading: new CircleAvatar(
+            backgroundColor: widget.cor,
+            radius: 16.0,
+          ),
+          title: new Text(
+            widget.conta,
+            style: new TextStyle(
+              fontSize: 13.0,
+              fontFamily: 'Roboto',
+              color: new Color(0xFF212121),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          subtitle: new Text(
+            widget.tipo,
+            style: new TextStyle(
+              fontSize: 12.0,
+              fontFamily: 'Roboto',
+              color: new Color(0xFF9E9E9E)
+            ),
+          ),
+          trailing: new Text(
+            'R\$ 3.051,00',
+            style: new TextStyle(
+              fontSize: 16.0,
+              fontFamily: 'Roboto',
+              color: new Color(0xFF26C6DA)
+            ),
+          )
+        ), 
+      ),
+    );
+  }
+}
+
+

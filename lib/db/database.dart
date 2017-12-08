@@ -10,8 +10,15 @@ class DatabaseClient {
   Future create() async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
-    print(dbPath);
     _db = await openDatabase(dbPath, version: 1, onCreate: this._create);
+
+    List lista = await _db.rawQuery("SELECT * FROM conta WHERE ativada = 1 ORDER BY conta ASC");
+    if(lista.length > 0) {
+      return lista;
+    }
+
+    return [];    
+
   }
 
   Future _create(Database db, int version) async {
@@ -428,19 +435,6 @@ class Conta {
     return lista; 
   }
 
-  Future getSaldoById(id) async {
-    Directory path = await getApplicationDocumentsDirectory();
-    String dbPath = join(path.path, "database.db");
-    Database db = await openDatabase(dbPath);
-
-    List listaReceitaById = await db.rawQuery("SELECT SUM(valor) FROM 'lancamento' WHERE idconta = ? AND pago = 1 AND tipo = 'Receita'", [id]);
-    //List listaDespesaById = await db.rawQuery("SELECT SUM(valor) FROM 'lancamento' WHERE idconta = ? AND pago = 1 AND tipo = 'Despesa'", [id]);
-   
-    await db.close();
-
-    return listaReceitaById; 
-  }
-
   Future getAllContaAtivas() async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
@@ -450,6 +444,18 @@ class Conta {
     await db.close();
 
     return lista; 
+  }
+
+  Future getSaldoById(id) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    List listaReceitaById = await db.rawQuery("SELECT SUM(valor) FROM 'lancamento' WHERE idconta = ? AND pago = 1 AND tipo = 'Receita'", [id]);
+    
+    await db.close();
+
+    return listaReceitaById; 
   }
 
   Future upsertConta(Conta conta) async {
