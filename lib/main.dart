@@ -65,13 +65,16 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   DatabaseClient db = new DatabaseClient();
   List listaContas = [];
-  List listaDB = [];
+  List listaDBConta = [];
+  List listaDBCartao = [];
   int _angle = 90;
   bool _isRotated = true;
   List cores = [];
   Palette listaCores = new Palette();
   Conta contaDB = new Conta();
-  bool cardContaNew;
+  Cartao cartaoDB = new Cartao();
+  bool cardContaNew = true;
+  bool cardCartaoNew = true;
 
   AnimationController _controller;
   Animation<double> _animation;
@@ -142,16 +145,25 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
     _controller.reverse();
     
-    db.create().then((lista) {
+    db.create().then((dict) {
       setState(() {
-        if(lista.length > 0) {
-          this.listaDB = lista;
+        if(dict['conta'].length > 0) {
+          this.listaDBConta = dict['conta'];
           this.cardContaNew = false;
         } else {
-          this.listaDB = lista;
+          this.listaDBConta = dict['conta'];
           this.cardContaNew = true;
         }
-        
+
+        if(dict['cartao'].length > 0) {
+          this.listaDBCartao = dict['cartao'];
+          this.cardCartaoNew = false;
+        } else {
+          this.cardCartaoNew = dict['cartao'];
+          this.cardContaNew = true;
+        }
+
+
       });
     });
 
@@ -230,6 +242,48 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       return this.listaContas;
     }
 
+    List<Widget> buildListaCartoes(list) {
+      this.listaContas = [
+        new Container(
+          padding: new EdgeInsets.only(left: 18.0, top: 18.0),
+          child: new Text(
+          'Cartões de crédito',
+            style: new TextStyle(
+              fontSize: 14.0,
+              fontFamily: 'Roboto',
+              color: new Color(0xFF757575),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ];
+
+      for(var i in list) {
+        var id = i['id'];
+        var conta = i['conta'];
+        var tipo = i['tipo'];
+        var saldoinicial = i['saldoinicial'];
+        var cor = this.cores[i['cor']];
+        var numeroCor = i['cor'];
+        var ativada = i['ativada'];
+
+        this.listaContas.add(
+          new ItemConta(
+            id: id,
+            conta: conta,
+            tipo: tipo,
+            saldoinicial: saldoinicial,
+            cor: cor,
+            numeroCor: numeroCor,
+            ativada: ativada,
+            onPressed: () {}
+          )
+        );
+      }
+
+      return this.listaContas;
+    }
+
     return new Scaffold( 
       appBar: new AppBar(
         backgroundColor: azulAppbar,
@@ -272,14 +326,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ));
 
                 contaDB.getAllContaAtivas().then(
-                  (list) {
-                    if(list.length > 0) {
-                      this.listaDB = list;
-                      this.cardContaNew = false;
-                    } else {
-                      this.listaDB = list;
-                      this.cardContaNew = true;
-                    }
+                  (lista) {
+                    setState(() {
+                      if(lista.length > 0) {
+                        this.listaDBConta = lista;
+                        this.cardContaNew = false;
+                      } else {
+                        this.listaDBConta = lista;
+                        this.cardContaNew = true;
+                      }        
+                    });
                   }
                 );
               },
@@ -474,15 +530,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           color: cinzaDrawer,
                           size: 40.0
                         ),
-                      ),
-                      
+                      ),                      
                       new GestureDetector(
                         child: new Container(
                           padding: new EdgeInsets.only(bottom: 26.0, top: 8.0),
                           child: new Chip(label: const Text('Adicionar contas')),
                         ),                        
                         onTap:  () async {
-                          Navigator.pop(context);
                           await Navigator.of(context).push(new PageRouteBuilder(
                             opaque: false,
                             pageBuilder: (BuildContext context, _, __) {
@@ -503,21 +557,22 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               );
                             }
                           ));
-
                           contaDB.getAllContaAtivas().then(
-                            (list) {
-                              if(list.length > 0) {
-                                this.listaDB = list;
-                                //this.cardContaNew = false;
-                              } else {
-                                this.listaDB = list;
-                                //this.cardContaNew = true;
-                              }
+                            (lista) {
+                              setState(() {
+                                if(lista.length > 0) {
+                                  this.listaDBConta = lista;
+                                  this.cardContaNew = false;
+                                } else {
+                                  this.listaDBConta = lista;
+                                  this.cardContaNew = true;
+                                }        
+                              });
                             }
                           );
                         },
-                      )                      
-                    ]                    
+                      )
+                    ]
                   ),
                 ),
               )
@@ -527,13 +582,82 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: new  Card(
                   child: new Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: buildListaContas(this.listaDB)                    
+                    children: buildListaContas(this.listaDBConta)                    
                   ),
                 ),
               ),
 
-              //new CardContas(this.listaContas),
-              new CardCartoes(),
+              this.cardCartaoNew ? 
+              new Container( // Card Cartao
+                padding: new EdgeInsets.only(bottom: 6.0, right: 6.0, left: 6.0),
+                child: new  Card(
+                  child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      new Container(
+                        padding: new EdgeInsets.only(bottom: 8.0, top: 26.0),
+                        child: new Icon(
+                          Icons.credit_card,
+                          color: cinzaDrawer,
+                          size: 40.0
+                        ),
+                      ),
+                      new GestureDetector(
+                        child: new Container(
+                          padding: new EdgeInsets.only(bottom: 26.0, top: 8.0),
+                          child: new Chip(label: const Text('Adicionar cartões')),
+                        ),                        
+                        onTap: () async {
+                          await Navigator.of(context).push(new PageRouteBuilder(
+                            opaque: false,
+                            pageBuilder: (BuildContext context, _, __) {
+                              return new CartaoPage();
+                            },
+                            transitionsBuilder: (
+                                BuildContext context,
+                                Animation<double> animation,
+                                Animation<double> secondaryAnimation,
+                                Widget child,
+                            ) {
+                              return new SlideTransition(
+                                position: new Tween<Offset>(
+                                  begin:  const Offset(1.0, 0.0),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              );
+                            }
+                          ));
+                          cartaoDB.getAllCartaoAtivos().then(
+                            (lista) {
+                              setState(() {
+                                if(lista.length > 0) {
+                                  this.listaDBCartao = lista;
+                                  this.cardCartaoNew = false;
+                                } else {
+                                  this.listaDBCartao = lista;
+                                  this.cardCartaoNew = true;
+                                }        
+                              });
+                            }
+                          );
+                        },
+                      )
+                    ]
+                  ),
+                ),
+              )
+              :
+              new Container( // Card Cartoes
+                padding: new EdgeInsets.only(bottom: 6.0, right: 6.0, left: 6.0),
+                child: new  Card(
+                  child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: buildListaCartoes(this.listaDBCartao)                    
+                  ),
+                ),
+              ),
               new CardAlertas(),
               new Container(
                 height: 70.0,
@@ -887,45 +1011,116 @@ class ItemContaState extends State<ItemConta> {
 
   @override
   Widget build(BuildContext context) {
-    return new GestureDetector(
-      child: new InkWell(
-        onTap: () {
-          print('contascontas');
-        },
-        child: new ListTile(
-          leading: new CircleAvatar(
-            backgroundColor: widget.cor,
-            radius: 16.0,
+    return new InkWell(
+      onTap: () {
+        print('contascontas');
+      },
+      child: new ListTile(
+        leading: new CircleAvatar(
+          backgroundColor: widget.cor,
+          radius: 16.0,
+        ),
+        title: new Text(
+          widget.conta,
+          style: new TextStyle(
+            fontSize: 13.0,
+            fontFamily: 'Roboto',
+            color: new Color(0xFF212121),
+            fontWeight: FontWeight.bold,
           ),
-          title: new Text(
-            widget.conta,
-            style: new TextStyle(
-              fontSize: 13.0,
-              fontFamily: 'Roboto',
-              color: new Color(0xFF212121),
-              fontWeight: FontWeight.bold,
-            ),
+        ),
+        subtitle: new Text(
+          widget.tipo,
+          style: new TextStyle(
+            fontSize: 12.0,
+            fontFamily: 'Roboto',
+            color: new Color(0xFF9E9E9E)
           ),
-          subtitle: new Text(
-            widget.tipo,
-            style: new TextStyle(
-              fontSize: 12.0,
-              fontFamily: 'Roboto',
-              color: new Color(0xFF9E9E9E)
-            ),
+        ),
+        trailing: new Text(
+          'R\$ 3.051,00',
+          style: new TextStyle(
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+            color: new Color(0xFF26C6DA)
           ),
-          trailing: new Text(
-            'R\$ 3.051,00',
-            style: new TextStyle(
-              fontSize: 16.0,
-              fontFamily: 'Roboto',
-              color: new Color(0xFF26C6DA)
-            ),
-          )
-        ), 
-      ),
+        )
+      ), 
+      
     );
   }
 }
 
+class ItemCartao extends StatefulWidget {
+   
+  final int id;
+  final String cartao;
+  final Color cor;
+  final double limite;
+  final String vencimento;
+  final String fechamento;
+  final int contapagamento;  
+  final int numeroCor;  
+  final int ativada;
+  final VoidCallback onPressed;
+
+  ItemCartao({
+    this.id,
+    this.cartao,
+    this.cor,
+    this.limite,
+    this.vencimento,
+    this.fechamento,
+    this.contapagamento,
+    this.numeroCor,
+    this.ativada,
+    this.onPressed
+  });
+
+  @override
+  ItemCartaoState createState() => new ItemCartaoState();
+}
+
+class ItemCartaoState extends State<ItemCartao> {
+  ItemCartaoState();
+  Cartao cartaoDB = new Cartao();
+
+  @override
+  Widget build(BuildContext context) {
+    return new InkWell(
+      onTap: () {
+        print('cartoescartoes');
+      },
+      child: new Container(
+        padding: new EdgeInsets.symmetric(horizontal: 16.0, vertical: 18.0),
+        child: new Row(        
+          children: <Widget>[
+            new Container(
+              padding: new EdgeInsets.only(right: 24.0),
+              child: new CircleAvatar(
+                backgroundColor: widget.cor, //0xFFF5F5F5
+                radius: 16.0,
+              )
+            ),
+            new Expanded(
+              child: new Container(
+                padding: new EdgeInsets.only(right: 13.0),
+                child: new Text(
+                  widget.cartao,
+                  overflow: TextOverflow.ellipsis,
+                  style: new TextStyle(
+                    fontSize: 13.0,
+                    fontFamily: 'Roboto',
+                    color: new Color(0xFF212121),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ]
+        ),
+      )
+    );
+  }
+}
 

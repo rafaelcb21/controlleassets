@@ -12,12 +12,20 @@ class DatabaseClient {
     String dbPath = join(path.path, "database.db");
     _db = await openDatabase(dbPath, version: 1, onCreate: this._create);
 
-    List lista = await _db.rawQuery("SELECT * FROM conta WHERE ativada = 1 ORDER BY conta ASC");
-    if(lista.length > 0) {
-      return lista;
+    List listaConta = await _db.rawQuery("SELECT * FROM conta WHERE ativada = 1 ORDER BY conta ASC");
+    List listaCartao = await _db.rawQuery("SELECT * FROM cartao WHERE ativada = 1 ORDER BY cartao ASC");
+    
+    var dict = { 'conta':[], 'cartao':[] };
+    
+    if(listaConta.length > 0) {
+      dict['conta'] = listaConta; 
     }
 
-    return [];    
+    if(listaCartao.length > 0) {
+      dict['cartao'] = listaCartao; 
+    }
+
+    return dict;    
 
   }
 

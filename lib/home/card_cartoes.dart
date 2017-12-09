@@ -36,53 +36,7 @@ class CardCartoes extends StatelessWidget {
                   ),
                 ),
               ),
-              new Container(
-                child: new Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    new Row(
-                      children: <Widget>[
-                        new Text(
-                          'Fatura  ',
-                          style: new TextStyle(
-                            fontSize: 12.0,
-                            fontFamily: 'Roboto',
-                            color: new Color(0xFF9E9E9E)
-                          ),
-                        ),
-                        new Text(
-                          'R\$ -300,95',
-                          style: new TextStyle(
-                            fontSize: 14.0,
-                            fontFamily: 'Roboto',
-                            color: new Color(0xFF212121)
-                          ),
-                        ),
-                      ],
-                    ),
-                    new Row(
-                      children: <Widget>[
-                        new Text(
-                          'Limite  ',
-                          style: new TextStyle(
-                            fontSize: 12.0,
-                            fontFamily: 'Roboto',
-                            color: new Color(0xFF9E9E9E)
-                          ),
-                        ),
-                        new Text(
-                          'R\$ 3.000,95',
-                          style: new TextStyle(
-                            fontSize: 14.0,
-                            fontFamily: 'Roboto',
-                            color: new Color(0xFF9E9E9E)
-                          ),
-                        ),
-                      ],
-                    ),
-                  ]
-                )
-              )
+              
             ],
           )
         )
