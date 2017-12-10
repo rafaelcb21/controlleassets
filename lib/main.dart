@@ -160,7 +160,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           this.cardCartaoNew = false;
         } else {
           this.cardCartaoNew = dict['cartao'];
-          this.cardContaNew = true;
+          this.cardCartaoNew = true;
         }
 
 
@@ -260,19 +260,23 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
       for(var i in list) {
         var id = i['id'];
-        var conta = i['conta'];
-        var tipo = i['tipo'];
-        var saldoinicial = i['saldoinicial'];
+        var cartao = i['cartao'];
+        var limite = i['limite'];
+        var vencimento = i['vencimento'];
+        var fechamento = i['fechamento'];
+        var contapagamento = i['contapagamento'];
         var cor = this.cores[i['cor']];
         var numeroCor = i['cor'];
         var ativada = i['ativada'];
 
         this.listaContas.add(
-          new ItemConta(
+          new ItemCartao(
             id: id,
-            conta: conta,
-            tipo: tipo,
-            saldoinicial: saldoinicial,
+            cartao: cartao,
+            limite: limite,
+            vencimento: vencimento,
+            fechamento: fechamento,
+            contapagamento: contapagamento,            
             cor: cor,
             numeroCor: numeroCor,
             ativada: ativada,
@@ -350,6 +354,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),  
               )
             ),
+
             new ListTile(
               onTap: () async {
                 Navigator.pop(context);
@@ -373,6 +378,20 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     );
                   }
                 ));
+
+                cartaoDB.getAllCartaoAtivos().then(
+                  (lista) {
+                    setState(() {
+                      if(lista.length > 0) {
+                        this.listaDBCartao = lista;
+                        this.cardCartaoNew = false;
+                      } else {
+                        this.listaDBCartao = lista;
+                        this.cardCartaoNew = true;
+                      }        
+                    });
+                  }
+                );
               },
               leading: new Icon(
                 Icons.credit_card,
@@ -530,7 +549,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           color: cinzaDrawer,
                           size: 40.0
                         ),
-                      ),                      
+                      ),
                       new GestureDetector(
                         child: new Container(
                           padding: new EdgeInsets.only(bottom: 26.0, top: 8.0),
@@ -607,7 +626,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         child: new Container(
                           padding: new EdgeInsets.only(bottom: 26.0, top: 8.0),
                           child: new Chip(label: const Text('Adicionar cartões')),
-                        ),                        
+                        ),
                         onTap: () async {
                           await Navigator.of(context).push(new PageRouteBuilder(
                             opaque: false,
@@ -658,112 +677,115 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ),
               ),
+
               new CardAlertas(),
               new Container(
                 height: 70.0,
               )
             ],
           ),
-        new Positioned(
-            bottom: 0.0,
-            child: new GestureDetector(
-              onTap: _rotate,
-              child: new AnimatedBuilder(
-                animation: _animation,
-                builder: (BuildContext context, Widget child) {
-                  return new Container(
-                    height: _height,
-                    child: new CustomPaint(
-                      painter: new Sky(_width, _height * _animation.value),
+
+          // float button
+          new Positioned(
+              bottom: 0.0,
+              child: new GestureDetector(
+                onTap: _rotate,
+                child: new AnimatedBuilder(
+                  animation: _animation,
+                  builder: (BuildContext context, Widget child) {
+                    return new Container(
+                      height: _height,
+                      child: new CustomPaint(
+                        painter: new Sky(_width, _height * _animation.value),
+                        child: new Container(
+                          height: _isRotated ? 0.0 : _height * _animation.value,
+                          width: _isRotated ? 0.0 : _width,
+                        ),
+                      ),
+                    );
+                  }
+                ),
+              )
+            ),
+            new Positioned(
+              bottom: 200.0,
+              right: 24.0,
+              child: new Container(
+                child: new Row(
+                  children: <Widget>[
+                    new ScaleTransition(
+                      scale: _animation3,
+                      alignment: FractionalOffset.center,
                       child: new Container(
-                        height: _isRotated ? 0.0 : _height * _animation.value,
-                        width: _isRotated ? 0.0 : _width,
+                        margin: new EdgeInsets.only(right: 16.0),
+                        child: new Text(
+                          'transferência',
+                          style: new TextStyle(
+                            fontSize: 13.0,
+                            fontFamily: 'Roboto',
+                            color: new Color(0xFF9E9E9E),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ), 
                       ),
                     ),
-                  );
-                }
-              ),
-            )
-          ),
-          new Positioned(
-            bottom: 200.0,
-            right: 24.0,
-            child: new Container(
-              child: new Row(
-                children: <Widget>[
-                  new ScaleTransition(
-                    scale: _animation3,
-                    alignment: FractionalOffset.center,
-                    child: new Container(
-                      margin: new EdgeInsets.only(right: 16.0),
-                      child: new Text(
-                        'transferência',
-                        style: new TextStyle(
-                          fontSize: 13.0,
-                          fontFamily: 'Roboto',
-                          color: new Color(0xFF9E9E9E),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ), 
+                    
+                    new ScaleTransition(
+                      scale: _animation3,
+                      alignment: FractionalOffset.center,
+                      child: new Material(
+                        color: new Color(0xFF9E9E9E),
+                        type: MaterialType.circle,
+                        elevation: 6.0,
+                        child: new GestureDetector(
+                          child: new Container(
+                            width: 40.0,
+                            height: 40.0,
+                            child: new InkWell(
+                              onTap: ()  async {
+                                if(_angle == 45.0){
+                                  _rotate();
+                                  
+                                  bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
+                                    opaque: false,
+                                    pageBuilder: (BuildContext context, _, __) {
+                                      return new LancamentoPage(false, new Lancamento(), new Color(0xFF9E9E9E));
+                                    },
+                                    transitionsBuilder: (
+                                      BuildContext context,
+                                      Animation<double> animation,
+                                      Animation<double> secondaryAnimation,
+                                      Widget child,
+                                    ) {
+                                      return new SlideTransition(
+                                        position: new Tween<Offset>(
+                                          begin:  const Offset(1.0, 0.0),
+                                          end: Offset.zero,
+                                        ).animate(animation),
+                                        child: child,
+                                      );
+                                    }
+                                  ));
+                                  //_interstitialAd = createInterstitialAd()..load();
+                                  //_interstitialAd ??= createInterstitialAd();
+                                  //_interstitialAd..load()..show();
+                                }
+                              },
+                              child: new Center(
+                                child: new Icon(
+                                  Icons.add,
+                                  color: new Color(0xFFFFFFFF),
+                                ),                      
+                              ),
+                            )
+                          ),
+                        )
+                      ),
                     ),
-                  ),
-                  
-                  new ScaleTransition(
-                    scale: _animation3,
-                    alignment: FractionalOffset.center,
-                    child: new Material(
-                      color: new Color(0xFF9E9E9E),
-                      type: MaterialType.circle,
-                      elevation: 6.0,
-                      child: new GestureDetector(
-                        child: new Container(
-                          width: 40.0,
-                          height: 40.0,
-                          child: new InkWell(
-                            onTap: ()  async {
-                              if(_angle == 45.0){
-                                _rotate();
-                                
-                                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
-                                  opaque: false,
-                                  pageBuilder: (BuildContext context, _, __) {
-                                    return new LancamentoPage(false, new Lancamento(), new Color(0xFF9E9E9E));
-                                  },
-                                  transitionsBuilder: (
-                                    BuildContext context,
-                                    Animation<double> animation,
-                                    Animation<double> secondaryAnimation,
-                                    Widget child,
-                                  ) {
-                                    return new SlideTransition(
-                                      position: new Tween<Offset>(
-                                        begin:  const Offset(1.0, 0.0),
-                                        end: Offset.zero,
-                                      ).animate(animation),
-                                      child: child,
-                                    );
-                                  }
-                                ));
-                                //_interstitialAd = createInterstitialAd()..load();
-                                //_interstitialAd ??= createInterstitialAd();
-                                //_interstitialAd..load()..show();
-                              }
-                            },
-                            child: new Center(
-                              child: new Icon(
-                                Icons.add,
-                                color: new Color(0xFFFFFFFF),
-                              ),                      
-                            ),
-                          )
-                        ),
-                      )
-                    ),
-                  ),                                     
-                ],
-              ),
-            )
-          ),
+                  ],
+                ),
+              )
+            ),
           
           new Positioned(
             bottom: 144.0,
@@ -833,7 +855,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               child: new Icon(
                                 Icons.add,
                                 color: new Color(0xFFFFFFFF),
-                              ),                      
+                              ),
                             ),
                           )
                         ),
@@ -1117,6 +1139,53 @@ class ItemCartaoState extends State<ItemCartao> {
                 ),
               ),
             ),
+            new Container(
+              child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  new Row(
+                    children: <Widget>[
+                      new Text(
+                        'Fatura  ',
+                        style: new TextStyle(
+                          fontSize: 12.0,
+                          fontFamily: 'Roboto',
+                          color: new Color(0xFF9E9E9E)
+                        ),
+                      ),
+                      new Text(
+                        'R\$ 00,00',
+                        style: new TextStyle(
+                          fontSize: 14.0,
+                          fontFamily: 'Roboto',
+                          color: new Color(0xFF212121)
+                        ),
+                      ),
+                    ],
+                  ),
+                  new Row(
+                    children: <Widget>[
+                      new Text(
+                        'Limite  ',
+                        style: new TextStyle(
+                          fontSize: 12.0,
+                          fontFamily: 'Roboto',
+                          color: new Color(0xFF9E9E9E)
+                        ),
+                      ),
+                      new Text(
+                        'R\$ ' + widget.limite.toString(),
+                        style: new TextStyle(
+                          fontSize: 14.0,
+                          fontFamily: 'Roboto',
+                          color: new Color(0xFF9E9E9E)
+                        ),
+                      ),
+                    ],
+                  ),
+                ]
+              )
+            )
           ]
         ),
       )
