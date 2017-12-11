@@ -1,10 +1,9 @@
 import "package:flutter/material.dart";
 
 import './db/database.dart';
-import "home/card_saldo.dart";
-import "home/card_cartoes.dart";
 import "home/card_alertas.dart";
 import "lancamento/lancamento.dart";
+import "lancamento/consultalancamento.dart";
 import "categoria/categoria.dart";
 import "conta/conta.dart";
 import "cartao/cartao.dart";
@@ -42,15 +41,15 @@ class ControlleApp extends StatelessWidget {
     return new MaterialApp(
       title: "Controlle Financeiro",
       home: new HomePage(),
-      routes: <String, WidgetBuilder> {
-        '/home': (BuildContext context) => new HomePage(),
-        '/categoria': (BuildContext context) => new CategoriaPage(),
-        '/tag': (BuildContext context) => new TagPage(),
-        '/conta': (BuildContext context) => new ContaPage(),
-        '/cartao': (BuildContext context) => new CartaoPage(),
-        //'/novacategoria': (BuildContext context) => new NovaCategoriaPage(),
-        //'/conta': (BuildContext context) => new LancamentoPage()
-      },
+      //routes: <String, WidgetBuilder> {
+      //  '/home': (BuildContext context) => new HomePage(),
+      //  '/categoria': (BuildContext context) => new CategoriaPage(),
+      //  '/tag': (BuildContext context) => new TagPage(),
+      //  '/conta': (BuildContext context) => new ContaPage(),
+      //  '/cartao': (BuildContext context) => new CartaoPage(),
+      //  '/consultalancamento': (BuildContext context) => new ConsultaLancamentoPage(),
+      //  //'/conta': (BuildContext context) => new LancamentoPage()
+      //},
     );
   }
 }
@@ -532,7 +531,170 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         children: <Widget>[
           new ListView  (
             children: <Widget>[  
-              new CardSaldo(),
+              
+              //Carda Saldo
+              new Container(
+                padding: new EdgeInsets.only(bottom: 3.0, right: 6.0, left: 6.0, top: 12.0),
+                child: new Card(
+                  child: new InkWell(
+                    onTap: () async {
+                      await Navigator.of(context).push(new PageRouteBuilder(
+                        opaque: false,
+                        pageBuilder: (BuildContext context, _, __) {
+                          return new ConsultaLancamentoPage();
+                        },
+                        transitionsBuilder: (
+                            BuildContext context,
+                            Animation<double> animation,
+                            Animation<double> secondaryAnimation,
+                            Widget child,
+                        ) {
+                          return new SlideTransition(
+                            position: new Tween<Offset>(
+                              begin:  const Offset(1.0, 0.0),
+                              end: Offset.zero,
+                            ).animate(animation),
+                            child: child,
+                          );
+                        }
+                      ));
+
+                      //retorno
+                    },
+                    child: new Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        new Container(
+                          padding: new EdgeInsets.only(top: 18.0),
+                          child: new Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              new Text(
+                                'R\$  ',
+                                style: new TextStyle(
+                                  fontSize: 20.0,
+                                  fontFamily: 'Roboto',
+                                  color: new Color(0xFF26C6DA),
+                                )
+                              ),
+                              new Text(
+                                '3.435,23',
+                                style: new TextStyle(
+                                  fontSize: 35.0,
+                                  fontFamily: 'Roboto',
+                                  color: new Color(0xFF26C6DA)
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        new Container(
+                          padding: new EdgeInsets.only(top: 3.0, bottom: 3.0),
+                          child: new Text(
+                            'saldo geral',
+                            style: new TextStyle(
+                              fontSize: 12.0,
+                              fontFamily: 'Roboto',
+                              color: new Color(0xFF757575),
+                            ),
+                          ),
+                        ),
+                        
+                        new Container(
+                          padding: new EdgeInsets.only(left: 32.0, right: 32.0),
+                          child: new Divider(),
+                        ),
+
+                        new Container(
+                          padding: new EdgeInsets.only(top: 3.0),
+                          child: new Text(
+                            '20/05 - 19/06',
+                            style: new TextStyle(
+                              fontSize: 14.0,
+                              fontFamily: 'Roboto',
+                              color: new Color(0xFF212121),
+                            ),
+                          ),
+                        ),
+
+                        new Container(
+                          padding: const EdgeInsets.only(left: 32.0, right: 32.0, top: 6.0, bottom: 3.0),
+                          child: new Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              new Text(
+                                'Receita:',
+                                style: new TextStyle(
+                                  fontSize: 12.0,
+                                  fontFamily: 'Roboto',
+                                  color: new Color(0xFF757575),
+                                ),
+                              ),
+                              new Text(
+                                'R\$ 3.051,00',
+                                style: new TextStyle(
+                                  fontSize: 12.0,
+                                  fontFamily: 'Roboto',
+                                  color: new Color(0xFF00BFA5),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        new Container(
+                          padding: const EdgeInsets.only(left: 32.0, right: 32.0, bottom: 3.0),
+                          child: new Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              new Text(
+                                'Despesa:',
+                                style: new TextStyle(
+                                  fontSize: 12.0,
+                                  fontFamily: 'Roboto',
+                                  color: new Color(0xFF757575),
+                                ),
+                              ),
+                              new Text(
+                                'R\$ 2.587,00',
+                                style: new TextStyle(
+                                  fontSize: 12.0,
+                                  fontFamily: 'Roboto',
+                                  color: new Color(0xFFF44336),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        new Container(
+                          padding: const EdgeInsets.only(left: 32.0, right: 32.0, bottom: 18.0),
+                          child: new Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              new Text(
+                                'Resultado:',
+                                style: new TextStyle(
+                                  fontSize: 12.0,
+                                  fontFamily: 'Roboto',
+                                  color: new Color(0xFF757575),
+                                ),
+                              ),
+                              new Text(
+                                'R\$ 464,00',
+                                style: new TextStyle(
+                                  fontSize: 12.0,
+                                  fontFamily: 'Roboto',
+                                  color: new Color(0xFF00BFA5),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ),
+              //Fim do Card Saldo
 
               this.cardContaNew ? 
               new Container( // Card Contas
