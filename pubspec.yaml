@@ -4,6 +4,8 @@ description: A new Flutter project.
 dependencies:
   intl: "^0.15.2"
   numberpicker: "^0.1.0"
+  crypto: "^2.0.2+1"
+  uuid: "^0.5.3"
   flutter:
     sdk: flutter
   google_sign_in: "^1.0.1"

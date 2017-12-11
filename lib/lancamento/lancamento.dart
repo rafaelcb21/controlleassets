@@ -9,6 +9,8 @@ import './textpicker.dart';
 import 'package:numberpicker/numberpicker.dart';
 import '../db/database.dart';
 import '../palette/palette.dart';
+//import 'package:crypto/crypto.dart';
+import 'package:uuid/uuid.dart';
 
 class LancamentoPage extends StatefulWidget {
   final Color color;
@@ -547,6 +549,7 @@ class FormularioState extends State<Formulario> {
   String nomeMes;
   List<Lancamento> lancamentoList = [];
   List meses = [];
+  var uuid = new Uuid();
 
   List cores = [];
   Palette listaCores = new Palette();  
@@ -1509,6 +1512,7 @@ class FormularioState extends State<Formulario> {
 
                     if(this.formSubmit['dividir'].length == 0) { //preparação dos dados se for parcelado
                       var listSplit = this.formSubmit['repetir'].split(";");
+                      lancamentoDB.hash = uuid.v4();
                       if(listSplit.length == 2) {
                         lancamentoDB.tiporepeticao = listSplit[0]; //fixo
                         lancamentoDB.periodorepeticao = listSplit[1]; //mensal
@@ -1521,7 +1525,7 @@ class FormularioState extends State<Formulario> {
                     } else { //preparação dos dados se for dividido
                       
                       var listSplit = this.formSubmit['dividir'].split(";");
-
+                      lancamentoDB.hash = uuid.v4();
                       lancamentoDB.tiporepeticao = "dividir";
                       lancamentoDB.quantidaderepeticao = double.parse(listSplit[0]); //3
                       lancamentoDB.periodorepeticao = listSplit[1]; //meses                  
@@ -1599,6 +1603,7 @@ class FormularioState extends State<Formulario> {
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                           lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
                           lancamento.pago = lancamentoDB.pago;
+                          lancamento.hash = lancamentoDB.hash;
 
                           if(
                             lancamentoDB.periodorepeticao == 'Dias' ||
@@ -1658,6 +1663,7 @@ class FormularioState extends State<Formulario> {
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                           lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
                           lancamento.pago = lancamentoDB.pago;
+                          lancamento.hash = lancamentoDB.hash;
 
                           if(
                             lancamentoDB.periodorepeticao == 'Dias' ||
@@ -1737,6 +1743,7 @@ class FormularioState extends State<Formulario> {
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                           lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
                           lancamento.pago = lancamentoDB.pago;
+                          lancamento.hash = lancamentoDB.hash;
 
                           if(
                             lancamentoDB.periodorepeticao == 'Dias' ||
@@ -1816,6 +1823,7 @@ class FormularioState extends State<Formulario> {
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                           lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
                           lancamento.pago = lancamentoDB.pago;
+                          lancamento.hash = lancamentoDB.hash;
                           
                           if(
                             lancamentoDB.periodorepeticao == 'Dias' ||

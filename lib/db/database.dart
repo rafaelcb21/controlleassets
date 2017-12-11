@@ -105,6 +105,7 @@ class DatabaseClient {
               quantidaderepeticao INTEGER,
               fatura TEXT,
               pago INTEGER NOT NULL,
+              hash TEXT,
 
               FOREIGN KEY (idcategoria) REFERENCES categoria (id) 
                 ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -622,11 +623,12 @@ class Lancamento {
   num quantidaderepeticao;
   String fatura;
   int pago;
+  String hash;
 
 
   static final columns = ["id", "tipo", "idcategoria", "idtag", "idconta", "idcontadestino", "idcartao",
                           "valor", "data", "descricao", "tiporepeticao", "periodorepeticao", "quantidaderepeticao",
-                          "fatura", "pago"];
+                          "fatura", "pago", "hash"];
 
   Map toMap() {
     Map map = {
@@ -643,7 +645,8 @@ class Lancamento {
       "periodorepeticao" : periodorepeticao,
       "quantidaderepeticao" : quantidaderepeticao,
       "fatura": fatura,
-      "pago": pago
+      "pago": pago,
+      "hash": hash
     };
 
     if (id != null) { map["id"] = id; }
@@ -668,6 +671,7 @@ class Lancamento {
     lancamentoTable.quantidaderepeticao = map["quantidaderepeticao"];
     lancamentoTable.fatura = map["fatura"];
     lancamentoTable.pago = map["pago"];
+    lancamentoTable.hash = map["hash"];
 
     return lancamentoTable;
   }

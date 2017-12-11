@@ -17,6 +17,19 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   List cores = [];
 
   @override
+  void initState() {
+    setState(() {
+      lancamentoDB.getLancamento().then(
+        (list) {
+          setState(() {
+            this.listaDB = list;
+          });
+        }
+      );
+    });    
+  }
+
+  @override
   Widget build(BuildContext context) {
 
 
@@ -157,6 +170,7 @@ class ItemLancamento extends StatefulWidget {
   final Color cor;
   final int ativada;
   final VoidCallback onPressed;
+  final VoidCallback onPressed2;
   final VoidCallback onPressed3;
 
   ItemLancamento({
@@ -169,6 +183,7 @@ class ItemLancamento extends StatefulWidget {
     this.numeroCor,
     this.ativada,
     this.onPressed,
+    this.onPressed2,
     this.onPressed3}) : super(key: key);
 
   @override
@@ -245,7 +260,7 @@ class ItemLancamentoState extends State<ItemLancamento> with TickerProviderState
                   ),
                   padding: new EdgeInsets.all(12.0),
                   child: new GestureDetector(
-                    onTap: (){},
+                    onTap: widget.onPressed2,
                     child: new Icon(
                       Icons.delete,
                       color: new Color(0xFFFFFFFF),
@@ -283,7 +298,7 @@ class ItemLancamentoState extends State<ItemLancamento> with TickerProviderState
                   ),
                   new Expanded(
                     child: new InkWell(
-                      onTap: (){},
+                      onTap: widget.onPressed,
                       child: new Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -337,7 +352,7 @@ class ItemLancamentoState extends State<ItemLancamento> with TickerProviderState
                   ),
                       
                   new InkWell(
-                    onTap: (){},
+                    onTap: widget.onPressed3,
                     child: new Container(
                       padding: new EdgeInsets.only(left: 10.0),
                       child: new Icon(
