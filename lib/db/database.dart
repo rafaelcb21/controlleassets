@@ -716,7 +716,7 @@ class Lancamento {
     }
     
     listaPorData.add([hoje, hojeMesDescrito]);
-    print(listaPorData);
+
     await db.close();
     return listaPorData;
   }
@@ -738,6 +738,48 @@ class Lancamento {
 
     return list;
   }
+
+  Future updateLancamentoPago(int id, int pago) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    List lista, result;
+    if(pago == 0) {
+      List result = await db.rawQuery('UPDATE lancamento SET pago = 1 WHERE id = ?', [id]);
+      List lista = await db.rawQuery('''
+        SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
+                l.valor, l.pago, l.hash
+                  FROM lancamento AS l
+          LEFT JOIN categoria AS c ON l.idcategoria = c.id
+          LEFT JOIN tag ON l.idtag = tag.id
+          LEFT JOIN conta ON l.idconta = conta.id
+          LEFT JOIN cartao ON l.idcartao = cartao.id
+            WHERE id = ?
+      ''', [id]);
+    } else if(pago == 1) {
+      List result = await db.rawQuery('UPDATE lancamento SET pago = 0 WHERE id = ?', [id]);
+      List lista = await db.rawQuery('''
+        SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
+                l.valor, l.pago, l.hash 
+                  FROM lancamento AS l
+          LEFT JOIN categoria AS c ON l.idcategoria = c.id
+          LEFT JOIN tag ON l.idtag = tag.id
+          LEFT JOIN conta ON l.idconta = conta.id
+          LEFT JOIN cartao ON l.idcartao = cartao.id
+            WHERE id = ?
+      ''', [id]);
+    }
+    
+
+    await db.close();
+
+    return lista;
+  }
+
+
+
+  
 
   Future upsertLancamentoRepetirParcela(Lancamento lancamento) async {
     Directory path = await getApplicationDocumentsDirectory();

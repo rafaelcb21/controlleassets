@@ -11,6 +11,7 @@ import '../db/database.dart';
 import '../palette/palette.dart';
 //import 'package:crypto/crypto.dart';
 import 'package:uuid/uuid.dart';
+//import 'dart:math';
 
 class LancamentoPage extends StatefulWidget {
   final Color color;
@@ -1648,7 +1649,10 @@ class FormularioState extends State<Formulario> {
                           lancamentoDB.periodorepeticao
                         );
 
-                        num valorDivisao = lancamentoDB.valor / lancamentoDB.quantidaderepeticao;
+                        //num valorDivisao = (lancamentoDB.valor / lancamentoDB.quantidaderepeticao) * ((pow(10, 2).round()) / pow(10, 2));
+                        //num valorDivisao = (lancamentoDB.valor / lancamentoDB.quantidaderepeticao).roundToDouble();
+                        num valorDivisao = num.parse((lancamentoDB.valor / lancamentoDB.quantidaderepeticao).toStringAsFixed(2));
+
                         for(var i = 0; i < lancamentoDB.quantidaderepeticao; i++) {
                           Lancamento lancamento = new Lancamento();
                           lancamento.tipo = lancamentoDB.tipo;
@@ -1808,7 +1812,9 @@ class FormularioState extends State<Formulario> {
                           lancamentoDB.periodorepeticao
                         );
 
-                        num valorDivisao = lancamentoDB.valor / lancamentoDB.quantidaderepeticao;
+                        //num valorDivisao = (lancamentoDB.valor / lancamentoDB.quantidaderepeticao) * ((pow(10, 2).round()) / pow(10, 2));
+                        num valorDivisao = num.parse((lancamentoDB.valor / lancamentoDB.quantidaderepeticao).toStringAsFixed(2));
+
                         for(var i = 0; i < lancamentoDB.quantidaderepeticao; i++) {
                           Lancamento lancamento = new Lancamento();
                           lancamento.tipo = lancamentoDB.tipo;

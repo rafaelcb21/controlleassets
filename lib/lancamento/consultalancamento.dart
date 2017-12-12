@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import '../palette/palette.dart';
 import '../db/database.dart';
+import 'package:intl/intl.dart';
 
 class ConsultaLancamentoPage extends StatefulWidget {
   @override
@@ -68,6 +69,14 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
           ///Mes
           new Container(
             padding: new EdgeInsets.only(bottom: 9.0, top: 9.0),
+            decoration: new BoxDecoration(
+              border: new Border(
+                bottom: new BorderSide(
+                  style: BorderStyle.solid,
+                  color: Colors.black12,
+                ),
+              )
+            ),
             child: new Row(
               children: <Widget>[
                 new Container(
@@ -125,10 +134,6 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                     style: BorderStyle.solid,
                     color: Colors.black12,
                   ),
-                  top: new BorderSide(
-                    style: BorderStyle.solid,
-                    color: Colors.black12,
-                  ),
                 )
               ),
               child: new Row(
@@ -147,6 +152,35 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
           );
 
           for(var u = 0; u < lista[i][1].length; u++) {
+            var valor, textoPago;
+            int pago = lista[i][1][u]['pago'];
+            
+            if(lista[i][1][u]['tipo'] == "Despesa"){
+              var numeroNegativo = lista[i][1][u]['valor']*-1;
+              var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
+              valor = f.format(numeroNegativo);
+              if(lista[i][1][u]['pago'] == 0){
+                textoPago = "não pago";
+              } else {
+                textoPago = "pago";
+              }
+            } else {
+              var f = new NumberFormat.currency(locale: 'pt_BR', symbol: "", decimalDigits: 2);
+              valor = f.format(lista[i][1][u]['valor']);
+
+              if(lista[i][1][u]['pago'] == 0 && lista[i][1][u]['tipo'] == "Receita"){
+                textoPago = "não recebido";
+              } else if(lista[i][1][u]['pago'] == 0 && lista[i][1][u]['tipo'] == "Transferência") {
+                textoPago = "não transferido";
+              } else if(lista[i][1][u]['pago'] == 1 && lista[i][1][u]['tipo'] == "Receita") {
+                textoPago = "recebido";
+              } else if(lista[i][1][u]['pago'] == 1 && lista[i][1][u]['tipo'] == "Transferência") {
+                textoPago = "transferido";
+              }
+            }
+
+            
+            
             this.listaLancamentos.add(
               new ItemLancamento(
                 id: lista[i][1][u]['id'],
@@ -156,21 +190,30 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                 //idconta: lista[i][1][u]['idconta'],
                 //idcontadestino: lista[i][1][u]['idcontadestino'],
                 //idcartao: lista[i][1][u]['idcartao'],
-                valor: lista[i][1][u]['valor'],
+                valor: valor,
                 data: lista[i][1][u]['data'],
                 descricao: lista[i][1][u]['descricao'],
                 //tiporepeticao: lista[i][1][u]['tiporepeticao'],
                 //periodorepeticao: lista[i][1][u]['periodorepeticao'],
                 //quantidaderepeticao: lista[i][1][u]['quantidaderepeticao'],
                 //fatura: lista[i][1][u]['fatura'],
-                pago: lista[i][1][u]['pago'],
+                pago: pago,
+                textoPago: textoPago,
                 hash: lista[i][1][u]['hash'],
+                onPressed3: () {                  
+                  lancamentoDB.updateLancamentoPago(lista[i][1][u]['id'], pago);
+                  lancamentoDB.getLancamento().then(
+                    (list) {
+                      setState(() {
+                        this.periodoFiltro = list.removeLast()[1];
+                        this.listaDB = list;
+                      });
+                    }
+                  );
+                },
               )
             );
           }
-
-          
-          
         }
       return this.listaLancamentos;
     }
@@ -203,7 +246,7 @@ class ItemLancamento extends StatefulWidget {
   //final int idconta;
   //final int idcontadestino;
   //final int idcartao;
-  final double valor;
+  final String valor;
   final String data;
   final String descricao;
   //final String tiporepeticao;
@@ -211,6 +254,7 @@ class ItemLancamento extends StatefulWidget {
   //final int quantidaderepeticao;
   //final String fatura;
   final int pago;
+  final String textoPago;
   final String hash;
   final VoidCallback onPressed;
   final VoidCallback onPressed2;
@@ -233,6 +277,7 @@ class ItemLancamento extends StatefulWidget {
     //this.quantidaderepeticao,
     //this.fatura,
     this.pago,
+    this.textoPago,
     this.hash,
     this.onPressed,
     this.onPressed2,
@@ -340,10 +385,10 @@ class ItemLancamentoState extends State<ItemLancamento> with TickerProviderState
               ),
               child: new Row(
                 children: <Widget>[
-                  new Container( //melhorar para colocar transferencia
+                  new Container(
                     padding: new EdgeInsets.only(right: 8.0),
                     child: new Icon(
-                      widget.tipo != "Transferência" ? Icons.brightness_1 : Icons.swap_horiz,
+                      widget.tipo != "Transferência" ? Icons.brightness_1 : Icons.swap_horizontal_circle,
                       color: widget.tipo != "Despesa" ? new Color(0xFF00BFA5) : new Color(0xFFE57373),
                       size: 10.0,
                     ),
@@ -382,17 +427,18 @@ class ItemLancamentoState extends State<ItemLancamento> with TickerProviderState
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        new Text( //melhorar para colocar transferencia
-                          widget.tipo != "Despesa" ? widget.valor.toString() : (-1*widget.valor).toString(),
+                        new Text(
+                          //widget.tipo != "Despesa" ? widget.valor.toString() : widget.valor,
+                          widget.valor,
                           overflow: TextOverflow.ellipsis,
                           style: new TextStyle(
                             fontSize: 14.0,
                             fontFamily: 'Roboto',
-                            color: widget.tipo != "Receita" ? new Color(0xFFE57373) : new Color(0xFF00BFA5),
+                            color: widget.tipo == "Despesa" ? new Color(0xFFE57373) : new Color(0xFF00BFA5),
                           ),
                         ),
                         new Text(
-                          widget.pago == 0 ? 'não pago' : 'pago',
+                          widget.textoPago,
                           style: new TextStyle(
                             fontSize: 12.0,
                             fontFamily: 'Roboto',
