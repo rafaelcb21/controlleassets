@@ -558,7 +558,7 @@ class FormularioState extends State<Formulario> {
   FocusNode _focusNode = new FocusNode();
   final TextEditingController _controller = new TextEditingController();
 
-  Map formSubmit = {'tipo':'', 'valor':0.0 ,'data':new DateTime.now().toString(), 'idcategoria':0,
+  Map formSubmit = {'tipo':'', 'valor':0.0 ,'data':new DateTime.now().toString().substring(0,10), 'idcategoria':0,
     'categoria':'', 'tag':'', 'idtag':0, 'conta':' ', 'idconta':0, 'contadestino':' ',
     'idcontadestino':0, 'cartao':' ','idcartao':0, 'descricao':'', 'repetir':'', 'dividir':'', "fatura":''};
   
@@ -1244,7 +1244,7 @@ class FormularioState extends State<Formulario> {
             selectDate: (DateTime date) {
               setState(() {
                 this._toDate = date;
-                this.formSubmit['data'] = date.toString();
+                this.formSubmit['data'] = date.toString().substring(0,10);
 
                 if(this.isCard) {
                   //var dia = date.day;
@@ -1611,7 +1611,7 @@ class FormularioState extends State<Formulario> {
                             lancamentoDB.periodorepeticao == 'Quinzenas' 
                           ) {
                             int days = i * this.periodos[lancamentoDB.periodorepeticao];
-                            lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
+                            lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString().substring(0,10);
                           
                           } else if(lancamentoDB.periodorepeticao == 'Anos') {
                             int days = i * this.periodos[lancamentoDB.periodorepeticao];
@@ -1620,9 +1620,9 @@ class FormularioState extends State<Formulario> {
                             int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
                             
                             if(_dia == 29 && _mes == 2) {
-                              lancamento.data = new DateTime(_ano, _mes + 1, 0).toString();
+                              lancamento.data = new DateTime(_ano, _mes + 1, 0).toString().substring(0,10);
                             } else {
-                              lancamento.data = new DateTime(_ano, _mes, _dia).toString();
+                              lancamento.data = new DateTime(_ano, _mes, _dia).toString().substring(0,10);
                             }
                           } else {
                             int days = i * this.periodos[lancamentoDB.periodorepeticao];
@@ -1630,9 +1630,9 @@ class FormularioState extends State<Formulario> {
                             int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
                             
                             if((_dia > 28 && mesesLista[i] == 2) || _dia == 31) {
-                              lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString();
+                              lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString().substring(0,10);
                             } else {
-                              lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString();                                                           
+                              lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString().substring(0,10);                                                           
                             } 
                           }
                           lancamentoList.add(lancamento);
@@ -1671,7 +1671,7 @@ class FormularioState extends State<Formulario> {
                             lancamentoDB.periodorepeticao == 'Quinzenas' 
                           ) {
                             int days = i * this.periodos[lancamentoDB.periodorepeticao];
-                            lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
+                            lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString().substring(0,10);
                           
                           } else if(lancamentoDB.periodorepeticao == 'Anos') {
                             int days = i * this.periodos[lancamentoDB.periodorepeticao];
@@ -1680,9 +1680,9 @@ class FormularioState extends State<Formulario> {
                             int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
                             
                             if(_dia == 29 && _mes == 2) {
-                              lancamento.data = new DateTime(_ano, _mes + 1, 0).toString();
+                              lancamento.data = new DateTime(_ano, _mes + 1, 0).toString().substring(0,10);
                             } else {
-                              lancamento.data = new DateTime(_ano, _mes, _dia).toString();
+                              lancamento.data = new DateTime(_ano, _mes, _dia).toString().substring(0,10);
                             }
                           } else {
                             int days = i * this.periodos[lancamentoDB.periodorepeticao];
@@ -1690,9 +1690,9 @@ class FormularioState extends State<Formulario> {
                             int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
                             
                             if((_dia > 28 && mesesLista[i] == 2) || _dia == 31) {
-                              lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString();
+                              lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString().substring(0,10);
                             } else {
-                              lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString();                                                           
+                              lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString().substring(0,10);                                                           
                             } 
                           }
                           lancamentoList.add(lancamento);
@@ -1751,7 +1751,7 @@ class FormularioState extends State<Formulario> {
                             lancamentoDB.periodorepeticao == 'Quinzenas' 
                           ) {
                             int days = i * this.periodos[lancamentoDB.periodorepeticao];
-                            lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
+                            lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString().substring(0,10);
                             DateTime dataFaturaFunction = DateTime.parse(lancamentoDB.data).add(new Duration(days: days));
                             var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
                             this.formSubmit["fatura"] = resultado;
@@ -1764,13 +1764,13 @@ class FormularioState extends State<Formulario> {
                             int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
                             
                             if(_dia == 29 && _mes == 2) {
-                              lancamento.data = new DateTime(_ano, _mes + 1, 0).toString();
+                              lancamento.data = new DateTime(_ano, _mes + 1, 0).toString().substring(0,10);
                               DateTime dataFaturaFunction = new DateTime(_ano, _mes + 1, 0);
                               var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
                               this.formSubmit["fatura"] = resultado;
                               lancamento.fatura = this.formSubmit["fatura"];
                             } else {
-                              lancamento.data = new DateTime(_ano, _mes, _dia).toString();
+                              lancamento.data = new DateTime(_ano, _mes, _dia).toString().substring(0,10);
                               DateTime dataFaturaFunction = new DateTime(_ano, _mes + 1, 0);
                               var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
                               this.formSubmit["fatura"] = resultado;
@@ -1782,13 +1782,13 @@ class FormularioState extends State<Formulario> {
                             int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
                             
                             if((_dia > 28 && mesesLista[i] == 2) || _dia == 31) {
-                              lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString();
+                              lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString().substring(0,10);
                               DateTime dataFaturaFunction = new DateTime(_ano, mesesLista[i] + 1, 0);
                               var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
                               this.formSubmit["fatura"] = resultado;
                               lancamento.fatura = this.formSubmit["fatura"];
                             } else {
-                              lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString();
+                              lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString().substring(0,10);
                               DateTime dataFaturaFunction = new DateTime(_ano, mesesLista[i], _dia);
                               var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
                               this.formSubmit["fatura"] = resultado;
@@ -1831,7 +1831,7 @@ class FormularioState extends State<Formulario> {
                             lancamentoDB.periodorepeticao == 'Quinzenas' 
                           ) {
                             int days = i * this.periodos[lancamentoDB.periodorepeticao];
-                            lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString();
+                            lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString().substring(0,10);
                             DateTime dataFaturaFunction = DateTime.parse(lancamentoDB.data).add(new Duration(days: days));
                             var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
                             this.formSubmit["fatura"] = resultado;
@@ -1844,7 +1844,7 @@ class FormularioState extends State<Formulario> {
                             int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
                             
                             if(_dia == 29 && _mes == 2) {
-                              lancamento.data = new DateTime(_ano, _mes + 1, 0).toString();
+                              lancamento.data = new DateTime(_ano, _mes + 1, 0).toString().substring(0,10);
                               DateTime dataFaturaFunction = new DateTime(_ano, _mes + 1, 0);
                               var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
                               this.formSubmit["fatura"] = resultado;
@@ -1862,13 +1862,13 @@ class FormularioState extends State<Formulario> {
                             int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
                             
                             if((_dia > 28 && mesesLista[i] == 2) || _dia == 31) {
-                              lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString();
+                              lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString().substring(0,10);
                               DateTime dataFaturaFunction = new DateTime(_ano, mesesLista[i] + 1, 0);
                               var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
                               this.formSubmit["fatura"] = resultado;
                               lancamento.fatura = this.formSubmit["fatura"];
                             } else {
-                              lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString();
+                              lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString().substring(0,10);
                               DateTime dataFaturaFunction = new DateTime(_ano, mesesLista[i], _dia);
                               var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
                               this.formSubmit["fatura"] = resultado;

@@ -22,11 +22,13 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
       lancamentoDB.getLancamento().then(
         (list) {
           setState(() {
+            
             this.listaDB = list;
+            print(this.listaDB.last); //dezembro de 2017
           });
-        }
+        } //[[11 de dezembro, [{idcategoria: 8, idconta: 1, fatura: null, hash
       );
-    });    
+    });
   }
 
   @override

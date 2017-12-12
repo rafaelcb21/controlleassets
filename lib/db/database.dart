@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
 
 class DatabaseClient {
   Database _db;
@@ -677,13 +678,35 @@ class Lancamento {
   }
 
   Future getLancamento() async {
-      Directory path = await getApplicationDocumentsDirectory();
-      String dbPath = join(path.path, "database.db");
-      Database db = await openDatabase(dbPath);
-      List lista = await db.rawQuery("SELECT * FROM lancamento");
-      await db.close();
-      return lista;
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+    //List lista = await db.rawQuery("SELECT * FROM lancamento");
+
+    var listaPorData = [];
+
+    List listaData = await db.rawQuery("SELECT data FROM lancamento GROUP BY data");
+
+    var hoje = new DateTime.now();
+    var hojeMes = new DateFormat.yM("pt_BR").format(hoje);
+    var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(hoje).toString();
+
+    for(var i in listaData){
+      List lista = await db.rawQuery("SELECT * FROM lancamento WHERE data = ?", [i['data']]);
+      var data = new DateFormat("yyyy-MM-dd").parse(i['data']);
+      var filtro = new DateFormat.yM("pt_BR").format(data);
+
+      if(hojeMes == filtro) {
+        var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
+        listaPorData.add([dataFormatada, lista]);
+      }    
     }
+    
+    listaPorData.add(hojeMesDescrito);
+
+    await db.close();
+    return listaPorData;
+  }
 
   Future upsertLancamento(List<Lancamento> list) async {
     Directory path = await getApplicationDocumentsDirectory();
