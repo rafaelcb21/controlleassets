@@ -692,11 +692,20 @@ class Lancamento {
     var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(hoje).toString(); // dezembro de 2017
 
     for(var i in listaData){
-      List lista = await db.rawQuery("SELECT * FROM lancamento WHERE data = ?", [i['data']]);
+      //List lista = await db.rawQuery("SELECT * FROM lancamento WHERE data = ?", [i['data']]);
 
-      //SELECT * FROM lancamento T1
-      //  INNER JOIN categoria T2 ON (T1.ID=T2.EID)
-      //    WHERE T2.HOUR=X
+      List lista = await db.rawQuery('''
+        SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
+                l.valor, l.pago, l.hash 
+                  FROM lancamento AS l
+          LEFT JOIN categoria AS c ON l.idcategoria = c.id
+          LEFT JOIN tag ON l.idtag = tag.id
+          LEFT JOIN conta ON l.idconta = conta.id
+          LEFT JOIN cartao ON l.idcartao = cartao.id
+            WHERE data = ?
+      ''', [i['data']]);
+
+
       var data = new DateFormat("yyyy-MM-dd").parse(i['data']);
       var filtro = new DateFormat.yM("pt_BR").format(data);
 
