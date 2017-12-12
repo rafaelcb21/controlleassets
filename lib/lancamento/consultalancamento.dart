@@ -34,6 +34,138 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   @override
   Widget build(BuildContext context) {
 
+    List<Widget> buildLancamentos(lista) {
+
+    this.listaLancamentos = [
+        ///Filtro
+        new Container(
+          padding: new EdgeInsets.only(left: 16.0, right: 16.0, bottom: 12.0),
+          decoration: new BoxDecoration(
+            border: new Border(
+              bottom: new BorderSide(
+                style: BorderStyle.solid,
+                color: Colors.black12,
+              ),
+            )
+          ),
+          child: new Row(
+            children: <Widget>[
+              new Text(
+                'Filtro:  ',
+                style: new TextStyle(
+                  fontSize: 12.0,
+                  fontFamily: 'Roboto',
+                  color: new Color(0xFF9E9E9E)
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        ///Mes
+        new Container(
+          padding: new EdgeInsets.only(bottom: 9.0, top: 9.0),
+          child: new Row(
+            children: <Widget>[
+              new Container(
+                margin: new EdgeInsets.only(left: 8.0),
+                child: new InkWell(
+                  onTap: (){},
+                  child: new Icon(
+                    Icons.keyboard_arrow_left,
+                    color: new Color(0xFF9E9E9E),
+                    size: 28.0,
+                  ),
+                ),
+              ),
+              new Expanded(
+                child: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    new InkWell(
+                      onTap: (){},
+                      child: new Text(
+                        "Dezembro de 2017",
+                        style: new TextStyle(
+                          fontSize: 16.0,
+                        )
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              new Container(
+                margin: new EdgeInsets.only(right: 8.0),
+                child: new InkWell(
+                  onTap: (){},
+                  child: new Icon(
+                    Icons.keyboard_arrow_right,
+                    color: new Color(0xFF9E9E9E),
+                    size: 28.0,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )
+      ];
+
+      for(var i = 0; i < lista.length -1; i++) {
+        ///Dia
+        new Container(
+          padding: new EdgeInsets.only(left: 8.0, right: 8.0, bottom: 5.0, top: 5.0),
+          decoration: new BoxDecoration(
+            border: new Border(
+              bottom: new BorderSide(
+                style: BorderStyle.solid,
+                color: Colors.black12,
+              ),
+              top: new BorderSide(
+                style: BorderStyle.solid,
+                color: Colors.black12,
+              ),
+            )
+          ),
+          child: new Row(
+            children: <Widget>[
+              new Text(
+                lista[i][0], //dia ex: 1 de fevereiro
+                style: new TextStyle(
+                  fontSize: 12.0,
+                  fontFamily: 'Roboto',
+                  color: new Color(0xFF9E9E9E)
+                ),
+              ),
+            ],
+          ),
+        );
+
+        for(var u = 0; u < lista[i][1].length; u++) {
+          new ItemLancamento(
+            id: lista[i][1][u]['id'],
+            tipo: lista[i][1][u]['tipo'],
+            idcategoria: lista[i][1][u]['idcategoria'],
+            idtag: lista[i][1][u]['idtag'],
+            idconta: lista[i][1][u]['idconta'],
+            idcontadestino: lista[i][1][u]['idcontadestino'],
+            idcartao: lista[i][1][u]['idcartao'],
+            valor: lista[i][1][u]['valor'],
+            data: lista[i][1][u]['data'],
+            descricao: lista[i][1][u]['descricao'],
+            tiporepeticao: lista[i][1][u]['tiporepeticao'],
+            periodorepeticao: lista[i][1][u]['periodorepeticao'],
+            quantidaderepeticao: lista[i][1][u]['quantidaderepeticao'],
+            fatura: lista[i][1][u]['fatura'],
+            pago: lista[i][1][u]['pago'],
+            hash: lista[i][1][u]['hash'],
+          );
+        }
+
+        
+        
+      }
+    }
 
     return new Scaffold( 
       appBar: new AppBar(
@@ -51,108 +183,12 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
         padding: new EdgeInsets.only(top: 16.0),
         children: <Widget>[
 
-          ///Filtro
-          new Container(
-            padding: new EdgeInsets.only(left: 16.0, right: 16.0, bottom: 12.0),
-            decoration: new BoxDecoration(
-              border: new Border(
-                bottom: new BorderSide(
-                  style: BorderStyle.solid,
-                  color: Colors.black12,
-                ),
-              )
-            ),
-            child: new Row(
-              children: <Widget>[
-                new Text(
-                  'Filtro:  ',
-                  style: new TextStyle(
-                    fontSize: 12.0,
-                    fontFamily: 'Roboto',
-                    color: new Color(0xFF9E9E9E)
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          ///Mes
-          new Container(
-            padding: new EdgeInsets.only(bottom: 9.0, top: 9.0),
-            child: new Row(
-              children: <Widget>[
-                new Container(
-                  margin: new EdgeInsets.only(left: 8.0),
-                  child: new InkWell(
-                    onTap: (){},
-                    child: new Icon(
-                      Icons.keyboard_arrow_left,
-                      color: new Color(0xFF9E9E9E),
-                      size: 28.0,
-                    ),
-                  ),
-                ),
-                new Expanded(
-                  child: new Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      new InkWell(
-                        onTap: (){},
-                        child: new Text(
-                          "Dezembro de 2017",
-                          style: new TextStyle(
-                            fontSize: 16.0,
-                          )
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                new Container(
-                  margin: new EdgeInsets.only(right: 8.0),
-                  child: new InkWell(
-                    onTap: (){},
-                    child: new Icon(
-                      Icons.keyboard_arrow_right,
-                      color: new Color(0xFF9E9E9E),
-                      size: 28.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
           
 
-          ///Dia
-          new Container(
-            padding: new EdgeInsets.only(left: 8.0, right: 8.0, bottom: 5.0, top: 5.0),
-            decoration: new BoxDecoration(
-              border: new Border(
-                bottom: new BorderSide(
-                  style: BorderStyle.solid,
-                  color: Colors.black12,
-                ),
-                top: new BorderSide(
-                  style: BorderStyle.solid,
-                  color: Colors.black12,
-                ),
-              )
-            ),
-            child: new Row(
-              children: <Widget>[
-                new Text(
-                  '1 de dezembro',
-                  style: new TextStyle(
-                    fontSize: 12.0,
-                    fontFamily: 'Roboto',
-                    color: new Color(0xFF9E9E9E)
-                  ),
-                ),
-              ],
-            ),
-          ),
+          
+          
+
+          
 
           ///Lancamento
           new ItemLancamento(),
@@ -163,30 +199,48 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   }
 }
 
-class ItemLancamento extends StatefulWidget {
-   
+class ItemLancamento extends StatefulWidget {   
   final int id;
-  final String tag;
-  final int numeroCor;
-  final String relacionada;
-  final Color cor;
-  final int ativada;
+  final String tipo;
+  final int idcategoria;
+  final int idtag;
+  final int idconta;
+  final int idcontadestino;
+  final int idcartao;
+  final double valor;
+  final String data;
+  final String descricao;
+  final String tiporepeticao;
+  final String periodorepeticao;
+  final int quantidaderepeticao;
+  final String fatura;
+  final int pago;
+  final String hash;
   final VoidCallback onPressed;
   final VoidCallback onPressed2;
   final VoidCallback onPressed3;
 
   ItemLancamento({
     Key key,
-
     this.id,
-    this.tag,
-    this.relacionada,
-    this.cor,
-    this.numeroCor,
-    this.ativada,
+    this.tipo,
+    this.idcategoria,
+    this.idtag,
+    this.idconta,
+    this.idcontadestino,
+    this.idcartao,
+    this.valor,
+    this.data,
+    this.descricao,
+    this.tiporepeticao,
+    this.periodorepeticao,
+    this.quantidaderepeticao,
+    this.fatura,
+    this.pago,
+    this.hash,
     this.onPressed,
     this.onPressed2,
-    this.onPressed3}) : super(key: key);
+    this.onPressed3,}) : super(key: key);
 
   @override
   ItemLancamentoState createState() => new ItemLancamentoState();

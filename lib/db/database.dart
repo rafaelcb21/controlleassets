@@ -688,22 +688,26 @@ class Lancamento {
     List listaData = await db.rawQuery("SELECT data FROM lancamento GROUP BY data");
 
     var hoje = new DateTime.now();
-    var hojeMes = new DateFormat.yM("pt_BR").format(hoje);
-    var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(hoje).toString();
+    var hojeMes = new DateFormat.yM("pt_BR").format(hoje); // 12/2017
+    var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(hoje).toString(); // dezembro de 2017
 
     for(var i in listaData){
       List lista = await db.rawQuery("SELECT * FROM lancamento WHERE data = ?", [i['data']]);
+
+      //SELECT * FROM lancamento T1
+      //  INNER JOIN categoria T2 ON (T1.ID=T2.EID)
+      //    WHERE T2.HOUR=X
       var data = new DateFormat("yyyy-MM-dd").parse(i['data']);
       var filtro = new DateFormat.yM("pt_BR").format(data);
 
       if(hojeMes == filtro) {
         var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
         listaPorData.add([dataFormatada, lista]);
-      }    
+      }
     }
     
-    listaPorData.add(hojeMesDescrito);
-
+    listaPorData.add([hoje, hojeMesDescrito]);
+    print(listaPorData);
     await db.close();
     return listaPorData;
   }
