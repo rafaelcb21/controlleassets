@@ -686,6 +686,7 @@ class Lancamento {
     var listaPorData = [];
 
     List listaData = await db.rawQuery("SELECT data FROM lancamento GROUP BY data");
+    print(listaData);
 
     var hoje = new DateTime.now();
     var hojeMes = new DateFormat.yM("pt_BR").format(hoje); // 12/2017
@@ -693,7 +694,7 @@ class Lancamento {
 
     for(var i in listaData){
       //List lista = await db.rawQuery("SELECT * FROM lancamento WHERE data = ?", [i['data']]);
-
+      print(i);
       List lista = await db.rawQuery('''
         SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
                 l.valor, l.pago, l.hash 
@@ -704,6 +705,7 @@ class Lancamento {
           LEFT JOIN cartao ON l.idcartao = cartao.id
             WHERE data = ?
       ''', [i['data']]);
+      print(lista);
 
 
       var data = new DateFormat("yyyy-MM-dd").parse(i['data']);
@@ -711,7 +713,9 @@ class Lancamento {
 
       if(hojeMes == filtro) {
         var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
-        listaPorData.add([dataFormatada, lista]);
+        if(lista.length > 0) {
+          listaPorData.add([dataFormatada, lista]);
+        }        
       }
     }
     
@@ -747,30 +751,9 @@ class Lancamento {
     List lista, result;
     if(pago == 0) {
       List result = await db.rawQuery('UPDATE lancamento SET pago = 1 WHERE id = ?', [id]);
-      List lista = await db.rawQuery('''
-        SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
-                l.valor, l.pago, l.hash
-                  FROM lancamento AS l
-          LEFT JOIN categoria AS c ON l.idcategoria = c.id
-          LEFT JOIN tag ON l.idtag = tag.id
-          LEFT JOIN conta ON l.idconta = conta.id
-          LEFT JOIN cartao ON l.idcartao = cartao.id
-            WHERE id = ?
-      ''', [id]);
     } else if(pago == 1) {
       List result = await db.rawQuery('UPDATE lancamento SET pago = 0 WHERE id = ?', [id]);
-      List lista = await db.rawQuery('''
-        SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
-                l.valor, l.pago, l.hash 
-                  FROM lancamento AS l
-          LEFT JOIN categoria AS c ON l.idcategoria = c.id
-          LEFT JOIN tag ON l.idtag = tag.id
-          LEFT JOIN conta ON l.idconta = conta.id
-          LEFT JOIN cartao ON l.idcartao = cartao.id
-            WHERE id = ?
-      ''', [id]);
     }
-    
 
     await db.close();
 
@@ -778,7 +761,43 @@ class Lancamento {
   }
 
 
+  Future deleteLancamento(int id) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
 
+    await db.rawUpdate("DELETE FROM lancamento WHERE id = ?", [id]);
+
+    await db.close();
+
+    return true;
+  }
+
+  Future deleteLancamentoRepetidos(String date, String hash) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+    DateTime dataCompare;
+    DateTime data = new DateFormat("yyyy-MM-dd").parse(date);
+    List listaId = [];
+
+    List listaHash = await db.rawQuery("SELECT id, data FROM lancamento WHERE hash = ?", [hash]);
+    
+    for(var i in listaHash) {
+      dataCompare = new DateFormat("yyyy-MM-dd").parse(i['data']);
+      if(dataCompare.isAfter(data) || dataCompare == data) {
+        listaId.add(i['id']);
+      }
+    }
+
+    for(var u in listaId) {
+      await db.rawUpdate("DELETE FROM lancamento WHERE id = ?", [u]);
+    }
+
+    await db.close();
+
+    return true;
+  }
   
 
   Future upsertLancamentoRepetirParcela(Lancamento lancamento) async {

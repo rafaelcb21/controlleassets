@@ -24,11 +24,10 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
       lancamentoDB.getLancamento().then(
         (list) {
           setState(() {
-
-            this.periodoFiltro = list.removeLast()[1];
-            this.listaDB = list;
-            print(this.periodoFiltro);
-            print(this.listaDB.last); //dezembro de 2017
+            if(list.length > 0) {
+              this.periodoFiltro = list.removeLast()[1];
+              this.listaDB = list;
+            }            
           });
         } //[[11 de dezembro, [{idcategoria: 8, idconta: 1, fatura: null, hash
       );
@@ -154,6 +153,9 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
           for(var u = 0; u < lista[i][1].length; u++) {
             var valor, textoPago;
             int pago = lista[i][1][u]['pago'];
+            int id = lista[i][1][u]['id'];
+            String data = lista[i][1][u]['data'];
+            String hash = lista[i][1][u]['hash'];
             
             if(lista[i][1][u]['tipo'] == "Despesa"){
               var numeroNegativo = lista[i][1][u]['valor']*-1;
@@ -177,13 +179,12 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
               } else if(lista[i][1][u]['pago'] == 1 && lista[i][1][u]['tipo'] == "Transferência") {
                 textoPago = "transferido";
               }
-            }
-
-            
+            }            
             
             this.listaLancamentos.add(
               new ItemLancamento(
-                id: lista[i][1][u]['id'],
+                key: new ObjectKey(lista[i][1][u]),
+                id: id,
                 tipo: lista[i][1][u]['tipo'],
                 categoria: lista[i][1][u]['categoria'],
                 //idtag: lista[i][1][u]['idtag'],
@@ -191,7 +192,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                 //idcontadestino: lista[i][1][u]['idcontadestino'],
                 //idcartao: lista[i][1][u]['idcartao'],
                 valor: valor,
-                data: lista[i][1][u]['data'],
+                data: data,
                 descricao: lista[i][1][u]['descricao'],
                 //tiporepeticao: lista[i][1][u]['tiporepeticao'],
                 //periodorepeticao: lista[i][1][u]['periodorepeticao'],
@@ -199,7 +200,152 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                 //fatura: lista[i][1][u]['fatura'],
                 pago: pago,
                 textoPago: textoPago,
-                hash: lista[i][1][u]['hash'],
+                hash: hash,
+                onPressed2: () async {
+                  void showDeleteDialog<T>({ BuildContext context, Widget child }) {
+                    showDialog<T>(
+                      context: context,
+                      child: child,
+                    )
+                    .then<Null>((T value) { });
+                  }
+
+                  if(hash == null) {
+                    showDeleteDialog<DialogOptionsAction>(
+                      context: context,
+                      child: new AlertDialog(
+                        title: const Text('Deletar Lançamento'),
+                        content: new Text(
+                            'Deseja deletar esse lançamento?',
+                            softWrap: true,
+                            style: new TextStyle(
+                              color: Colors.black45,
+                              fontSize: 16.0,
+                              fontFamily: "Roboto",
+                              fontWeight: FontWeight.w500,
+                            )
+                        ),
+                        actions: <Widget>[
+                          new FlatButton(
+                            child: const Text('CANCEL'),
+                            onPressed: () {                                
+                              Navigator.pop(context);
+                            }
+                          ),
+                          new FlatButton(
+                            child: const Text('OK'),
+                            onPressed: () {
+                              lancamentoDB.deleteLancamento(id);
+                              lancamentoDB.getLancamento().then(
+                                (list) {
+                                  setState(() {
+                                    this.periodoFiltro = list.removeLast()[1];
+                                    this.listaDB = list;
+                                  });
+                                }
+                              );
+                              Navigator.pop(context);
+                            }
+                          )
+                        ]
+                      )
+                    );
+                  } else {
+                    showDeleteDialog<DialogOptionsAction>(
+                      context: context,
+                      child: new AlertDialog(
+                        title: const Text('Deletar Lançamento'),
+                        content: new Container(
+                          height: 120.0,
+                          child: new Column(
+                            children: <Widget>[
+                              new GestureDetector(
+                                onTap: (){
+                                  lancamentoDB.deleteLancamento(id);
+                                  lancamentoDB.getLancamento().then(
+                                    (list) {
+                                      setState(() {
+                                        this.periodoFiltro = list.removeLast()[1];
+                                        this.listaDB = list;
+                                      });
+                                    }
+                                  );
+                                  Navigator.pop(context);
+                                },
+                                child: new Container(
+                                  margin: new EdgeInsets.only(bottom: 16.0),
+                                  padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                
+                                  width: 250.0,
+                                  height: 40.0,
+                                  decoration: new BoxDecoration(
+                                    color: new Color(0xFF9E9E9E),
+                                    borderRadius: new BorderRadius.circular(3.0)
+                                  ),
+                                  child: new Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      new Text(
+                                        'Deletar apenas esse',
+                                        softWrap: true,
+                                        style: new TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16.0,
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500,
+                                        )
+                                      ),
+                                    ],
+                                  )
+                                ),
+                              ),
+                              new GestureDetector(
+                                onTap: (){
+                                  lancamentoDB.deleteLancamentoRepetidos(data, hash);
+                                  lancamentoDB.getLancamento().then(
+                                    (list) {
+                                      setState(() {
+                                        this.periodoFiltro = list.removeLast()[1];
+                                        this.listaDB = list;
+                                      });
+                                    }
+                                  );
+                                  Navigator.pop(context);
+                                },
+                                child: new Container(
+                                  margin: new EdgeInsets.only(bottom: 16.0),
+                                  padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                
+                                  width: 250.0,
+                                  height: 40.0,
+                                  decoration: new BoxDecoration(
+                                    color: new Color(0xFF9E9E9E),
+                                    borderRadius: new BorderRadius.circular(3.0)
+                                  ),
+                                  child: new Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      new Text(
+                                        'Deletar esse e os próximos',
+                                        softWrap: true,
+                                        style: new TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16.0,
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500,
+                                        )
+                                      ),
+                                    ],
+                                  )
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    );
+                  }
+                },
                 onPressed3: () {                  
                   lancamentoDB.updateLancamentoPago(lista[i][1][u]['id'], pago);
                   lancamentoDB.getLancamento().then(
@@ -230,10 +376,11 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
           )
         ],
       ),
-      body: new ListView(
-        padding: new EdgeInsets.only(top: 16.0),
-        children: buildLancamentos(this.listaDB)
-      )
+      body: this.listaDB == [] ? new Container() : 
+        new ListView(
+          padding: new EdgeInsets.only(top: 16.0),
+          children: buildLancamentos(this.listaDB)
+        )
     );
   }
 }
