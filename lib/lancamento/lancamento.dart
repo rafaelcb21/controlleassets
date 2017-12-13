@@ -1725,7 +1725,7 @@ class FormularioState extends State<Formulario> {
                       }
                     } else { //lancamento de cartão
                       lancamentoDB.fatura = this.formSubmit["fatura"];
-                       if(lancamentoDB.tiporepeticao == 'Parcelada') { //cartão parcelado
+                        if(lancamentoDB.tiporepeticao == 'Parcelada') { //cartão parcelado
 
                         List mesesLista = listaDosMeses(
                           lancamentoDB.quantidaderepeticao,
@@ -1887,6 +1887,7 @@ class FormularioState extends State<Formulario> {
                         lancamentoDB.upsertLancamento(lancamentoList);
 
                       } else { //lancamento de cartao não parcelado e nem dividido
+                      
                         Lancamento lancamento = new Lancamento();
                         lancamento.tipo = lancamentoDB.tipo;
                         lancamento.idcategoria = lancamentoDB.idcategoria;
@@ -1901,6 +1902,7 @@ class FormularioState extends State<Formulario> {
                         lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
                         lancamento.data = lancamentoDB.data;
                         lancamento.pago = lancamentoDB.pago;
+                        lancamento.fatura = lancamentoDB.fatura;
 
                         lancamentoList.add(lancamento);
                         lancamentoDB.upsertLancamento(lancamentoList);

@@ -705,7 +705,7 @@ class Lancamento {
           LEFT JOIN cartao ON l.idcartao = cartao.id
             WHERE data = ?
       ''', [i['data']]);
-      print(lista);
+      print(lista); //AND idcartao = 0
 
 
       var data = new DateFormat("yyyy-MM-dd").parse(i['data']);
