@@ -677,6 +677,36 @@ class Lancamento {
     return lancamentoTable;
   }
 
+  int mesEscolhido(month) {
+    switch(month) {
+      case "janeiro": return 1; break;
+      case "fevereiro": return 2; break;
+      case "março": return 3; break;
+      case "abril": return 4; break;
+      case "maio": return 5; break;
+      case "junho": return 6; break;
+      case "julho": return 7; break;
+      case "agosto": return 8; break;
+      case "setembro": return 9; break;
+      case "outubro": return 10; break;
+      case "novembro": return 11; break;
+      case "dezembro": return 12; break;
+    }
+  }
+
+  String stringDateInDateTimeString(String date, String vencimento) {
+    List listaMesAno = date.split(" ");
+    String nomeMes = listaMesAno[0];
+    int ano = int.parse(listaMesAno[2]);
+    int mes = mesEscolhido(nomeMes);
+    int dia = int.parse(vencimento);
+
+    DateTime data = new DateTime(ano, mes, dia);
+    String dataString = new DateFormat("yyyy-MM-dd").format(data);
+
+    return dataString;
+  }
+
   Future getLancamento() async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
@@ -684,17 +714,45 @@ class Lancamento {
     //List lista = await db.rawQuery("SELECT * FROM lancamento");
 
     var listaPorData = [];
+    var listaDeFaturas = [];
 
     List listaData = await db.rawQuery("SELECT data FROM lancamento GROUP BY data");
-    print(listaData);
-
+    
     var hoje = new DateTime.now();
     var hojeMes = new DateFormat.yM("pt_BR").format(hoje); // 12/2017
     var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(hoje).toString(); // dezembro de 2017
 
+    //var fatura = hojeMesDescrito[0].toUpperCase() + hojeMesDescrito.substring(1);
+
+    List listaIdCartao = await db.rawQuery("SELECT id, vencimento FROM cartao"); //todos os ids de cartao
+
+   
+    for(var j in listaIdCartao) {
+
+      List somaFaturaCartao = await db.rawQuery(
+        '''SELECT c.vencimento, l.fatura, c.cartao, SUM(valor)
+              FROM lancamento AS l 
+            LEFT JOIN cartao AS c ON l.idcartao = c.id        
+              WHERE l.idconta = ? AND l.fatura = ?
+        ''', [j['id'], fatura]);
+
+      print(somaFaturaCartao);
+
+      String dataFatura = stringDateInDateTimeString(hojeMesDescrito, somaFaturaCartao[0]['vencimento']);
+
+      if(somaFaturaCartao[0]['SUM(valor)'] > 0) {
+        listaDeFaturas.add([dataFatura, somaFaturaCartao[0]]);
+      }      
+
+    }
+
+    print("********************");
+    print(listaDeFaturas);
+    print("********************");
+
     for(var i in listaData){
       //List lista = await db.rawQuery("SELECT * FROM lancamento WHERE data = ?", [i['data']]);
-      print(i);
+
       List lista = await db.rawQuery('''
         SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
                 l.valor, l.pago, l.hash 
@@ -703,10 +761,8 @@ class Lancamento {
           LEFT JOIN tag ON l.idtag = tag.id
           LEFT JOIN conta ON l.idconta = conta.id
           LEFT JOIN cartao ON l.idcartao = cartao.id
-            WHERE data = ?
+            WHERE l.data = ? AND l.idcartao = 0
       ''', [i['data']]);
-      print(lista); //AND idcartao = 0
-
 
       var data = new DateFormat("yyyy-MM-dd").parse(i['data']);
       var filtro = new DateFormat.yM("pt_BR").format(data);
@@ -719,6 +775,8 @@ class Lancamento {
       }
     }
     
+    print("+++++++++++++++++++++++");
+    print(listaPorData);
     listaPorData.add([hoje, hojeMesDescrito]);
 
     await db.close();
