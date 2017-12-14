@@ -722,7 +722,7 @@ class Lancamento {
     var hojeMes = new DateFormat.yM("pt_BR").format(hoje); // 12/2017
     var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(hoje).toString(); // dezembro de 2017
 
-    //var fatura = hojeMesDescrito[0].toUpperCase() + hojeMesDescrito.substring(1);
+    var fatura = hojeMesDescrito[0].toUpperCase() + hojeMesDescrito.substring(1);
 
     List listaIdCartao = await db.rawQuery("SELECT id, vencimento FROM cartao"); //todos os ids de cartao
 
@@ -731,12 +731,10 @@ class Lancamento {
 
       List somaFaturaCartao = await db.rawQuery(
         '''SELECT c.vencimento, l.fatura, c.cartao, SUM(valor)
-              FROM lancamento AS l 
-            LEFT JOIN cartao AS c ON l.idcartao = c.id        
-              WHERE l.idconta = ? AND l.fatura = ?
-        ''', [j['id'], fatura]);
-
-      print(somaFaturaCartao);
+              FROM lancamento AS l
+                LEFT JOIN cartao AS c ON l.idcartao = c.id
+              WHERE l.idcartao = ? AND l.fatura = ?
+        ''', [ j['id'], fatura ]);
 
       String dataFatura = stringDateInDateTimeString(hojeMesDescrito, somaFaturaCartao[0]['vencimento']);
 
