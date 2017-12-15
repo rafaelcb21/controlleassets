@@ -4,15 +4,15 @@ description: A new Flutter project.
 dependencies:
   intl: "^0.15.2"
   numberpicker: "^0.1.0"
-  crypto: "^2.0.2+1"
+#  crypto: "^2.0.2+1"
   uuid: "^0.5.3"
   flutter:
     sdk: flutter
-  google_sign_in: "^1.0.1"
-  firebase_analytics: 0.1.1
-  firebase_auth: 0.3.1
-  firebase_database: 0.1.2
-  firebase_storage: 0.0.7
+ # google_sign_in: "^1.0.1"
+ # firebase_analytics: 0.1.1
+ # firebase_auth: 0.3.1
+ # firebase_database: 0.1.2
+ # firebase_storage: 0.0.7
   sqflite: any
   path_provider: any
   firebase_admob: "^0.0.2"
@@ -39,7 +39,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-  - lib/images/cef.jpg
+#  - lib/images/cef.jpg
   - lib/images/itau.jpg
   - lib/images/bb.jpg
   - lib/images/visa.png

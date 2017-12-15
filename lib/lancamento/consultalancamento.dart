@@ -138,7 +138,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
               child: new Row(
                 children: <Widget>[
                   new Text(
-                    lista[i][0], //dia ex: 1 de fevereiro
+                    'dia ex: 1 de fevereiro',//lista[i][0], //dia ex: 1 de fevereiro
                     style: new TextStyle(
                       fontSize: 12.0,
                       fontFamily: 'Roboto',

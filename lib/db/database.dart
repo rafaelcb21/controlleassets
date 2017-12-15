@@ -722,20 +722,26 @@ class Lancamento {
     var hojeMes = new DateFormat.yM("pt_BR").format(hoje); // 12/2017
     var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(hoje).toString(); // dezembro de 2017
 
-    var fatura = hojeMesDescrito[0].toUpperCase() + hojeMesDescrito.substring(1);
+    var fatura = hojeMesDescrito[0].toUpperCase() + hojeMesDescrito.substring(1); // Dezembro de 2017
 
     List listaIdCartao = await db.rawQuery("SELECT id, vencimento FROM cartao"); //todos os ids de cartao
 
+    List ttt = await db.rawQuery("SELECT * FROM lancamento");
+
+    for(var k in ttt){
+      print(k);
+    }
    
     for(var j in listaIdCartao) {
-
+      print(fatura);
+      print(j['id']);
       List somaFaturaCartao = await db.rawQuery(
         '''SELECT c.vencimento, l.fatura, c.cartao, SUM(valor)
               FROM lancamento AS l
                 LEFT JOIN cartao AS c ON l.idcartao = c.id
               WHERE l.idcartao = ? AND l.fatura = ?
         ''', [ j['id'], fatura ]);
-
+      print(somaFaturaCartao);
       String dataFatura = stringDateInDateTimeString(hojeMesDescrito, somaFaturaCartao[0]['vencimento']);
 
       if(somaFaturaCartao[0]['SUM(valor)'] > 0) {
@@ -763,12 +769,21 @@ class Lancamento {
       ''', [i['data']]);
 
       var data = new DateFormat("yyyy-MM-dd").parse(i['data']);
+
+      
+      List dataAnoMesDia = i['data'].split("-");
+      DateTime dataDateTime = new DateTime(
+        int.parse(dataAnoMesDia[0]), int.parse(dataAnoMesDia[1]), int.parse(dataAnoMesDia[2]));
+
+
       var filtro = new DateFormat.yM("pt_BR").format(data);
 
       if(hojeMes == filtro) {
-        var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
+        //var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
+        
         if(lista.length > 0) {
-          listaPorData.add([dataFormatada, lista]);
+          //listaPorData.add([dataFormatada, lista]);
+          listaPorData.add([dataDateTime, lista]);
         }        
       }
     }

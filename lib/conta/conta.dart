@@ -186,6 +186,7 @@ class ItemContaState extends State<ItemConta> {
   Widget build(BuildContext context) {
     return new Container(
       decoration: new BoxDecoration(
+        color: new Color(0xFFFAFAFA),
         border: new Border(
           bottom: new BorderSide(
             style: BorderStyle.solid,

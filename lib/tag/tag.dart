@@ -671,10 +671,10 @@ class ItemTagState extends State<ItemTag> with TickerProviderStateMixin {
             ).animate(_animation),
             child: new Container(
               decoration: new BoxDecoration(
+                color: new Color(0xFFFAFAFA),
                 border: new Border(
                   top: new BorderSide(style: BorderStyle.solid, color: Colors.black26),
                 ),
-                color: new Color(0xFFFFFFFF),
               ),
               margin: new EdgeInsets.only(top: 0.0, bottom: 0.0),
               child: new Row(
@@ -709,7 +709,7 @@ class ItemTagState extends State<ItemTag> with TickerProviderStateMixin {
                                       fontFamily: "Roboto",
                                       fontWeight: FontWeight.w500,
                                     ),
-                                  ),                                             
+                                  ),
                               ],
                             )
                           )

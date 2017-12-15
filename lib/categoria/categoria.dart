@@ -1049,9 +1049,9 @@ class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMi
             child: new Container(
               decoration: new BoxDecoration(
                 border: new Border(
-                  top: widget.filho ? new BorderSide(style: BorderStyle.solid, color: new Color(0xFFFFFFFF)) : new BorderSide(style: BorderStyle.solid, color: Colors.black26),
+                  top: widget.filho ? new BorderSide(style: BorderStyle.solid, color: new Color(0xFFFAFAFA)) : new BorderSide(style: BorderStyle.solid, color: Colors.black26),
                 ),
-                color: new Color(0xFFFFFFFF),
+                color: new Color(0xFFFAFAFA),
               ),
               margin: new EdgeInsets.only(top: 0.0, bottom: 0.0),
               child: new Row(
