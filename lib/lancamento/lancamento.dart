@@ -1730,6 +1730,7 @@ class FormularioState extends State<Formulario> {
                       }
                     } else { //lancamento de cartão
                       lancamentoDB.fatura = this.formSubmit["fatura"];
+                      print(lancamentoDB.fatura);
                         if(lancamentoDB.tiporepeticao == 'Parcelada') { //cartão parcelado
 
                         List mesesLista = listaDosMeses(
@@ -1737,6 +1738,8 @@ class FormularioState extends State<Formulario> {
                           lancamentoDB.data,
                           lancamentoDB.periodorepeticao
                         );
+
+                        print(mesesLista);
 
                         for(var i = 0; i < lancamentoDB.quantidaderepeticao; i++) {
                           Lancamento lancamento = new Lancamento();
@@ -1759,9 +1762,21 @@ class FormularioState extends State<Formulario> {
                             lancamentoDB.periodorepeticao == 'Semanas' ||
                             lancamentoDB.periodorepeticao == 'Quinzenas' 
                           ) {
+
+
+                            var faturaNome = lancamentoDB.fatura[0].toLowerCase() + lancamentoDB.fatura.substring(1); // dezembro de 2017
+                            String dia = lancamentoDB.data.substring(8, 10);
+                            String dataString = lancamentoDB.stringDateInDateTimeString(faturaNome, dia); //2016-01-28
+                            
+                            print(lancamentoDB.data);
+                            print(faturaNome);
+                            print(dia); //inserir logica de mes para dias 31 e a logica para mes de fevereiro
+                            print(dataString);
+
                             int days = i * this.periodos[lancamentoDB.periodorepeticao];
                             lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString().substring(0,10);
-                            DateTime dataFaturaFunction = DateTime.parse(lancamentoDB.data).add(new Duration(days: days));
+                            lancamento.datafatura = DateTime.parse(dataString).add(new Duration(days: days)).toString().substring(0,10);
+                            DateTime dataFaturaFunction = DateTime.parse(lancamento.datafatura).add(new Duration(days: days));
                             var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
 
                             this.formSubmit["fatura"] = resultado;

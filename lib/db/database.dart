@@ -100,6 +100,7 @@ class DatabaseClient {
               idcartao INTEGER,
               valor REAL NOT NULL,
               data TEXT NOT NULL,
+              datafatura TEXT,
               descricao TEXT NOT NULL,
               tiporepeticao TEXT,
               periodorepeticao TEXT,
@@ -618,6 +619,7 @@ class Lancamento {
   int idcartao;
   num valor;
   String data;
+  String datafatura;
   String descricao;
   String tiporepeticao;
   String periodorepeticao;
@@ -628,7 +630,7 @@ class Lancamento {
 
 
   static final columns = ["id", "tipo", "idcategoria", "idtag", "idconta", "idcontadestino", "idcartao",
-                          "valor", "data", "descricao", "tiporepeticao", "periodorepeticao", "quantidaderepeticao",
+                          "valor", "data", "datafatura", "descricao", "tiporepeticao", "periodorepeticao", "quantidaderepeticao",
                           "fatura", "pago", "hash"];
 
   Map toMap() {
@@ -641,6 +643,7 @@ class Lancamento {
       "idcartao" : idcartao,
       "valor" : valor,
       "data" : data,
+      "datafatura": datafatura,
       "descricao" : descricao,
       "tiporepeticao" : tiporepeticao,
       "periodorepeticao" : periodorepeticao,
@@ -666,6 +669,7 @@ class Lancamento {
     lancamentoTable.idcartao = map["idcartao"];
     lancamentoTable.valor = map["valor"];
     lancamentoTable.data = map["data"];
+    lancamentoTable.datafatura = map["datafatura"];
     lancamentoTable.descricao = map["descricao"];
     lancamentoTable.tiporepeticao = map["tiporepeticao"];
     lancamentoTable.periodorepeticao = map["periodorepeticao"];
