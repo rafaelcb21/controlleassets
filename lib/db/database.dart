@@ -730,22 +730,16 @@ class Lancamento {
 
     List listaIdCartao = await db.rawQuery("SELECT id, vencimento FROM cartao"); //todos os ids de cartao
 
-    List ttt = await db.rawQuery("SELECT * FROM lancamento");
-
-    for(var k in ttt){
-      print(k);
-    }
-   
-    for(var j in listaIdCartao) {
-      print(fatura);
-      print(j['id']);
+    for(var idCartao in listaIdCartao) {
+      //print(fatura);
+      //print(idCartao['id']);
       List somaFaturaCartao = await db.rawQuery(
         '''SELECT c.vencimento, l.fatura, c.cartao, SUM(valor)
               FROM lancamento AS l
                 LEFT JOIN cartao AS c ON l.idcartao = c.id
               WHERE l.idcartao = ? AND l.fatura = ?
-        ''', [ j['id'], fatura ]);
-      print(somaFaturaCartao);
+        ''', [ idCartao['id'], fatura ]);
+      //print(somaFaturaCartao);
       String dataFatura = stringDateInDateTimeString(hojeMesDescrito, somaFaturaCartao[0]['vencimento']);
 
       if(somaFaturaCartao[0]['SUM(valor)'] > 0) {
