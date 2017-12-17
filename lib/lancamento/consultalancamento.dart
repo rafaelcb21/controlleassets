@@ -326,7 +326,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       new Text(
-                                        'Deletar esse e os próximos',
+                                        'Deletar esse e os\n próximos',
                                         softWrap: true,
                                         style: new TextStyle(
                                           color: Colors.white,

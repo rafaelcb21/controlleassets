@@ -1848,10 +1848,10 @@ class FormularioState extends State<Formulario> {
                             lancamento.fatura = this.formSubmit["fatura"];
 
                           }
-                          print(lancamento.fatura);
-                          print(lancamento.data);
-                          print(lancamento.datafatura);
-                          print("=========================");
+                          //print(lancamento.fatura);
+                          //print(lancamento.data);
+                          //print(lancamento.datafatura);
+                          //print("=========================");
                           lancamentoList.add(lancamento);
                         } //for 
 
@@ -1965,37 +1965,11 @@ class FormularioState extends State<Formulario> {
                             lancamento.fatura = this.formSubmit["fatura"];
 
                           }
-                          print(lancamento.fatura);
-                          print(lancamento.data);
-                          print(lancamento.datafatura);
-                          print("*************************");
-                          lancamentoList.add(lancamento);
-
-                            //int days = i * this.periodos[lancamentoDB.periodorepeticao];
-                            //int _dia = int.parse(lancamentoDB.data.substring(8,10));
-                            //int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
-                            //
-                            //if((_dia > 28 && mesesLista[i] == 2) || _dia == 31) {
-                            //  lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString().substring(0,10);
-                            //  DateTime dataFaturaFunction = new DateTime(_ano, mesesLista[i] + 1, 0);
-                            //  var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
-                            //  this.formSubmit["fatura"] = resultado;
-                            //  lancamento.fatura = this.formSubmit["fatura"];
-                            //} else {
-                            //  lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString().substring(0,10);
-                            //  DateTime dataFaturaFunction = new DateTime(_ano, mesesLista[i], _dia);
-                            //  var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
-                            //  this.formSubmit["fatura"] = resultado;
-                            //  lancamento.fatura = this.formSubmit["fatura"];
-                            //} 
-                          
                           //print(lancamento.fatura);
                           //print(lancamento.data);
                           //print(lancamento.datafatura);
-                          //lancamentoList.add(lancamento);
-                          
-                          
-
+                          //print("*************************");
+                          lancamentoList.add(lancamento);
 
                         } //for 
 
@@ -2021,6 +1995,11 @@ class FormularioState extends State<Formulario> {
 
                         lancamentoList.add(lancamento);
                         lancamentoDB.upsertLancamento(lancamentoList);
+                        
+                        //print(lancamento.datafatura);
+                        // Data fatura é data fake só para inserir na fatura correta,
+                        // nesse caso ela é null pois nao precisa-se dela no lancamento de cartao não parcelado e nem dividido
+                        
                       }
                     }
                     lancamentoList = [];
