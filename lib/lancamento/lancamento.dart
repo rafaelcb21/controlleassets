@@ -1603,7 +1603,7 @@ class FormularioState extends State<Formulario> {
                           lancamento.idconta = lancamentoDB.idconta;
                           lancamento.idcontadestino = lancamentoDB.idcontadestino;
                           lancamento.idcartao = lancamentoDB.idcartao;
-                          lancamento.valor = lancamentoDB.valor;
+                          lancamento.valor = lancamento.tipo == 'Despesa' ? -1*lancamentoDB.valor : lancamentoDB.valor;
                           lancamento.descricao = lancamentoDB.descricao;
                           lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
@@ -1666,7 +1666,7 @@ class FormularioState extends State<Formulario> {
                           lancamento.idconta = lancamentoDB.idconta;
                           lancamento.idcontadestino = lancamentoDB.idcontadestino;
                           lancamento.idcartao = lancamentoDB.idcartao;
-                          lancamento.valor = valorDivisao;
+                          lancamento.valor = lancamento.tipo == 'Despesa' ? -1*valorDivisao : valorDivisao;
                           lancamento.descricao = lancamentoDB.descricao;
                           lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
@@ -1717,7 +1717,7 @@ class FormularioState extends State<Formulario> {
                         lancamento.idconta = lancamentoDB.idconta;
                         lancamento.idcontadestino = lancamentoDB.idcontadestino;
                         lancamento.idcartao = lancamentoDB.idcartao;
-                        lancamento.valor = lancamentoDB.valor;
+                        lancamento.valor = lancamento.tipo == 'Despesa' ? -1*lancamentoDB.valor : lancamentoDB.valor;;
                         lancamento.descricao = lancamentoDB.descricao;
                         lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
                         lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
@@ -1749,7 +1749,7 @@ class FormularioState extends State<Formulario> {
                           lancamento.idconta = lancamentoDB.idconta;
                           lancamento.idcontadestino = lancamentoDB.idcontadestino;
                           lancamento.idcartao = lancamentoDB.idcartao;
-                          lancamento.valor = lancamentoDB.valor;
+                          lancamento.valor = lancamento.tipo == 'Despesa' ? -1*lancamentoDB.valor : lancamentoDB.valor;
                           lancamento.descricao = lancamentoDB.descricao;
                           lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
@@ -1876,7 +1876,7 @@ class FormularioState extends State<Formulario> {
                           lancamento.idconta = lancamentoDB.idconta;
                           lancamento.idcontadestino = lancamentoDB.idcontadestino;
                           lancamento.idcartao = lancamentoDB.idcartao;
-                          lancamento.valor = valorDivisao;
+                          lancamento.valor = lancamento.tipo == 'Despesa' ? -1*valorDivisao : valorDivisao;
                           lancamento.descricao = lancamentoDB.descricao;
                           lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
@@ -1984,7 +1984,7 @@ class FormularioState extends State<Formulario> {
                         lancamento.idconta = lancamentoDB.idconta;
                         lancamento.idcontadestino = lancamentoDB.idcontadestino;
                         lancamento.idcartao = lancamentoDB.idcartao;
-                        lancamento.valor = lancamentoDB.valor;
+                        lancamento.valor = lancamento.tipo == 'Despesa' ? -1*lancamentoDB.valor : lancamentoDB.valor;
                         lancamento.descricao = lancamentoDB.descricao;
                         lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
                         lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
