@@ -719,6 +719,7 @@ class Lancamento {
 
     var listaPorData = [];
     var listaDeFaturas = [];
+    var listaDataAndFatura = [];
 
     List listaData = await db.rawQuery("SELECT data FROM lancamento GROUP BY data");
     
@@ -741,11 +742,10 @@ class Lancamento {
         ''', [ idCartao['id'], fatura ]);
       //print(somaFaturaCartao);
       String dataFatura = stringDateInDateTimeString(hojeMesDescrito, somaFaturaCartao[0]['vencimento']);
-
-      if(somaFaturaCartao[0]['SUM(valor)'] > 0) {
-        listaDeFaturas.add([dataFatura, somaFaturaCartao[0]]);
-      }      
-
+      DateTime dataFaturaDateTime = DateTime.parse(dataFatura);
+      if(somaFaturaCartao[0]['SUM(valor)'] > 0) { // se tiver valor na fatura
+        listaDeFaturas.add([dataFaturaDateTime, dataFatura, 'comCartao', somaFaturaCartao[0]]);
+      }
     }
 
     print("********************");
@@ -777,16 +777,42 @@ class Lancamento {
       var filtro = new DateFormat.yM("pt_BR").format(data);
 
       if(hojeMes == filtro) {
-        //var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
+        var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
         
         if(lista.length > 0) {
           //listaPorData.add([dataFormatada, lista]);
-          listaPorData.add([dataDateTime, lista]);
+          listaPorData.add([dataDateTime, dataFormatada, 'semCartao',lista]);
         }        
       }
     }
+
+    //I/flutter (26604): ********************
+    //I/flutter (26604): [[2017-12-10 00:00:00.000, 2017-12-10, comCartao, {SUM(valor): 310.98, fatura: Dezembro de 2017, vencimento: 10, cartao: Platinium}]]
+    //I/flutter (26604): ********************
+    //I/flutter (26604): +++++++++++++++++++++++
+    //I/flutter (26604): [[2017-12-17 00:00:00.000, 17 de dezembro, semCartao, [{categoria: Investimento, pago: 0, descricao: Rrrrr, hash: null, valor: -85.0, id: 4, data: 2017-12-17, tipo: Despesa}, {categoria: Educação, pago: 0, descricao: Uuuuu, hash: null, valor: -112.54, id: 5, data: 2017-12-17, tipo: Despesa}]]]
+
+    var datasLista = [];
+
+    for(var i in listaDeFaturas) {
+      datasLista.add(i[0]); //pega todas as datas
+    }
+
+    for(var i in datasLista) {
+
+    }
+
+
     
+    
+
+    //listaDataAndFatura = new List.from(listaPorData)..addAll(listaDeFaturas);
+    //listaDataAndFatura.sort();
+    //listaDataAndFatura.add([hoje, hojeMesDescrito]);
+
     print("+++++++++++++++++++++++");
+    //print(listaDataAndFatura);
+    //print("======================");
     print(listaPorData);
     listaPorData.add([hoje, hojeMesDescrito]);
 

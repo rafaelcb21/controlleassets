@@ -138,7 +138,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
               child: new Row(
                 children: <Widget>[
                   new Text(
-                    'dia ex: 1 de fevereiro',//lista[i][0], //dia ex: 1 de fevereiro
+                    'dia ex: 1 de fevereiro',//lista[i][1], //dia ex: 1 de fevereiro
                     style: new TextStyle(
                       fontSize: 12.0,
                       fontFamily: 'Roboto',
@@ -150,50 +150,50 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
             )
           );
 
-          for(var u = 0; u < lista[i][1].length; u++) {
+          for(var u = 0; u < lista[i][3].length; u++) {
             var valor, textoPago;
-            int pago = lista[i][1][u]['pago'];
-            int id = lista[i][1][u]['id'];
-            String data = lista[i][1][u]['data'];
-            String hash = lista[i][1][u]['hash'];
+            int pago = lista[i][3][u]['pago'];
+            int id = lista[i][3][u]['id'];
+            String data = lista[i][3][u]['data'];
+            String hash = lista[i][3][u]['hash'];
             
-            if(lista[i][1][u]['tipo'] == "Despesa"){
-              var numeroNegativo = lista[i][1][u]['valor']*-1;
+            if(lista[i][3][u]['tipo'] == "Despesa"){
+              var numeroNegativo = lista[i][3][u]['valor'];
               var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
               valor = f.format(numeroNegativo);
-              if(lista[i][1][u]['pago'] == 0){
+              if(lista[i][3][u]['pago'] == 0){
                 textoPago = "não pago";
               } else {
                 textoPago = "pago";
               }
             } else {
               var f = new NumberFormat.currency(locale: 'pt_BR', symbol: "", decimalDigits: 2);
-              valor = f.format(lista[i][1][u]['valor']);
+              valor = f.format(lista[i][3][u]['valor']);
 
-              if(lista[i][1][u]['pago'] == 0 && lista[i][1][u]['tipo'] == "Receita"){
+              if(lista[i][3][u]['pago'] == 0 && lista[i][3][u]['tipo'] == "Receita"){
                 textoPago = "não recebido";
-              } else if(lista[i][1][u]['pago'] == 0 && lista[i][1][u]['tipo'] == "Transferência") {
+              } else if(lista[i][3][u]['pago'] == 0 && lista[i][3][u]['tipo'] == "Transferência") {
                 textoPago = "não transferido";
-              } else if(lista[i][1][u]['pago'] == 1 && lista[i][1][u]['tipo'] == "Receita") {
+              } else if(lista[i][3][u]['pago'] == 1 && lista[i][3][u]['tipo'] == "Receita") {
                 textoPago = "recebido";
-              } else if(lista[i][1][u]['pago'] == 1 && lista[i][1][u]['tipo'] == "Transferência") {
+              } else if(lista[i][3][u]['pago'] == 1 && lista[i][3][u]['tipo'] == "Transferência") {
                 textoPago = "transferido";
               }
             }            
             
             this.listaLancamentos.add(
               new ItemLancamento(
-                key: new ObjectKey(lista[i][1][u]),
+                key: new ObjectKey(lista[i][3][u]),
                 id: id,
-                tipo: lista[i][1][u]['tipo'],
-                categoria: lista[i][1][u]['categoria'],
+                tipo: lista[i][3][u]['tipo'],
+                categoria: lista[i][3][u]['categoria'],
                 //idtag: lista[i][1][u]['idtag'],
                 //idconta: lista[i][1][u]['idconta'],
                 //idcontadestino: lista[i][1][u]['idcontadestino'],
                 //idcartao: lista[i][1][u]['idcartao'],
                 valor: valor,
                 data: data,
-                descricao: lista[i][1][u]['descricao'],
+                descricao: lista[i][3][u]['descricao'],
                 //tiporepeticao: lista[i][1][u]['tiporepeticao'],
                 //periodorepeticao: lista[i][1][u]['periodorepeticao'],
                 //quantidaderepeticao: lista[i][1][u]['quantidaderepeticao'],
