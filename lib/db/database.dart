@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:collection';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -771,7 +772,8 @@ class Lancamento {
       
       List dataAnoMesDia = i['data'].split("-");
       DateTime dataDateTime = new DateTime(
-        int.parse(dataAnoMesDia[0]), int.parse(dataAnoMesDia[1]), int.parse(dataAnoMesDia[2]));
+        int.parse(dataAnoMesDia[0]), int.parse(dataAnoMesDia[1]), int.parse(dataAnoMesDia[2])
+      );
 
 
       var filtro = new DateFormat.yM("pt_BR").format(data);
@@ -781,7 +783,7 @@ class Lancamento {
         
         if(lista.length > 0) {
           //listaPorData.add([dataFormatada, lista]);
-          listaPorData.add([dataDateTime, dataFormatada, 'semCartao',lista]);
+          listaPorData.add([dataDateTime, dataFormatada, 'semCartao', lista]);
         }        
       }
     }
@@ -792,19 +794,77 @@ class Lancamento {
     //I/flutter (26604): +++++++++++++++++++++++
     //I/flutter (26604): [[2017-12-17 00:00:00.000, 17 de dezembro, semCartao, [{categoria: Investimento, pago: 0, descricao: Rrrrr, hash: null, valor: -85.0, id: 4, data: 2017-12-17, tipo: Despesa}, {categoria: Educação, pago: 0, descricao: Uuuuu, hash: null, valor: -112.54, id: 5, data: 2017-12-17, tipo: Despesa}]]]
 
-    var datasLista = [];
+    //Map<DateTime, List> dateMap = {};
+    var dateMap = new LinkedHashMap();
+    
+    List allDate = [];
 
-    for(var i in listaDeFaturas) {
-      datasLista.add(i[0]); //pega todas as datas
+    for(var key in listaDeFaturas) {
+      allDate.add(key[0]); //pega todas as datas
     }
 
-    for(var i in datasLista) {
-
+    for(var key in listaPorData) {
+      allDate.add(key[0]); //pega todas as datas
     }
 
+    allDate.sort();
 
+    for(var key in allDate) {
+      dateMap.putIfAbsent(key, () => []); //insere todas as datas de forma ordenada no {}
+    }
+
+    //for(var key in listaDeFaturas) {
+    //  dateMap.putIfAbsent(key[0], () => []); //pega todas as datas
+    //}
+
+    //for(var key in listaPorData) {
+    //  dateMap.putIfAbsent(key[0], () => []); //pega todas as datas
+    //}
+
+    for(var lista in listaPorData) {
+      DateTime dateKey = lista[0];
+      String dateNome = lista[1];
+      String tipoLancamento = lista[2];
+      List lancamentos = lista[3];
+      
+      for(var itemLancamento in lancamentos) {
+        dateMap[dateKey].add([
+          dateKey,
+          itemLancamento['descricao'], dateNome, tipoLancamento, itemLancamento['categoria'],
+          itemLancamento['pago'], itemLancamento['hash'], itemLancamento['valor'],
+          itemLancamento['id'], itemLancamento['data'], itemLancamento['tipo']
+        ]);
+      }
+    }
+
+    for(var lista in listaDeFaturas) {
+      DateTime dateKey = lista[0];
+      String dateString = lista[1];
+
+      var data = new DateFormat("yyyy-MM-dd").parse(dateString);
+      var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
+      
+      String tipoLancamento = lista[2];
+      double somaValor = lista[3]['SUM(valor)'];
+      String faturaLancamento = lista[3]['fatura'];
+      String vencimentoLancamento = lista[3]['vencimento'];
+      String cartaoLancamento = lista[3]['cartao'];
+      
+      dateMap[dateKey].add([
+        dateKey,
+        faturaLancamento, dataFormatada, tipoLancamento, cartaoLancamento, somaValor, vencimentoLancamento
+      ]);
+    }
+
+    List listaUnica = [];
+
+    dateMap.forEach((key, value) {
+      listaUnica.add(value);
+    });
     
-    
+    listaUnica.add([hoje, hojeMesDescrito]);
+
+    print(listaUnica);    
 
     //listaDataAndFatura = new List.from(listaPorData)..addAll(listaDeFaturas);
     //listaDataAndFatura.sort();
