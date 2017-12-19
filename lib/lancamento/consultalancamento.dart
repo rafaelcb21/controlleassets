@@ -179,7 +179,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
               String categoria = listaLaunch[4];
               String descricao = listaLaunch[1];
               
-              if(tipo == "Despesa"){
+              if(tipo == "Despesa") {
                 
                 var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
                 valor = f.format(valorLaunch);
@@ -370,6 +370,62 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   },
                   onPressed3: () {
                     lancamentoDB.updateLancamentoPago(id, pago);
+                    lancamentoDB.getLancamento().then(
+                      (list) {
+                        setState(() {
+                          this.listaDB = list[0];
+                          this.periodoFiltro = list[1][1];
+                        });
+                      }
+                    );
+                  },
+                )
+              );
+            } else if(listaLaunch[3] == 'comCartao') {
+              String valor = '';
+              String textoPago = '';
+              String tipo = listaLaunch[3];
+              double valorLaunch = listaLaunch[5];
+              int pago = listaLaunch[7];
+              String categoria = listaLaunch[4];
+              String descricao = listaLaunch[1];
+              List ids = listaLaunch[8];
+              var data = new DateFormat("yyyy-MM-dd").parse(listaLaunch[0]);
+              //var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
+              
+              if(valorLaunch < 0) {
+                var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
+                valor = f.format(valorLaunch);
+                if(pago == 0){
+                  textoPago = "não pago";
+                } else {
+                  textoPago = "pago";
+                }
+              } else if(valorLaunch > 0) {
+                var f = new NumberFormat.currency(locale: 'pt_BR', symbol: "", decimalDigits: 2);
+                valor = f.format(valorLaunch);
+                if(pago == 0){
+                  textoPago = "não recebido";
+                } else {
+                  textoPago = "recebido";
+                }
+              }
+
+              this.listaLancamentos.add(
+                new ItemLancamentoCartao(
+                  key: new ObjectKey(listaLaunch),
+                  ids: ids,
+                  tipo: tipo,
+                  categoria: categoria,
+                  valor: valor,
+                  valorOriginal: valorLaunch,
+                  data: data.toString(),
+                  descricao: descricao,
+                  pago: pago,
+                  textoPago: textoPago,
+                  
+                  onPressed2: () {
+                    lancamentoDB.updateLancamentoPagoFatura(ids, pago);
                     lancamentoDB.getLancamento().then(
                       (list) {
                         setState(() {
@@ -639,4 +695,145 @@ class ItemLancamentoState extends State<ItemLancamento> with TickerProviderState
     );
   }
 }
+
+class ItemLancamentoCartao extends StatefulWidget {   
+  final List ids;
+  final String tipo;
+  final String categoria;
+  final String valor;
+  final double valorOriginal;
+  final String data;
+  final String descricao;
+  final int pago;  
+  final String textoPago;
+  final VoidCallback onPressed;
+  final VoidCallback onPressed2;
+
+  ItemLancamentoCartao({
+    Key key,
+    this.ids,
+    this.tipo,
+    this.categoria,
+    this.valor,
+    this.valorOriginal,
+    this.data,
+    this.descricao,
+    this.pago,
+    this.textoPago,
+    this.onPressed,
+    this.onPressed2,}) : super(key: key);
+
+  @override
+  ItemLancamentoCartaoState createState() => new ItemLancamentoCartaoState();
+}
+
+class ItemLancamentoCartaoState extends State<ItemLancamentoCartao> {
+  ItemLancamentoCartaoState();
+
+  Lancamento lancamentoDB = new Lancamento();
+
+  void showDeleteDialog<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Container(
+      padding: new EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0, top: 8.0),
+      decoration: new BoxDecoration(
+        color: new Color(0xFFFAFAFA),
+        border: new Border(
+          bottom: new BorderSide(
+            style: BorderStyle.solid,
+            color: Colors.black12,
+          ),
+        )
+      ),
+      child: new Row(
+        children: <Widget>[
+          new Container(
+            padding: new EdgeInsets.only(right: 8.0),
+            child: new Icon(
+              Icons.insert_drive_file,
+              color: Colors.black26,
+              size: 10.0,
+            ),
+          ),
+          new Expanded(
+            child: new InkWell(
+              onTap: widget.onPressed,
+              child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  new Text(
+                    widget.descricao,
+                    overflow: TextOverflow.ellipsis,
+                    style: new TextStyle(
+                      fontSize: 14.0,
+                      fontFamily: 'Roboto',
+                      color: new Color(0xFF212121),
+                    ),
+                  ),
+                  new Text(
+                    widget.categoria,
+                    style: new TextStyle(
+                      fontSize: 12.0,
+                      fontFamily: 'Roboto',
+                      color: new Color(0xFF9E9E9E)
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          new Container(
+            padding: new EdgeInsets.only(left: 8.0),
+            child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new Text(
+                  widget.valor,
+                  overflow: TextOverflow.ellipsis,
+                  style: new TextStyle(
+                    fontSize: 14.0,
+                    fontFamily: 'Roboto',
+                    color: widget.valorOriginal < 0 ? new Color(0xFFE57373) : new Color(0xFF00BFA5),
+                  ),
+                ),
+                new Text(
+                  widget.textoPago,
+                  style: new TextStyle(
+                    fontSize: 12.0,
+                    fontFamily: 'Roboto',
+                    color: new Color(0xFF9E9E9E)
+                  ),
+                ),
+              ],
+            ),
+          ),
+              
+          new InkWell(
+            onTap: widget.onPressed2,
+            child: new Container(
+              padding: new EdgeInsets.only(left: 10.0),
+              child: new Icon(
+                widget.pago == 0 ? Icons.thumb_down : Icons.thumb_up,
+                color: widget.pago == 0 ? new Color(0xFFE57373) : new Color(0xFF00BFA5),
+                size: 24.0,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+
 

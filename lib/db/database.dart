@@ -736,16 +736,28 @@ class Lancamento {
       //print(fatura);
       //print(idCartao['id']);
       List somaFaturaCartao = await db.rawQuery(
-        '''SELECT c.vencimento, l.fatura, c.cartao, SUM(valor)
+        '''SELECT c.vencimento, l.fatura, c.cartao, SUM(valor), SUM(pago)
               FROM lancamento AS l
                 LEFT JOIN cartao AS c ON l.idcartao = c.id
               WHERE l.idcartao = ? AND l.fatura = ?
         ''', [ idCartao['id'], fatura ]);
-      //print(somaFaturaCartao);
+      
+      List idsLancamentosFatura = await db.rawQuery(
+        'SELECT l.id FROM lancamento AS l WHERE l.idcartao = ? AND l.fatura = ?', [ idCartao['id'], fatura ]);
+
       String dataFatura = stringDateInDateTimeString(hojeMesDescrito, somaFaturaCartao[0]['vencimento']);
       DateTime dataFaturaDateTime = DateTime.parse(dataFatura);
+      var pagoFatura = somaFaturaCartao[0]['SUM(pago)'];
+      int resultadoPagamentoFatura;
+
+      if(pagoFatura > 0) {
+        resultadoPagamentoFatura = 1;
+      } else {
+        resultadoPagamentoFatura = 0;
+      }
+
       if(somaFaturaCartao[0]['SUM(valor)'] > 0) { // se tiver valor na fatura
-        listaDeFaturas.add([dataFaturaDateTime, dataFatura, 'comCartao', somaFaturaCartao[0]]);
+        listaDeFaturas.add([dataFaturaDateTime, dataFatura, 'comCartao', somaFaturaCartao[0], resultadoPagamentoFatura, idsLancamentosFatura]);
       }
     }
 
@@ -840,6 +852,8 @@ class Lancamento {
     for(var lista in listaDeFaturas) {
       DateTime dateKey = lista[0];
       String dateString = lista[1];
+      int pago = lista[4];
+      List idsFatura = lista[5];
 
       var data = new DateFormat("yyyy-MM-dd").parse(dateString);
       var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
@@ -852,7 +866,7 @@ class Lancamento {
       
       dateMap[dateKey].add([
         dateKey,
-        faturaLancamento, dataFormatada, tipoLancamento, cartaoLancamento, somaValor, vencimentoLancamento
+        faturaLancamento, dataFormatada, tipoLancamento, cartaoLancamento, somaValor, vencimentoLancamento, pago, idsFatura
       ]);
     }
 
@@ -904,11 +918,33 @@ class Lancamento {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    List lista, result;
+    List lista = [];
     if(pago == 0) {
-      List result = await db.rawQuery('UPDATE lancamento SET pago = 1 WHERE id = ?', [id]);
+      await db.rawQuery('UPDATE lancamento SET pago = 1 WHERE id = ?', [id]);
     } else if(pago == 1) {
-      List result = await db.rawQuery('UPDATE lancamento SET pago = 0 WHERE id = ?', [id]);
+      await db.rawQuery('UPDATE lancamento SET pago = 0 WHERE id = ?', [id]);
+    }
+
+    await db.close();
+
+    return lista;
+  }
+
+  
+
+  Future updateLancamentoPagoFatura(List ids, int pago) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    List lista = [];
+
+    for(var id in ids) {
+      if(pago == 0) {
+        await db.rawQuery('UPDATE lancamento SET pago = 1 WHERE id = ?', [id]);
+      } else if(pago == 1) {
+        await db.rawQuery('UPDATE lancamento SET pago = 0 WHERE id = ?', [id]);
+      }
     }
 
     await db.close();
