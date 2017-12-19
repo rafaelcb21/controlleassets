@@ -25,8 +25,23 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
         (list) {
           setState(() {
             if(list.length > 0) {
-              this.periodoFiltro = list.removeLast()[1];
-              this.listaDB = list;
+              this.listaDB = list[0];
+              this.periodoFiltro = list[1][1];
+              
+
+              //print(this.listaDB[0]);
+              //print(this.listaDB[0][0]);
+              //print(this.listaDB[0][0][1]);
+
+              //for(var i = 0; i < this.listaDB.length; i++) {
+                //print(i);
+              //  for(var x in this.listaDB[i][0]) {
+              //    print(x);
+              //  }
+                //print(this.listaDB[i][0][2]);
+                //this.listaDB[i][0];
+                //if()
+              //}
             }            
           });
         } //[[11 de dezembro, [{idcategoria: 8, idconta: 1, fatura: null, hash
@@ -38,7 +53,6 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   Widget build(BuildContext context) {
 
     List<Widget> buildLancamentos(lista) {
-      
       this.listaLancamentos = [
           ///Filtro
           new Container(
@@ -124,6 +138,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
 
         for(var i = 0; i < lista.length; i++) {
           ///Dia
+          //print(lista[i][0][2].toString());
           this.listaLancamentos.add(
             new Container(
               padding: new EdgeInsets.only(left: 8.0, right: 8.0, bottom: 5.0, top: 5.0),
@@ -138,7 +153,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
               child: new Row(
                 children: <Widget>[
                   new Text(
-                    'dia ex: 1 de fevereiro',//lista[i][1], //dia ex: 1 de fevereiro
+                    lista[i][0][2], //dia ex: 1 de fevereiro
                     style: new TextStyle(
                       fontSize: 12.0,
                       fontFamily: 'Roboto',
@@ -150,215 +165,223 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
             )
           );
 
-          for(var u = 0; u < lista[i][3].length; u++) {
-            var valor, textoPago;
-            int pago = lista[i][3][u]['pago'];
-            int id = lista[i][3][u]['id'];
-            String data = lista[i][3][u]['data'];
-            String hash = lista[i][3][u]['hash'];
-            
-            if(lista[i][3][u]['tipo'] == "Despesa"){
-              var numeroNegativo = lista[i][3][u]['valor'];
-              var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
-              valor = f.format(numeroNegativo);
-              if(lista[i][3][u]['pago'] == 0){
-                textoPago = "não pago";
+          //for(var u = 0; u < lista[i].length; u++) {
+          for(var listaLaunch in lista[i]) {
+            if(listaLaunch[3] == 'semCartao') {
+              String valor = '';
+              String textoPago = '';
+              int pago = listaLaunch[5];
+              int id = listaLaunch[8];
+              String data = listaLaunch[9];
+              String hash = listaLaunch[6];
+              String tipo = listaLaunch[10];
+              double valorLaunch = listaLaunch[7];
+              String categoria = listaLaunch[4];
+              String descricao = listaLaunch[1];
+              
+              if(tipo == "Despesa"){
+                
+                var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
+                valor = f.format(valorLaunch);
+                if(pago == 0){
+                  textoPago = "não pago";
+                } else {
+                  textoPago = "pago";
+                }
               } else {
-                textoPago = "pago";
-              }
-            } else {
-              var f = new NumberFormat.currency(locale: 'pt_BR', symbol: "", decimalDigits: 2);
-              valor = f.format(lista[i][3][u]['valor']);
+                var f = new NumberFormat.currency(locale: 'pt_BR', symbol: "", decimalDigits: 2);
+                valor = f.format(valorLaunch);
 
-              if(lista[i][3][u]['pago'] == 0 && lista[i][3][u]['tipo'] == "Receita"){
-                textoPago = "não recebido";
-              } else if(lista[i][3][u]['pago'] == 0 && lista[i][3][u]['tipo'] == "Transferência") {
-                textoPago = "não transferido";
-              } else if(lista[i][3][u]['pago'] == 1 && lista[i][3][u]['tipo'] == "Receita") {
-                textoPago = "recebido";
-              } else if(lista[i][3][u]['pago'] == 1 && lista[i][3][u]['tipo'] == "Transferência") {
-                textoPago = "transferido";
-              }
-            }            
+                if(pago == 0 && tipo == "Receita"){
+                  textoPago = "não recebido";
+                } else if(pago == 0 && tipo == "Transferência") {
+                  textoPago = "não transferido";
+                } else if(pago == 1 && tipo == "Receita") {
+                  textoPago = "recebido";
+                } else if(pago == 1 && tipo == "Transferência") {
+                  textoPago = "transferido";
+                }
+              }   
             
-            this.listaLancamentos.add(
-              new ItemLancamento(
-                key: new ObjectKey(lista[i][3][u]),
-                id: id,
-                tipo: lista[i][3][u]['tipo'],
-                categoria: lista[i][3][u]['categoria'],
-                //idtag: lista[i][1][u]['idtag'],
-                //idconta: lista[i][1][u]['idconta'],
-                //idcontadestino: lista[i][1][u]['idcontadestino'],
-                //idcartao: lista[i][1][u]['idcartao'],
-                valor: valor,
-                data: data,
-                descricao: lista[i][3][u]['descricao'],
-                //tiporepeticao: lista[i][1][u]['tiporepeticao'],
-                //periodorepeticao: lista[i][1][u]['periodorepeticao'],
-                //quantidaderepeticao: lista[i][1][u]['quantidaderepeticao'],
-                //fatura: lista[i][1][u]['fatura'],
-                pago: pago,
-                textoPago: textoPago,
-                hash: hash,
-                onPressed2: () async {
-                  void showDeleteDialog<T>({ BuildContext context, Widget child }) {
-                    showDialog<T>(
-                      context: context,
-                      child: child,
-                    )
-                    .then<Null>((T value) { });
-                  }
-
-                  if(hash == null) {
-                    showDeleteDialog<DialogOptionsAction>(
-                      context: context,
-                      child: new AlertDialog(
-                        title: const Text('Deletar Lançamento'),
-                        content: new Text(
-                            'Deseja deletar esse lançamento?',
-                            softWrap: true,
-                            style: new TextStyle(
-                              color: Colors.black45,
-                              fontSize: 16.0,
-                              fontFamily: "Roboto",
-                              fontWeight: FontWeight.w500,
-                            )
-                        ),
-                        actions: <Widget>[
-                          new FlatButton(
-                            child: const Text('CANCEL'),
-                            onPressed: () {                                
-                              Navigator.pop(context);
-                            }
-                          ),
-                          new FlatButton(
-                            child: const Text('OK'),
-                            onPressed: () {
-                              lancamentoDB.deleteLancamento(id);
-                              lancamentoDB.getLancamento().then(
-                                (list) {
-                                  setState(() {
-                                    this.periodoFiltro = list.removeLast()[1];
-                                    this.listaDB = list;
-                                  });
-                                }
-                              );
-                              Navigator.pop(context);
-                            }
-                          )
-                        ]
+              this.listaLancamentos.add(
+                new ItemLancamento(
+                  key: new ObjectKey(listaLaunch),
+                  id: id,
+                  tipo: tipo,
+                  categoria: categoria,
+                  //idtag: lista[i][1][u]['idtag'],
+                  //idconta: lista[i][1][u]['idconta'],
+                  //idcontadestino: lista[i][1][u]['idcontadestino'],
+                  //idcartao: lista[i][1][u]['idcartao'],
+                  valor: valor,
+                  data: data,
+                  descricao: descricao,
+                  //tiporepeticao: lista[i][1][u]['tiporepeticao'],
+                  //periodorepeticao: lista[i][1][u]['periodorepeticao'],
+                  //quantidaderepeticao: lista[i][1][u]['quantidaderepeticao'],
+                  //fatura: lista[i][1][u]['fatura'],
+                  pago: pago,
+                  textoPago: textoPago,
+                  hash: hash,
+                  onPressed2: () async {
+                    void showDeleteDialog<T>({ BuildContext context, Widget child }) {
+                      showDialog<T>(
+                        context: context,
+                        child: child,
                       )
-                    );
-                  } else {
-                    showDeleteDialog<DialogOptionsAction>(
-                      context: context,
-                      child: new AlertDialog(
-                        title: const Text('Deletar Lançamento'),
-                        content: new Container(
-                          height: 120.0,
-                          child: new Column(
-                            children: <Widget>[
-                              new GestureDetector(
-                                onTap: (){
-                                  lancamentoDB.deleteLancamento(id);
-                                  lancamentoDB.getLancamento().then(
-                                    (list) {
-                                      setState(() {
-                                        this.periodoFiltro = list.removeLast()[1];
-                                        this.listaDB = list;
-                                      });
-                                    }
-                                  );
-                                  Navigator.pop(context);
-                                },
-                                child: new Container(
-                                  margin: new EdgeInsets.only(bottom: 16.0),
-                                  padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                
-                                  width: 250.0,
-                                  height: 40.0,
-                                  decoration: new BoxDecoration(
-                                    color: new Color(0xFF9E9E9E),
-                                    borderRadius: new BorderRadius.circular(3.0)
-                                  ),
-                                  child: new Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      new Text(
-                                        'Deletar apenas esse',
-                                        softWrap: true,
-                                        style: new TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16.0,
-                                          fontFamily: "Roboto",
-                                          fontWeight: FontWeight.w500,
-                                        )
-                                      ),
-                                    ],
-                                  )
-                                ),
-                              ),
-                              new GestureDetector(
-                                onTap: (){
-                                  lancamentoDB.deleteLancamentoRepetidos(data, hash);
-                                  lancamentoDB.getLancamento().then(
-                                    (list) {
-                                      setState(() {
-                                        this.periodoFiltro = list.removeLast()[1];
-                                        this.listaDB = list;
-                                      });
-                                    }
-                                  );
-                                  Navigator.pop(context);
-                                },
-                                child: new Container(
-                                  margin: new EdgeInsets.only(bottom: 16.0),
-                                  padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                
-                                  width: 250.0,
-                                  height: 40.0,
-                                  decoration: new BoxDecoration(
-                                    color: new Color(0xFF9E9E9E),
-                                    borderRadius: new BorderRadius.circular(3.0)
-                                  ),
-                                  child: new Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      new Text(
-                                        'Deletar esse e os\n próximos',
-                                        softWrap: true,
-                                        style: new TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16.0,
-                                          fontFamily: "Roboto",
-                                          fontWeight: FontWeight.w500,
-                                        )
-                                      ),
-                                    ],
-                                  )
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    );
-                  }
-                },
-                onPressed3: () {                  
-                  lancamentoDB.updateLancamentoPago(lista[i][1][u]['id'], pago);
-                  lancamentoDB.getLancamento().then(
-                    (list) {
-                      setState(() {
-                        this.periodoFiltro = list.removeLast()[1];
-                        this.listaDB = list;
-                      });
+                      .then<Null>((T value) { });
                     }
-                  );
-                },
-              )
-            );
+
+                    if(hash == null) {
+                      showDeleteDialog<DialogOptionsAction>(
+                        context: context,
+                        child: new AlertDialog(
+                          title: const Text('Deletar Lançamento'),
+                          content: new Text(
+                              'Deseja deletar esse lançamento?',
+                              softWrap: true,
+                              style: new TextStyle(
+                                color: Colors.black45,
+                                fontSize: 16.0,
+                                fontFamily: "Roboto",
+                                fontWeight: FontWeight.w500,
+                              )
+                          ),
+                          actions: <Widget>[
+                            new FlatButton(
+                              child: const Text('CANCEL'),
+                              onPressed: () {                                
+                                Navigator.pop(context);
+                              }
+                            ),
+                            new FlatButton(
+                              child: const Text('OK'),
+                              onPressed: () {
+                                lancamentoDB.deleteLancamento(id);
+                                lancamentoDB.getLancamento().then(
+                                  (list) {
+                                    setState(() {
+                                      this.listaDB = list[0];
+                                      this.periodoFiltro = list[1][1];
+                                    });
+                                  }
+                                );
+                                Navigator.pop(context);
+                              }
+                            )
+                          ]
+                        )
+                      );
+                    } else {
+                      showDeleteDialog<DialogOptionsAction>(
+                        context: context,
+                        child: new AlertDialog(
+                          title: const Text('Deletar Lançamento'),
+                          content: new Container(
+                            height: 120.0,
+                            child: new Column(
+                              children: <Widget>[
+                                new GestureDetector(
+                                  onTap: (){
+                                    lancamentoDB.deleteLancamento(id);
+                                    lancamentoDB.getLancamento().then(
+                                      (list) {
+                                        setState(() {
+                                          this.listaDB = list[0];
+                                          this.periodoFiltro = list[1][1];
+                                        });
+                                      }
+                                    );
+                                    Navigator.pop(context);
+                                  },
+                                  child: new Container(
+                                    margin: new EdgeInsets.only(bottom: 16.0),
+                                    padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                
+                                    width: 250.0,
+                                    height: 40.0,
+                                    decoration: new BoxDecoration(
+                                      color: new Color(0xFF9E9E9E),
+                                      borderRadius: new BorderRadius.circular(3.0)
+                                    ),
+                                    child: new Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        new Text(
+                                          'Deletar apenas esse',
+                                          softWrap: true,
+                                          style: new TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16.0,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.w500,
+                                          )
+                                        ),
+                                      ],
+                                    )
+                                  ),
+                                ),
+                                new GestureDetector(
+                                  onTap: (){
+                                    lancamentoDB.deleteLancamentoRepetidos(data, hash);
+                                    lancamentoDB.getLancamento().then(
+                                      (list) {
+                                        setState(() {
+                                          this.listaDB = list[0];
+                                          this.periodoFiltro = list[1][1];
+                                        });
+                                      }
+                                    );
+                                    Navigator.pop(context);
+                                  },
+                                  child: new Container(
+                                    margin: new EdgeInsets.only(bottom: 16.0),
+                                    padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                
+                                    width: 250.0,
+                                    height: 40.0,
+                                    decoration: new BoxDecoration(
+                                      color: new Color(0xFF9E9E9E),
+                                      borderRadius: new BorderRadius.circular(3.0)
+                                    ),
+                                    child: new Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        new Text(
+                                          'Deletar esse e os\n próximos',
+                                          softWrap: true,
+                                          style: new TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16.0,
+                                            fontFamily: "Roboto",
+                                            fontWeight: FontWeight.w500,
+                                          )
+                                        ),
+                                      ],
+                                    )
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      );
+                    }
+                  },
+                  onPressed3: () {
+                    lancamentoDB.updateLancamentoPago(id, pago);
+                    lancamentoDB.getLancamento().then(
+                      (list) {
+                        setState(() {
+                          this.listaDB = list[0];
+                          this.periodoFiltro = list[1][1];
+                        });
+                      }
+                    );
+                  },
+                )
+              );
+            }
           }
         }
       return this.listaLancamentos;

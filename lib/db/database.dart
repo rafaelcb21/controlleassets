@@ -749,9 +749,9 @@ class Lancamento {
       }
     }
 
-    print("********************");
-    print(listaDeFaturas);
-    print("********************");
+    //print("********************");
+    //print(listaDeFaturas);
+    //print("********************");
 
     for(var i in listaData){
       //List lista = await db.rawQuery("SELECT * FROM lancamento WHERE data = ?", [i['data']]);
@@ -858,26 +858,27 @@ class Lancamento {
 
     List listaUnica = [];
 
+    //print(dateMap);
     dateMap.forEach((key, value) {
       listaUnica.add(value);
     });
     
-    listaUnica.add([hoje, hojeMesDescrito]);
+    //listaUnica.add([hoje, hojeMesDescrito]);
 
-    print(listaUnica);    
+    //print(listaUnica);
 
     //listaDataAndFatura = new List.from(listaPorData)..addAll(listaDeFaturas);
     //listaDataAndFatura.sort();
     //listaDataAndFatura.add([hoje, hojeMesDescrito]);
 
-    print("+++++++++++++++++++++++");
+    //print("+++++++++++++++++++++++");
     //print(listaDataAndFatura);
     //print("======================");
-    print(listaPorData);
-    listaPorData.add([hoje, hojeMesDescrito]);
+    //print(listaPorData);
+    //listaUnica.add([hoje, hojeMesDescrito]);
 
     await db.close();
-    return listaPorData;
+    return [listaUnica, [hoje, hojeMesDescrito]];
   }
 
   Future upsertLancamento(List<Lancamento> list) async {

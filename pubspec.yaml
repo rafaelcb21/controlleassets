@@ -4,6 +4,7 @@ description: A new Flutter project.
 dependencies:
   intl: "^0.15.2"
   numberpicker: "^0.1.0"
+#  typeof: "^0.0.2"
 #  crypto: "^2.0.2+1"
   uuid: "^0.5.3"
   flutter:
@@ -15,7 +16,7 @@ dependencies:
  # firebase_storage: 0.0.7
   sqflite: any
   path_provider: any
-  firebase_admob: "^0.0.2"
+  firebase_admob: "0.0.3"
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
