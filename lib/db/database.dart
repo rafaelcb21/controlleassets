@@ -778,9 +778,8 @@ class Lancamento {
           LEFT JOIN cartao ON l.idcartao = cartao.id
             WHERE l.data = ? AND l.idcartao = 0
       ''', [i['data']]);
-
+      
       var data = new DateFormat("yyyy-MM-dd").parse(i['data']);
-
       
       List dataAnoMesDia = i['data'].split("-");
       DateTime dataDateTime = new DateTime(

@@ -308,7 +308,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: <Widget>[
                                         new Text(
-                                          'Deletar apenas esse',
+                                          'Apenas esse',
                                           softWrap: true,
                                           style: new TextStyle(
                                             color: Colors.white,
@@ -348,7 +348,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: <Widget>[
                                         new Text(
-                                          'Deletar esse e os\n próximos',
+                                          'Esse e os próximos',
                                           softWrap: true,
                                           style: new TextStyle(
                                             color: Colors.white,
@@ -390,8 +390,11 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
               String categoria = listaLaunch[4];
               String descricao = listaLaunch[1];
               List ids = listaLaunch[8];
-              var data = new DateFormat("yyyy-MM-dd").parse(listaLaunch[0]);
-              //var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
+              
+              //var data = new DateFormat("yyyy-MM-dd").parse(STRING);
+              //var dataFormatada = new DateFormat.yMMMM("pt_BR").format(DATETIME).toString();
+
+              String data = new DateFormat("yyyy-MM-dd").format(listaLaunch[0]);
               
               if(valorLaunch < 0) {
                 var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
