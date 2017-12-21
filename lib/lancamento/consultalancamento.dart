@@ -29,16 +29,14 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
               this.periodoFiltro = list[1][1];
               
 
-              //print(this.listaDB[0]);
-              //print(this.listaDB[0][0]);
-              //print(this.listaDB[0][0][1]);
+              
 
               //for(var i = 0; i < this.listaDB.length; i++) {
-                //print(i);
+                //
               //  for(var x in this.listaDB[i][0]) {
-              //    print(x);
+              //    
               //  }
-                //print(this.listaDB[i][0][2]);
+                
                 //this.listaDB[i][0];
                 //if()
               //}
@@ -138,7 +136,6 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
 
         for(var i = 0; i < lista.length; i++) {
           ///Dia
-          //print(lista[i][0][2].toString());
           this.listaLancamentos.add(
             new Container(
               padding: new EdgeInsets.only(left: 8.0, right: 8.0, bottom: 5.0, top: 5.0),
@@ -390,7 +387,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
               String categoria = listaLaunch[4];
               String descricao = listaLaunch[1];
               List ids = listaLaunch[8];
-              
+
               //var data = new DateFormat("yyyy-MM-dd").parse(STRING);
               //var dataFormatada = new DateFormat.yMMMM("pt_BR").format(DATETIME).toString();
 
@@ -419,7 +416,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   key: new ObjectKey(listaLaunch),
                   ids: ids,
                   tipo: tipo,
-                  categoria: categoria,
+                  categoria: "cartão " + categoria,
                   valor: valor,
                   valorOriginal: valorLaunch,
                   data: data.toString(),

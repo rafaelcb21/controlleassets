@@ -1996,7 +1996,6 @@ class FormularioState extends State<Formulario> {
                         lancamentoList.add(lancamento);
                         lancamentoDB.upsertLancamento(lancamentoList);
                         
-                        //print(lancamento.datafatura);
                         // Data fatura é data fake só para inserir na fatura correta,
                         // nesse caso ela é null pois nao precisa-se dela no lancamento de cartao não parcelado e nem dividido
                         

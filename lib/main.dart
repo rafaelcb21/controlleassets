@@ -722,7 +722,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           await Navigator.of(context).push(new PageRouteBuilder(
                             opaque: false,
                             pageBuilder: (BuildContext context, _, __) {
-                              return new ContaPage();
+                              return new NovaContaPage(false, new Conta());
                             },
                             transitionsBuilder: (
                                 BuildContext context,
@@ -794,7 +794,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           await Navigator.of(context).push(new PageRouteBuilder(
                             opaque: false,
                             pageBuilder: (BuildContext context, _, __) {
-                              return new CartaoPage();
+                              return new NovaCartaoPage(false, new Cartao());
                             },
                             transitionsBuilder: (
                                 BuildContext context,
