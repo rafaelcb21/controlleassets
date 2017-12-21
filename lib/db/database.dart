@@ -712,7 +712,28 @@ class Lancamento {
     return dataString;
   }
 
-  Future getLancamento() async {
+  List nextPeriod(String date, bool next) {
+    List listaMesAno = date.split(" ");
+    String nomeMes = listaMesAno[0];
+    int ano = int.parse(listaMesAno[2]);
+    int mes = mesEscolhido(nomeMes);
+    DateTime data = new DateTime(ano, mes, 1);
+    String dataString = new DateFormat("yyyy-MM-dd").format(data);
+    DateTime nextDate;
+
+    next ? 
+      nextDate = DateTime.parse(dataString).add(new Duration(days: 31)) 
+    :
+      nextDate = DateTime.parse(dataString).subtract(new Duration(days: 5));
+     
+
+    String hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(nextDate).toString(); //janeiro de 2018    
+    
+
+    return [hojeMesDescrito, nextDate];
+  }
+
+  Future getLancamento(DateTime diaSearch) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
@@ -720,13 +741,13 @@ class Lancamento {
 
     var listaPorData = [];
     var listaDeFaturas = [];
-    var listaDataAndFatura = [];
+    //var listaDataAndFatura = [];
 
     List listaData = await db.rawQuery("SELECT data FROM lancamento GROUP BY data");
     
-    var hoje = new DateTime.now();
-    var hojeMes = new DateFormat.yM("pt_BR").format(hoje); // 12/2017
-    var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(hoje).toString(); // dezembro de 2017
+    //var hoje = new DateTime.now();
+    var hojeMes = new DateFormat.yM("pt_BR").format(diaSearch); // 12/2017
+    var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(diaSearch).toString(); // dezembro de 2017
 
     var fatura = hojeMesDescrito[0].toUpperCase() + hojeMesDescrito.substring(1); // Dezembro de 2017
 
@@ -883,7 +904,7 @@ class Lancamento {
     //listaUnica.add([hoje, hojeMesDescrito]);
 
     await db.close();
-    return [listaUnica, [hoje, hojeMesDescrito]];
+    return [listaUnica, [diaSearch, hojeMesDescrito]];
   }
 
   Future upsertLancamento(List<Lancamento> list) async {

@@ -21,25 +21,13 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   @override
   void initState() {
     setState(() {
-      lancamentoDB.getLancamento().then(
+      lancamentoDB.getLancamento(new DateTime.now()).then(
         (list) {
           setState(() {
             if(list.length > 0) {
               this.listaDB = list[0];
               this.periodoFiltro = list[1][1];
-              
 
-              
-
-              //for(var i = 0; i < this.listaDB.length; i++) {
-                //
-              //  for(var x in this.listaDB[i][0]) {
-              //    
-              //  }
-                
-                //this.listaDB[i][0];
-                //if()
-              //}
             }            
           });
         } //[[11 de dezembro, [{idcategoria: 8, idconta: 1, fatura: null, hash
@@ -93,7 +81,11 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                 new Container(
                   margin: new EdgeInsets.only(left: 8.0),
                   child: new InkWell(
-                    onTap: (){},
+                    onTap: (){
+                      setState(() {
+                        this.periodoFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, false);
+                      });
+                    },
                     child: new Icon(
                       Icons.keyboard_arrow_left,
                       color: new Color(0xFF9E9E9E),
@@ -121,7 +113,23 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                 new Container(
                   margin: new EdgeInsets.only(right: 8.0),
                   child: new InkWell(
-                    onTap: (){},
+                    onTap: (){
+                      setState(() {
+                        var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true);
+                        this.periodoFiltro = listaFiltro[0];
+                        DateTime periodoNext = listaFiltro[1];
+                        lancamentoDB.getLancamento(periodoNext).then(
+                          (list) {
+                            setState(() {
+                              if(list.length > 0) {
+                                this.listaDB = list[0];
+                                this.periodoFiltro = list[1][1];
+                              }            
+                            });
+                          }
+                        );
+                      });
+                    },
                     child: new Icon(
                       Icons.keyboard_arrow_right,
                       color: new Color(0xFF9E9E9E),
@@ -255,7 +263,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                               child: const Text('OK'),
                               onPressed: () {
                                 lancamentoDB.deleteLancamento(id);
-                                lancamentoDB.getLancamento().then(
+                                lancamentoDB.getLancamento(new DateTime.now()).then(
                                   (list) {
                                     setState(() {
                                       this.listaDB = list[0];
@@ -281,7 +289,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new GestureDetector(
                                   onTap: (){
                                     lancamentoDB.deleteLancamento(id);
-                                    lancamentoDB.getLancamento().then(
+                                    lancamentoDB.getLancamento(new DateTime.now()).then(
                                       (list) {
                                         setState(() {
                                           this.listaDB = list[0];
@@ -321,7 +329,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new GestureDetector(
                                   onTap: (){
                                     lancamentoDB.deleteLancamentoRepetidos(data, hash);
-                                    lancamentoDB.getLancamento().then(
+                                    lancamentoDB.getLancamento(new DateTime.now()).then(
                                       (list) {
                                         setState(() {
                                           this.listaDB = list[0];
@@ -367,7 +375,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   },
                   onPressed3: () {
                     lancamentoDB.updateLancamentoPago(id, pago);
-                    lancamentoDB.getLancamento().then(
+                    lancamentoDB.getLancamento(new DateTime.now()).then(
                       (list) {
                         setState(() {
                           this.listaDB = list[0];
@@ -426,7 +434,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   
                   onPressed2: () {
                     lancamentoDB.updateLancamentoPagoFatura(ids, pago);
-                    lancamentoDB.getLancamento().then(
+                    lancamentoDB.getLancamento(new DateTime.now()).then(
                       (list) {
                         setState(() {
                           this.listaDB = list[0];
