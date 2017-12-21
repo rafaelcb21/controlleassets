@@ -713,7 +713,8 @@ class FormularioState extends State<Formulario> {
     DateTime vencimentoDefinido;
     DateTime fechamentoDefinido;
 
-    DateTime diaVencimento = new DateTime(ano, mes, int.parse(vencimento));    
+    DateTime diaVencimento = new DateTime(ano, mes, int.parse(vencimento));
+
     if(diaVencimento.isBefore(diaLancamento)) {
       if(mes < 12) {
         vencimentoDefinido = new DateTime(ano, mes + 1, int.parse(vencimento));
@@ -721,7 +722,11 @@ class FormularioState extends State<Formulario> {
         vencimentoDefinido = new DateTime(ano + 1, 1, int.parse(vencimento));
       }      
     } else {
-      vencimentoDefinido = diaVencimento;
+      if(mes < 12) {
+        vencimentoDefinido = new DateTime(ano, mes + 1, int.parse(vencimento));
+      } else if (mes == 12) {
+        vencimentoDefinido = new DateTime(ano + 1, 1, int.parse(vencimento));
+      } 
     }
 
     DateTime diaFechamento = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
@@ -736,15 +741,19 @@ class FormularioState extends State<Formulario> {
     }
 
     if(diaLancamento.isAfter(fechamentoDefinido)) {
-      if(vencimentoDefinido.month < 12) {        
+      if(fechamentoDefinido.month < 12) {
         return capitalize(mesEscolhido(vencimentoDefinido.month + 1) + ' de ' + ano.toString());
       } else {
-        return "Janeiro" + ' de ' + (ano + 1).toString();
+        return "Fevereiro" + " de " + (ano + 1).toString();
       }
     } else if(
       diaLancamento.isBefore(fechamentoDefinido) ||
       diaLancamento.compareTo(fechamentoDefinido) == 0) {
-      return capitalize(mesEscolhido(vencimentoDefinido.month) + ' de ' + ano.toString());
+      if(fechamentoDefinido.month < 12) {
+        return capitalize(mesEscolhido(vencimentoDefinido.month) + ' de ' + ano.toString());
+      } else {
+        return "Janeiro" + " de " + (ano + 1).toString();
+      }
     }
   }
 
@@ -759,10 +768,8 @@ class FormularioState extends State<Formulario> {
           _valueTextCartao = value.toString();
           if(this.formSubmit['idcartao'] != 0) {
             this.isCard = true;
-
             this.nomeMes = lancarNaFatura(this.fechamento, this.vencimento, this._toDate);
             this.formSubmit["fatura"] = this.nomeMes;
-
           } else {
             this.isCard = false;
           }
@@ -1834,8 +1841,6 @@ class FormularioState extends State<Formulario> {
                               dataStringFatura = new DateFormat("yyyy-MM-dd").format(new DateTime(_ano, _mes + 1, 0)).toString().substring(0,10);
                               lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString().substring(0,10);
                             } else {
-                              print(int.parse(dia));
-                              print(new DateTime(_ano, mesesLista[i], int.parse(dia)).toString());
                               dataStringFatura = new DateFormat("yyyy-MM-dd").format(new DateTime(_ano, _mes, int.parse(dia))).toString().substring(0,10);
                               lancamento.data = new DateTime(_ano, mesesLista[i], int.parse(dia)).toString().substring(0,10);
                             }                           
@@ -1951,8 +1956,6 @@ class FormularioState extends State<Formulario> {
                               dataStringFatura = new DateFormat("yyyy-MM-dd").format(new DateTime(_ano, _mes + 1, 0)).toString().substring(0,10);
                               lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString().substring(0,10);
                             } else {
-                              print(int.parse(dia));
-                              print(new DateTime(_ano, mesesLista[i], int.parse(dia)).toString());
                               dataStringFatura = new DateFormat("yyyy-MM-dd").format(new DateTime(_ano, _mes, int.parse(dia))).toString().substring(0,10);
                               lancamento.data = new DateTime(_ano, mesesLista[i], int.parse(dia)).toString().substring(0,10);
                             }                           

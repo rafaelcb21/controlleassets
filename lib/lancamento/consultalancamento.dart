@@ -17,6 +17,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   Palette listaCores = new Palette();
   List cores = [];
   String periodoFiltro = "";
+  DateTime periodoNext = new DateTime.now();
 
   @override
   void initState() {
@@ -32,6 +33,30 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
           });
         } //[[11 de dezembro, [{idcategoria: 8, idconta: 1, fatura: null, hash
       );
+    });
+  }
+
+  void showDialogPeriodos<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) { // The value passed to Navigator.pop() or null.
+      if (value != null) {
+        setState(() {
+          print(value);
+          //lancamentoDB.getLancamento(this.periodoNext).then(
+          //  (list) {
+          //    setState(() {
+          //      if(list.length > 0) {
+          //        this.listaDB = list[0];
+          //        this.periodoFiltro = list[1][1];
+          //      }            
+          //    });
+          //  }
+          //);
+        });
+      }
     });
   }
 
@@ -83,7 +108,19 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   child: new InkWell(
                     onTap: (){
                       setState(() {
-                        this.periodoFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, false);
+                        var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, false);
+                        this.periodoFiltro = listaFiltro[0];
+                        this.periodoNext = listaFiltro[1];
+                        lancamentoDB.getLancamento(this.periodoNext).then(
+                          (list) {
+                            setState(() {
+                              if(list.length > 0) {
+                                this.listaDB = list[0];
+                                this.periodoFiltro = list[1][1];
+                              }            
+                            });
+                          }
+                        );
                       });
                     },
                     child: new Icon(
@@ -99,7 +136,40 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       new InkWell(
-                        onTap: (){},
+                        onTap: (){
+                          showDialogPeriodos<String>(
+                            context: context,
+                            child: new SimpleDialog(
+                              title: const Text('Periodos'),
+                              children: <Widget>[
+                                new DialogItem(
+                                  text: "Hoje",
+                                  onPressed: () {
+                                    Navigator.pop(context, new DateTime.now());
+                                  }
+                                ),
+                                new DialogItem(
+                                  text: "Esta semana",
+                                  onPressed: () {
+                                    Navigator.pop(context, new DateTime.now());
+                                  }
+                                ),
+                                new DialogItem(
+                                  text: "Este mes",
+                                  onPressed: () {
+                                    Navigator.pop(context, new DateTime.now());
+                                  }
+                                ),
+                                new DialogItem(
+                                  text: "Escolher periodo",
+                                  onPressed: () {
+                                    Navigator.pop(context, new DateTime.now());
+                                  }
+                                ),
+                              ]
+                            )
+                          );
+                        },
                         child: new Text(
                           this.periodoFiltro,
                           style: new TextStyle(
@@ -117,8 +187,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                       setState(() {
                         var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true);
                         this.periodoFiltro = listaFiltro[0];
-                        DateTime periodoNext = listaFiltro[1];
-                        lancamentoDB.getLancamento(periodoNext).then(
+                        this.periodoNext = listaFiltro[1];
+                        lancamentoDB.getLancamento(this.periodoNext).then(
                           (list) {
                             setState(() {
                               if(list.length > 0) {
@@ -263,7 +333,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                               child: const Text('OK'),
                               onPressed: () {
                                 lancamentoDB.deleteLancamento(id);
-                                lancamentoDB.getLancamento(new DateTime.now()).then(
+                                lancamentoDB.getLancamento(this.periodoNext).then(
                                   (list) {
                                     setState(() {
                                       this.listaDB = list[0];
@@ -289,7 +359,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new GestureDetector(
                                   onTap: (){
                                     lancamentoDB.deleteLancamento(id);
-                                    lancamentoDB.getLancamento(new DateTime.now()).then(
+                                    lancamentoDB.getLancamento(this.periodoNext).then(
                                       (list) {
                                         setState(() {
                                           this.listaDB = list[0];
@@ -329,7 +399,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new GestureDetector(
                                   onTap: (){
                                     lancamentoDB.deleteLancamentoRepetidos(data, hash);
-                                    lancamentoDB.getLancamento(new DateTime.now()).then(
+                                    lancamentoDB.getLancamento(this.periodoNext).then(
                                       (list) {
                                         setState(() {
                                           this.listaDB = list[0];
@@ -375,7 +445,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   },
                   onPressed3: () {
                     lancamentoDB.updateLancamentoPago(id, pago);
-                    lancamentoDB.getLancamento(new DateTime.now()).then(
+                    lancamentoDB.getLancamento(this.periodoNext).then(
                       (list) {
                         setState(() {
                           this.listaDB = list[0];
@@ -434,7 +504,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   
                   onPressed2: () {
                     lancamentoDB.updateLancamentoPagoFatura(ids, pago);
-                    lancamentoDB.getLancamento(new DateTime.now()).then(
+                    lancamentoDB.getLancamento(this.periodoNext).then(
                       (list) {
                         setState(() {
                           this.listaDB = list[0];
@@ -839,6 +909,41 @@ class ItemLancamentoCartaoState extends State<ItemLancamentoCartao> {
           )
         ],
       ),
+    );
+  }
+}
+
+class DialogItem extends StatelessWidget {
+  DialogItem({ Key key, this.icon, this.size, this.color, this.text, this.onPressed }) : super(key: key);
+ 
+  final IconData icon;
+  double size = 36.0;
+  final Color color;
+  final String text;
+  final VoidCallback onPressed;
+ 
+  @override
+  Widget build(BuildContext context) {
+    return new SimpleDialogOption(
+      onPressed: onPressed,
+      child: new Container(
+        child: new Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            new Container(              
+              child: new Container(
+                margin: size == 16.0 ? new EdgeInsets.only(left: 7.0) : null,
+                child: new Icon(icon, size: size, color: color),
+              )                
+            ),        
+            new Padding(
+              padding: size == 16.0 ? const EdgeInsets.only(left: 17.0) : const EdgeInsets.only(left: 16.0),
+              child: new Text(text),
+            ),
+          ],
+        ),
+      )
     );
   }
 }
