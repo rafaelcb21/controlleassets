@@ -22,7 +22,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   @override
   void initState() {
     setState(() {
-      lancamentoDB.getLancamento(new DateTime.now()).then(
+      lancamentoDB.getLancamentoMes(new DateTime.now()).then(
         (list) {
           setState(() {
             if(list.length > 0) {
@@ -45,7 +45,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
       if (value != null) {
         setState(() {
           print(value);
-          //lancamentoDB.getLancamento(this.periodoNext).then(
+          //lancamentoDB.getLancamentoMes(this.periodoNext).then(
           //  (list) {
           //    setState(() {
           //      if(list.length > 0) {
@@ -111,7 +111,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                         var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, false);
                         this.periodoFiltro = listaFiltro[0];
                         this.periodoNext = listaFiltro[1];
-                        lancamentoDB.getLancamento(this.periodoNext).then(
+                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
                           (list) {
                             setState(() {
                               if(list.length > 0) {
@@ -140,7 +140,13 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                           showDialogPeriodos<String>(
                             context: context,
                             child: new SimpleDialog(
-                              title: const Text('Periodos'),
+                              title: new Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  new Text('Periodos'),
+                                ],
+                              ),
                               children: <Widget>[
                                 new DialogItem(
                                   text: "Hoje",
@@ -188,7 +194,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                         var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true);
                         this.periodoFiltro = listaFiltro[0];
                         this.periodoNext = listaFiltro[1];
-                        lancamentoDB.getLancamento(this.periodoNext).then(
+                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
                           (list) {
                             setState(() {
                               if(list.length > 0) {
@@ -333,7 +339,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                               child: const Text('OK'),
                               onPressed: () {
                                 lancamentoDB.deleteLancamento(id);
-                                lancamentoDB.getLancamento(this.periodoNext).then(
+                                lancamentoDB.getLancamentoMes(this.periodoNext).then(
                                   (list) {
                                     setState(() {
                                       this.listaDB = list[0];
@@ -359,7 +365,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new GestureDetector(
                                   onTap: (){
                                     lancamentoDB.deleteLancamento(id);
-                                    lancamentoDB.getLancamento(this.periodoNext).then(
+                                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
                                       (list) {
                                         setState(() {
                                           this.listaDB = list[0];
@@ -399,7 +405,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new GestureDetector(
                                   onTap: (){
                                     lancamentoDB.deleteLancamentoRepetidos(data, hash);
-                                    lancamentoDB.getLancamento(this.periodoNext).then(
+                                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
                                       (list) {
                                         setState(() {
                                           this.listaDB = list[0];
@@ -445,7 +451,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   },
                   onPressed3: () {
                     lancamentoDB.updateLancamentoPago(id, pago);
-                    lancamentoDB.getLancamento(this.periodoNext).then(
+                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
                       (list) {
                         setState(() {
                           this.listaDB = list[0];
@@ -504,7 +510,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   
                   onPressed2: () {
                     lancamentoDB.updateLancamentoPagoFatura(ids, pago);
-                    lancamentoDB.getLancamento(this.periodoNext).then(
+                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
                       (list) {
                         setState(() {
                           this.listaDB = list[0];
@@ -914,11 +920,8 @@ class ItemLancamentoCartaoState extends State<ItemLancamentoCartao> {
 }
 
 class DialogItem extends StatelessWidget {
-  DialogItem({ Key key, this.icon, this.size, this.color, this.text, this.onPressed }) : super(key: key);
- 
-  final IconData icon;
-  double size = 36.0;
-  final Color color;
+  DialogItem({ Key key, this.text, this.onPressed }) : super(key: key);
+
   final String text;
   final VoidCallback onPressed;
  
@@ -928,19 +931,10 @@ class DialogItem extends StatelessWidget {
       onPressed: onPressed,
       child: new Container(
         child: new Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            new Container(              
-              child: new Container(
-                margin: size == 16.0 ? new EdgeInsets.only(left: 7.0) : null,
-                child: new Icon(icon, size: size, color: color),
-              )                
-            ),        
-            new Padding(
-              padding: size == 16.0 ? const EdgeInsets.only(left: 17.0) : const EdgeInsets.only(left: 16.0),
-              child: new Text(text),
-            ),
+            new Text(text),            
           ],
         ),
       )

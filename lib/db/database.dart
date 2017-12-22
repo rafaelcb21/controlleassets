@@ -733,7 +733,7 @@ class Lancamento {
     return [hojeMesDescrito, nextDate];
   }
 
-  Future getLancamento(DateTime diaSearch) async {
+  Future getLancamentoHoje(DateTime diaSearch) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
@@ -909,6 +909,185 @@ class Lancamento {
     await db.close();
     return [listaUnica, [diaSearch, hojeMesDescrito]];
   }
+
+  Future getLancamentoMes(DateTime diaSearch) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+    //List lista = await db.rawQuery("SELECT * FROM lancamento");
+
+    var listaPorData = [];
+    var listaDeFaturas = [];
+    //var listaDataAndFatura = [];
+
+    List listaData = await db.rawQuery("SELECT data FROM lancamento GROUP BY data");
+    
+    //var hoje = new DateTime.now();
+    var hojeMes = new DateFormat.yM("pt_BR").format(diaSearch); // 12/2017
+    var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(diaSearch).toString(); // dezembro de 2017
+
+    var fatura = hojeMesDescrito[0].toUpperCase() + hojeMesDescrito.substring(1); // Dezembro de 2017
+    
+    List listaIdCartao = await db.rawQuery("SELECT id, vencimento FROM cartao"); //todos os ids de cartao
+
+    //var x = await db.rawQuery("SELECT * FROM lancamento");
+    //for(var i in x){print(i);}
+
+    for(var idCartao in listaIdCartao) {
+      List somaFaturaCartao = await db.rawQuery(
+        '''SELECT c.vencimento, l.fatura, c.cartao, SUM(valor), SUM(pago)
+              FROM lancamento AS l
+                LEFT JOIN cartao AS c ON l.idcartao = c.id
+              WHERE l.idcartao = ? AND l.fatura = ?
+        ''', [ idCartao['id'], fatura ]);
+      
+      List idsLancamentosFatura = await db.rawQuery(
+        'SELECT l.id FROM lancamento AS l WHERE l.idcartao = ? AND l.fatura = ?', [ idCartao['id'], fatura ]);
+
+      if(somaFaturaCartao[0]['vencimento'] != null) {
+        String dataFatura = stringDateInDateTimeString(hojeMesDescrito, somaFaturaCartao[0]['vencimento']);
+        DateTime dataFaturaDateTime = DateTime.parse(dataFatura);
+        var pagoFatura = somaFaturaCartao[0]['SUM(pago)'];
+        int resultadoPagamentoFatura;
+
+        if(pagoFatura > 0) {
+          resultadoPagamentoFatura = 1;
+        } else {
+          resultadoPagamentoFatura = 0;
+        }
+
+        if(somaFaturaCartao[0]['SUM(valor)'] != 0) { // se tiver valor na fatura
+          listaDeFaturas.add([dataFaturaDateTime, dataFatura, 'comCartao', somaFaturaCartao[0], resultadoPagamentoFatura, idsLancamentosFatura]);
+        }
+      }      
+    }
+
+    for(var i in listaData){
+      //List lista = await db.rawQuery("SELECT * FROM lancamento WHERE data = ?", [i['data']]);
+
+      List lista = await db.rawQuery('''
+        SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
+                l.valor, l.pago, l.hash 
+                  FROM lancamento AS l
+          LEFT JOIN categoria AS c ON l.idcategoria = c.id
+          LEFT JOIN tag ON l.idtag = tag.id
+          LEFT JOIN conta ON l.idconta = conta.id
+          LEFT JOIN cartao ON l.idcartao = cartao.id
+            WHERE l.data = ? AND l.idcartao = 0
+      ''', [i['data']]);
+      
+      var data = new DateFormat("yyyy-MM-dd").parse(i['data']);
+      
+      List dataAnoMesDia = i['data'].split("-");
+      DateTime dataDateTime = new DateTime(
+        int.parse(dataAnoMesDia[0]), int.parse(dataAnoMesDia[1]), int.parse(dataAnoMesDia[2])
+      );
+
+
+      var filtro = new DateFormat.yM("pt_BR").format(data);
+
+      if(hojeMes == filtro) {
+        var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
+        
+        if(lista.length > 0) {
+          //listaPorData.add([dataFormatada, lista]);
+          listaPorData.add([dataDateTime, dataFormatada, 'semCartao', lista]);
+        }        
+      }
+    }
+
+    //I/flutter (26604): ********************
+    //I/flutter (26604): [[2017-12-10 00:00:00.000, 2017-12-10, comCartao, {SUM(valor): 310.98, fatura: Dezembro de 2017, vencimento: 10, cartao: Platinium}]]
+    //I/flutter (26604): ********************
+    //I/flutter (26604): +++++++++++++++++++++++
+    //I/flutter (26604): [[2017-12-17 00:00:00.000, 17 de dezembro, semCartao, [{categoria: Investimento, pago: 0, descricao: Rrrrr, hash: null, valor: -85.0, id: 4, data: 2017-12-17, tipo: Despesa}, {categoria: Educação, pago: 0, descricao: Uuuuu, hash: null, valor: -112.54, id: 5, data: 2017-12-17, tipo: Despesa}]]]
+
+    //Map<DateTime, List> dateMap = {};
+    var dateMap = new LinkedHashMap();
+    
+    List allDate = [];
+
+    for(var key in listaDeFaturas) {
+      allDate.add(key[0]); //pega todas as datas
+    }
+
+    for(var key in listaPorData) {
+      allDate.add(key[0]); //pega todas as datas
+    }
+
+    allDate.sort();
+
+    for(var key in allDate) {
+      dateMap.putIfAbsent(key, () => []); //insere todas as datas de forma ordenada no {}
+    }
+
+    //for(var key in listaDeFaturas) {
+    //  dateMap.putIfAbsent(key[0], () => []); //pega todas as datas
+    //}
+
+    //for(var key in listaPorData) {
+    //  dateMap.putIfAbsent(key[0], () => []); //pega todas as datas
+    //}
+
+    for(var lista in listaPorData) {
+      DateTime dateKey = lista[0];
+      String dateNome = lista[1];
+      String tipoLancamento = lista[2];
+      List lancamentos = lista[3];
+      
+      for(var itemLancamento in lancamentos) {
+        dateMap[dateKey].add([
+          dateKey,
+          itemLancamento['descricao'], dateNome, tipoLancamento, itemLancamento['categoria'],
+          itemLancamento['pago'], itemLancamento['hash'], itemLancamento['valor'],
+          itemLancamento['id'], itemLancamento['data'], itemLancamento['tipo']
+        ]);
+      }
+    }
+
+    for(var lista in listaDeFaturas) {
+
+      DateTime dateKey = lista[0];
+      String dateString = lista[1];
+      int pago = lista[4];
+      List idsFatura = lista[5];
+
+      var data = new DateFormat("yyyy-MM-dd").parse(dateString);
+      var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
+      
+      String tipoLancamento = lista[2];
+      double somaValor = lista[3]['SUM(valor)'];
+      String faturaLancamento = lista[3]['fatura'];
+      String vencimentoLancamento = lista[3]['vencimento'];
+      String cartaoLancamento = lista[3]['cartao'];
+      
+      dateMap[dateKey].add([
+        dateKey,
+        faturaLancamento, dataFormatada, tipoLancamento, cartaoLancamento, somaValor, vencimentoLancamento, pago, idsFatura
+      ]);
+    }
+
+    List listaUnica = [];
+
+    dateMap.forEach((key, value) {
+      listaUnica.add(value);
+    });
+    
+    //listaUnica.add([hoje, hojeMesDescrito]);
+
+
+    //listaDataAndFatura = new List.from(listaPorData)..addAll(listaDeFaturas);
+    //listaDataAndFatura.sort();
+    //listaDataAndFatura.add([hoje, hojeMesDescrito]);
+
+
+    //listaUnica.add([hoje, hojeMesDescrito]);
+
+    await db.close();
+    return [listaUnica, [diaSearch, hojeMesDescrito]];
+  }
+
+
 
   Future upsertLancamento(List<Lancamento> list) async {
     Directory path = await getApplicationDocumentsDirectory();
