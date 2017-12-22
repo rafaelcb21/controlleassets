@@ -151,6 +151,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new DialogItem(
                                   text: "Hoje",
                                   onPressed: () {
+                                    lancamentoDB.getLancamentoHoje(new DateTime.now());
                                     Navigator.pop(context, new DateTime.now());
                                   }
                                 ),
