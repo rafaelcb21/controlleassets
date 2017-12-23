@@ -391,14 +391,29 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                               child: const Text('OK'),
                               onPressed: () {
                                 lancamentoDB.deleteLancamento(id);
-                                lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                                  (list) {
-                                    setState(() {
-                                      this.listaDB = list[0];
-                                      this.periodoFiltro = list[1][1];
-                                    });
-                                  }
-                                );
+                                if(this.periodo == "hoje") {
+                                  lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                                    (list) {
+                                      setState(() {
+                                        if(list.length > 0) {
+                                          this.listaDB = list[0];
+                                          this.periodoFiltro = list[1][1];
+                                        }
+                                      });
+                                    }
+                                  );
+                                } else if(this.periodo == "mes") {
+                                  lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                    (list) {
+                                      setState(() {
+                                        if(list.length > 0) {
+                                          this.listaDB = list[0];
+                                          this.periodoFiltro = list[1][1];
+                                        }
+                                      });
+                                    }
+                                  );
+                                }
                                 Navigator.pop(context);
                               }
                             )
@@ -417,14 +432,29 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new GestureDetector(
                                   onTap: (){
                                     lancamentoDB.deleteLancamento(id);
-                                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                                      (list) {
-                                        setState(() {
-                                          this.listaDB = list[0];
-                                          this.periodoFiltro = list[1][1];
-                                        });
-                                      }
-                                    );
+                                    if(this.periodo == "hoje") {
+                                      lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
+                                              this.listaDB = list[0];
+                                              this.periodoFiltro = list[1][1];
+                                            }
+                                          });
+                                        }
+                                      );
+                                    } else if(this.periodo == "mes") {
+                                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
+                                              this.listaDB = list[0];
+                                              this.periodoFiltro = list[1][1];
+                                            }
+                                          });
+                                        }
+                                      );
+                                    }
                                     Navigator.pop(context);
                                   },
                                   child: new Container(
@@ -457,14 +487,29 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new GestureDetector(
                                   onTap: (){
                                     lancamentoDB.deleteLancamentoRepetidos(data, hash);
-                                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                                      (list) {
-                                        setState(() {
-                                          this.listaDB = list[0];
-                                          this.periodoFiltro = list[1][1];
-                                        });
-                                      }
-                                    );
+                                    if(this.periodo == "hoje") {
+                                      lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
+                                              this.listaDB = list[0];
+                                              this.periodoFiltro = list[1][1];
+                                            }
+                                          });
+                                        }
+                                      );
+                                    } else if(this.periodo == "mes") {
+                                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
+                                              this.listaDB = list[0];
+                                              this.periodoFiltro = list[1][1];
+                                            }
+                                          });
+                                        }
+                                      );
+                                    }
                                     Navigator.pop(context);
                                   },
                                   child: new Container(
@@ -503,14 +548,29 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   },
                   onPressed3: () {
                     lancamentoDB.updateLancamentoPago(id, pago);
-                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                      (list) {
-                        setState(() {
-                          this.listaDB = list[0];
-                          this.periodoFiltro = list[1][1];
-                        });
-                      }
-                    );
+                    if(this.periodo == "hoje") {
+                      lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                            }
+                          });
+                        }
+                      );
+                    } else if(this.periodo == "mes") {
+                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                            }
+                          });
+                        }
+                      );
+                    }
                   },
                 )
               );
@@ -562,14 +622,29 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   
                   onPressed2: () {
                     lancamentoDB.updateLancamentoPagoFatura(ids, pago);
-                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                      (list) {
-                        setState(() {
-                          this.listaDB = list[0];
-                          this.periodoFiltro = list[1][1];
-                        });
-                      }
-                    );
+                    if(this.periodo == "hoje") {
+                      lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                            }
+                          });
+                        }
+                      );
+                    } else if(this.periodo == "mes") {
+                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                            }
+                          });
+                        }
+                      );
+                    }
                   },
                 )
               );
