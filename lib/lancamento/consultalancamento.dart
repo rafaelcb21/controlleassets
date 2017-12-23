@@ -18,6 +18,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   List cores = [];
   String periodoFiltro = "";
   DateTime periodoNext = new DateTime.now();
+  String periodo = "mes";
 
   @override
   void initState() {
@@ -44,7 +45,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
     .then<Null>((T value) { // The value passed to Navigator.pop() or null.
       if (value != null) {
         setState(() {
-          print(value);
+          //print(value);
           //lancamentoDB.getLancamentoMes(this.periodoNext).then(
           //  (list) {
           //    setState(() {
@@ -108,19 +109,34 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   child: new InkWell(
                     onTap: (){
                       setState(() {
-                        var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, false);
+                        var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, false, this.periodo);
                         this.periodoFiltro = listaFiltro[0];
                         this.periodoNext = listaFiltro[1];
-                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                          (list) {
-                            setState(() {
-                              if(list.length > 0) {
-                                this.listaDB = list[0];
-                                this.periodoFiltro = list[1][1];
-                              }            
-                            });
-                          }
-                        );
+
+                        if(this.periodo == "hoje") {
+                          lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                            (list) {
+                              setState(() {
+                                if(list.length > 0) {
+                                  this.listaDB = list[0];
+                                  this.periodoFiltro = list[1][1];
+                                }
+                              });
+                            }
+                          );
+                        } else if(this.periodo == "mes") {
+                          lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                            (list) {
+                              setState(() {
+                                if(list.length > 0) {
+                                  this.listaDB = list[0];
+                                  this.periodoFiltro = list[1][1];
+                                }
+                              });
+                            }
+                          );
+                        }
+                        
                       });
                     },
                     child: new Icon(
@@ -151,7 +167,17 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new DialogItem(
                                   text: "Hoje",
                                   onPressed: () {
-                                    lancamentoDB.getLancamentoHoje(new DateTime.now());
+                                    lancamentoDB.getLancamentoHoje(new DateTime.now()).then(
+                                      (list) {
+                                        setState(() {
+                                          this.periodo = "hoje";
+                                          if(list.length > 0) {
+                                            this.listaDB = list[0];
+                                            this.periodoFiltro = list[1][1];
+                                          }            
+                                        });
+                                      }
+                                    );
                                     Navigator.pop(context, new DateTime.now());
                                   }
                                 ),
@@ -164,6 +190,17 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new DialogItem(
                                   text: "Este mes",
                                   onPressed: () {
+                                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                      (list) {
+                                        setState(() {
+                                          this.periodo = "mes";
+                                          if(list.length > 0) {
+                                            this.listaDB = list[0];
+                                            this.periodoFiltro = list[1][1];
+                                          }
+                                        });
+                                      }
+                                    );
                                     Navigator.pop(context, new DateTime.now());
                                   }
                                 ),
@@ -190,21 +227,35 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                 new Container(
                   margin: new EdgeInsets.only(right: 8.0),
                   child: new InkWell(
-                    onTap: (){
+                    onTap: () {
                       setState(() {
-                        var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true);
+                        var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true, this.periodo);
                         this.periodoFiltro = listaFiltro[0];
                         this.periodoNext = listaFiltro[1];
-                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                          (list) {
-                            setState(() {
-                              if(list.length > 0) {
-                                this.listaDB = list[0];
-                                this.periodoFiltro = list[1][1];
-                              }            
-                            });
-                          }
-                        );
+
+                        if(this.periodo == "hoje") {
+                          lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                            (list) {
+                              setState(() {
+                                if(list.length > 0) {
+                                  this.listaDB = list[0];
+                                  this.periodoFiltro = list[1][1];
+                                }
+                              });
+                            }
+                          );
+                        } else if(this.periodo == "mes") {
+                          lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                            (list) {
+                              setState(() {
+                                if(list.length > 0) {
+                                  this.listaDB = list[0];
+                                  this.periodoFiltro = list[1][1];
+                                }
+                              });
+                            }
+                          );
+                        }
                       });
                     },
                     child: new Icon(
