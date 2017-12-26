@@ -713,6 +713,10 @@ class FormularioState extends State<Formulario> {
     DateTime vencimentoDefinido;
     DateTime fechamentoDefinido;
 
+    //print(diaLancamento);
+    //print(vencimento);
+    //print(fechamento);
+
     DateTime diaVencimento = new DateTime(ano, mes, int.parse(vencimento));
 
     if(diaVencimento.isBefore(diaLancamento)) {
@@ -729,6 +733,8 @@ class FormularioState extends State<Formulario> {
       } 
     }
 
+    //print(vencimentoDefinido);
+
     DateTime diaFechamento = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
     if(vencimentoDefinido.isBefore(diaFechamento)) {
       if(vencimentoDefinido.month == 1) {
@@ -740,18 +746,30 @@ class FormularioState extends State<Formulario> {
       fechamentoDefinido = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
     }
 
+    //print(fechamentoDefinido);
+
     if(diaLancamento.isAfter(fechamentoDefinido)) {
+      //print('rafa1');
       if(fechamentoDefinido.month < 12) {
+        //print('rafa2');
+        //print("============");
         return capitalize(mesEscolhido(vencimentoDefinido.month + 1) + ' de ' + ano.toString());
       } else {
+        //print('rafa3');
+        //print("============");
         return "Fevereiro" + " de " + (ano + 1).toString();
       }
     } else if(
       diaLancamento.isBefore(fechamentoDefinido) ||
       diaLancamento.compareTo(fechamentoDefinido) == 0) {
+      //print('rafa4');
       if(fechamentoDefinido.month < 12) {
+        //print('rafa5');
+        //print("============");
         return capitalize(mesEscolhido(vencimentoDefinido.month) + ' de ' + ano.toString());
       } else {
+        //print('rafa6');
+        //print("============");
         return "Janeiro" + " de " + (ano + 1).toString();
       }
     }
@@ -1780,6 +1798,9 @@ class FormularioState extends State<Formulario> {
                             
                             String dia = lancamentoDB.data.substring(8, 10); //dia do lancamento ex '2017-12-[16]'
 
+                            
+                            print(this.fechamento+"/"+mesFatura.toString()+"/"+lancamentoDB.data.substring(4));
+
                             //print(faturaNomeNovo); // novembro de 2017
                             //print(dia); // ex:16   inserir logica de mes para dias 31 e a logica para mes de fevereiro
                             
@@ -1793,7 +1814,7 @@ class FormularioState extends State<Formulario> {
 
                             //print(lancamento.data); // ex: 2017-12-16 
                             //print(dataString); // ex: ex: 2017-11-16
-                            //print(lancamento.datafatura);
+                            print(lancamento.datafatura);
                             //print(dataFaturaFunction);
 
                             this.formSubmit["fatura"] = resultado;
@@ -1837,6 +1858,12 @@ class FormularioState extends State<Formulario> {
                             int _ano = DateTime.parse(dataString).add(new Duration(days: days)).year; // ano encontrado
                             int _mes = DateTime.parse(dataString).add(new Duration(days: days)).month;// mes encontrado
 
+                            print(this.fechamento+"/"+mesFatura.toString()+"/"+lancamentoDB.data.substring(0,4));
+
+                            String dataFechamento = '';
+
+                            //if()
+
                             if( dia == '31' || (int.parse(dia) > 28 && _mes == 2) ) {                              
                               dataStringFatura = new DateFormat("yyyy-MM-dd").format(new DateTime(_ano, _mes + 1, 0)).toString().substring(0,10);
                               lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString().substring(0,10);
@@ -1846,6 +1873,7 @@ class FormularioState extends State<Formulario> {
                             }                           
 
                             lancamento.datafatura = dataStringFatura;
+                            print(lancamento.datafatura);
 
                             DateTime dataFaturaFunction = new DateTime(_ano, int.parse(lancamento.datafatura.substring(5,7)), int.parse(dia));
                             var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);

@@ -119,9 +119,10 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     //_bannerAd = createBannerAd()..load();
     //_bannerAd ??= createBannerAd();
     //_bannerAd..load()..show();
-    _interstitialAd = createInterstitialAd()..load();
-    _interstitialAd ??= createInterstitialAd();
-    _interstitialAd..load()..show();
+
+    //_interstitialAd = createInterstitialAd()..load();
+    //_interstitialAd ??= createInterstitialAd();
+    //_interstitialAd..load()..show();
 
     _controller = new AnimationController(
       vsync: this,

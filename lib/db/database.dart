@@ -914,9 +914,6 @@ class Lancamento {
     
     List listaIdCartao = await db.rawQuery("SELECT id, vencimento FROM cartao"); //todos os ids de cartao
 
-    //var x = await db.rawQuery("SELECT * FROM lancamento");
-    //for(var i in x){print(i);}
-
     for(var idCartao in listaIdCartao) {
       List somaFaturaCartao = await db.rawQuery(
         '''SELECT c.vencimento, l.fatura, c.cartao, SUM(valor), SUM(pago)
