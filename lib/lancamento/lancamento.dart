@@ -706,72 +706,58 @@ class FormularioState extends State<Formulario> {
     }
   }
 
-  String lancarNaFatura(DateTime fechamento, String vencimento, DateTime diaLancamento) {
-    int dia = diaLancamento.day;
-    int mes = diaLancamento.month;
-    int ano = diaLancamento.year;
-    DateTime vencimentoDefinido;
-    DateTime fechamentoDefinido;
+  String lancarNaFatura(DateTime fechamentoDefinido, String vencimento, DateTime diaLancamento) {
+    int dia = fechamentoDefinido.day;
+    int mes = fechamentoDefinido.month;
+    int ano = fechamentoDefinido.year;
+    //DateTime vencimentoDefinido;
+    //DateTime fechamentoDefinido;
 
     //print(diaLancamento);
     //print(vencimento);
     //print(fechamento);
 
-    DateTime diaVencimento = new DateTime(ano, mes, int.parse(vencimento));
+    //DateTime diaVencimento = new DateTime(ano, mes, int.parse(vencimento));
 
-    if(diaVencimento.isBefore(diaLancamento)) {
-      if(mes < 12) {
-        vencimentoDefinido = new DateTime(ano, mes + 1, int.parse(vencimento));
-      } else if (mes == 12) {
-        vencimentoDefinido = new DateTime(ano + 1, 1, int.parse(vencimento));
-      }      
-    } else {
-      if(mes < 12) {
-        vencimentoDefinido = new DateTime(ano, mes + 1, int.parse(vencimento));
-      } else if (mes == 12) {
-        vencimentoDefinido = new DateTime(ano + 1, 1, int.parse(vencimento));
-      } 
-    }
+    //if(diaVencimento.isBefore(diaLancamento)) {
+    //  if(mes < 12) {
+    //    vencimentoDefinido = new DateTime(ano, mes + 1, int.parse(vencimento));
+    //  } else if (mes == 12) {
+    //    vencimentoDefinido = new DateTime(ano + 1, 1, int.parse(vencimento));
+    //  }      
+    //} else {
+    //  if(mes < 12) {
+    //    vencimentoDefinido = new DateTime(ano, mes + 1, int.parse(vencimento));
+    //  } else if (mes == 12) {
+    //    vencimentoDefinido = new DateTime(ano + 1, 1, int.parse(vencimento));
+    //  } 
+    //}
 
     //print(vencimentoDefinido);
 
-    DateTime diaFechamento = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
-    if(vencimentoDefinido.isBefore(diaFechamento)) {
-      if(vencimentoDefinido.month == 1) {
-        fechamentoDefinido = new DateTime(vencimentoDefinido.year - 1, 12, int.parse(fechamento));
-      } else {
-        fechamentoDefinido = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month - 1, int.parse(fechamento));
-      }      
-    } else {
-      fechamentoDefinido = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
-    }
+    //DateTime diaFechamento = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
+    //if(vencimentoDefinido.isBefore(diaFechamento)) {
+    //  if(vencimentoDefinido.month == 1) {
+    //    fechamentoDefinido = new DateTime(vencimentoDefinido.year - 1, 12, int.parse(fechamento));
+    //  } else {
+    //    fechamentoDefinido = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month - 1, int.parse(fechamento));
+    //  }      
+    //} else {
+    //  fechamentoDefinido = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
+    //}
 
     //print(fechamentoDefinido);
 
     if(diaLancamento.isAfter(fechamentoDefinido)) {
-      //print('rafa1');
-      if(fechamentoDefinido.month < 12) {
-        //print('rafa2');
-        //print("============");
-        return capitalize(mesEscolhido(vencimentoDefinido.month + 1) + ' de ' + ano.toString());
+      if(mes < 12) {
+        return capitalize(mesEscolhido(mes + 1) + ' de ' + ano.toString());
       } else {
-        //print('rafa3');
-        //print("============");
-        return "Fevereiro" + " de " + (ano + 1).toString();
+        return "Janeiro" + " de " + (ano + 1).toString();
       }
     } else if(
       diaLancamento.isBefore(fechamentoDefinido) ||
       diaLancamento.compareTo(fechamentoDefinido) == 0) {
-      //print('rafa4');
-      if(fechamentoDefinido.month < 12) {
-        //print('rafa5');
-        //print("============");
-        return capitalize(mesEscolhido(vencimentoDefinido.month) + ' de ' + ano.toString());
-      } else {
-        //print('rafa6');
-        //print("============");
-        return "Janeiro" + " de " + (ano + 1).toString();
-      }
+        return capitalize(mesEscolhido(mes) + ' de ' + ano.toString());
     }
   }
 
@@ -786,7 +772,9 @@ class FormularioState extends State<Formulario> {
           _valueTextCartao = value.toString();
           if(this.formSubmit['idcartao'] != 0) {
             this.isCard = true;
-            this.nomeMes = lancarNaFatura(this.fechamento, this.vencimento, this._toDate);
+            DateTime dataFechamento = new DateTime(this._toDate.year, this._toDate.month, int.parse(this.fechamento));
+            this.nomeMes = lancarNaFatura(dataFechamento, this.vencimento, this._toDate);
+            //this.nomeMes = lancarNaFatura(this.fechamento, this.vencimento, this._toDate);
             this.formSubmit["fatura"] = this.nomeMes;
           } else {
             this.isCard = false;
@@ -1279,8 +1267,8 @@ class FormularioState extends State<Formulario> {
 
                 if(this.isCard) {
                   //var dia = date.day;
-
-                  this.nomeMes = lancarNaFatura(this.fechamento, this.vencimento, this._toDate);
+                  DateTime dataFechamento = new DateTime(this._toDate.year, this._toDate.month, int.parse(this.fechamento));
+                  this.nomeMes = lancarNaFatura(dataFechamento, this.vencimento, this._toDate);
                   this.formSubmit["fatura"] = this.nomeMes;
 
                   //if(dia >= int.parse(fechamento)) {
@@ -1810,7 +1798,14 @@ class FormularioState extends State<Formulario> {
                             lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString().substring(0,10);
                             lancamento.datafatura = DateTime.parse(dataString).add(new Duration(days: days)).toString().substring(0,10);
                             DateTime dataFaturaFunction = DateTime.parse(lancamento.datafatura).add(new Duration(days: days));
-                            var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+
+                            DateTime dataFechamento = new DateTime(
+                              int.parse(lancamento.datafatura.substring(0,4)), 
+                              int.parse(lancamento.datafatura.substring(5,7)),
+                              int.parse(this.fechamento)
+                            );
+
+                            var resultado = lancarNaFatura(dataFechamento, this.vencimento, dataFaturaFunction);
 
                             //print(lancamento.data); // ex: 2017-12-16 
                             //print(dataString); // ex: ex: 2017-11-16
@@ -1978,7 +1973,14 @@ class FormularioState extends State<Formulario> {
                             lancamento.data = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).toString().substring(0,10);
                             lancamento.datafatura = DateTime.parse(dataString).add(new Duration(days: days)).toString().substring(0,10);
                             DateTime dataFaturaFunction = DateTime.parse(lancamento.datafatura).add(new Duration(days: days));
-                            var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+
+                            DateTime dataFechamento = new DateTime(
+                              int.parse(lancamento.datafatura.substring(0,4)), 
+                              int.parse(lancamento.datafatura.substring(5,7)),
+                              int.parse(this.fechamento)
+                            );
+
+                            var resultado = lancarNaFatura(dataFechamento, this.vencimento, dataFaturaFunction);
 
                             this.formSubmit["fatura"] = resultado;
                             lancamento.fatura = this.formSubmit["fatura"];
@@ -2031,7 +2033,14 @@ class FormularioState extends State<Formulario> {
                             lancamento.datafatura = dataStringFatura;
 
                             DateTime dataFaturaFunction = new DateTime(_ano, int.parse(lancamento.datafatura.substring(5,7)), int.parse(dia));
-                            var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                            
+                            DateTime dataFechamento = new DateTime(
+                              int.parse(lancamento.datafatura.substring(0,4)), 
+                              int.parse(lancamento.datafatura.substring(5,7)),
+                              int.parse(this.fechamento)
+                            );
+                            
+                            var resultado = lancarNaFatura(dataFechamento, this.vencimento, dataFaturaFunction);
                             this.formSubmit["fatura"] = resultado;
                             lancamento.fatura = this.formSubmit["fatura"];
 
