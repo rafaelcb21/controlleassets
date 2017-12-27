@@ -706,7 +706,7 @@ class FormularioState extends State<Formulario> {
     }
   }
 
-  String lancarNaFatura(String fechamento, String vencimento, DateTime diaLancamento) {
+  String lancarNaFatura(DateTime fechamento, String vencimento, DateTime diaLancamento) {
     int dia = diaLancamento.day;
     int mes = diaLancamento.month;
     int ano = diaLancamento.year;
@@ -1858,10 +1858,6 @@ class FormularioState extends State<Formulario> {
                             int _ano = DateTime.parse(dataString).add(new Duration(days: days)).year; // ano encontrado
                             int _mes = DateTime.parse(dataString).add(new Duration(days: days)).month;// mes encontrado
 
-                            print(this.fechamento+"/"+mesFatura.toString()+"/"+lancamentoDB.data.substring(0,4));
-
-                            String dataFechamento = '';
-
                             //if()
 
                             if( dia == '31' || (int.parse(dia) > 28 && _mes == 2) ) {                              
@@ -1873,10 +1869,54 @@ class FormularioState extends State<Formulario> {
                             }                           
 
                             lancamento.datafatura = dataStringFatura;
-                            print(lancamento.datafatura);
+
+                            DateTime dataFechamento = new DateTime(
+                              int.parse(lancamento.datafatura.substring(0,4)), 
+                              int.parse(lancamento.datafatura.substring(5,7)),
+                              int.parse(this.fechamento)
+                            );
+                            
+                            print(dataFechamento);
 
                             DateTime dataFaturaFunction = new DateTime(_ano, int.parse(lancamento.datafatura.substring(5,7)), int.parse(dia));
-                            var resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                            
+                            var resultado;
+                            print(dataFaturaFunction);
+
+                            if(dataFechamento.isBefore(dataFaturaFunction)) {
+                              print('rafa1');
+                              //print(dataFaturaFunction.difference(dataFechamento));
+                              //dataFatura = dataFaturaFunction.subtract(dataFaturaFunction.difference(dataFechamento));
+                              //resultado = lancarNaFatura(this.fechamento, this.vencimento, 
+                              //  dataFaturaFunction.subtract(dataFaturaFunction.difference(dataFechamento)));
+                                resultado = lancarNaFatura(dataFechamento, this.vencimento, dataFaturaFunction);
+                            } else {
+                              print('rafa2');
+                              //resultado = lancarNaFatura(this.fechamento, this.vencimento, dataFaturaFunction);
+                            }
+//I/flutter (19486): 2017-10-13 00:00:00.000
+//I/flutter (19486): 2017-10-27 00:00:00.000
+//I/flutter (19486): rafa1
+//I/flutter (19486): Novembro de 2017
+//I/flutter (19486): ============
+//I/flutter (19486): 2017-11-13 00:00:00.000
+//I/flutter (19486): 2017-11-27 00:00:00.000
+//I/flutter (19486): rafa1
+//I/flutter (19486): Janeiro de 2018
+//I/flutter (19486): ============
+//I/flutter (19486): 2017-12-13 00:00:00.000
+//I/flutter (19486): 2017-12-27 00:00:00.000
+//I/flutter (19486): rafa1
+//I/flutter (19486): Janeiro de 2017
+//I/flutter (19486): ============
+//I/flutter (19486): 2018-01-13 00:00:00.000
+//I/flutter (19486): 2018-01-27 00:00:00.000
+//I/flutter (19486): rafa1
+//I/flutter (19486): Fevereiro de 2018
+//I/flutter (19486): ============
+                            
+                            print(resultado);
+                            print('============');
                             this.formSubmit["fatura"] = resultado;
                             lancamento.fatura = this.formSubmit["fatura"];
 
