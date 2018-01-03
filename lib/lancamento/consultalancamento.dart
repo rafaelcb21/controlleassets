@@ -110,7 +110,6 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                     onTap: (){
                       setState(() {
                         var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, false, this.periodo);
-                        this.periodoFiltro = listaFiltro[0];
                         this.periodoNext = listaFiltro[1];
 
                         if(this.periodo == "hoje") {
@@ -131,6 +130,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 if(list.length > 0) {
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
+                                  print(this.periodoFiltro);
                                 }
                               });
                             }
@@ -230,7 +230,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                     onTap: () {
                       setState(() {
                         var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true, this.periodo);
-                        this.periodoFiltro = listaFiltro[0];
+                        //this.periodoFiltro = listaFiltro[0];
                         this.periodoNext = listaFiltro[1];
 
                         if(this.periodo == "hoje") {
