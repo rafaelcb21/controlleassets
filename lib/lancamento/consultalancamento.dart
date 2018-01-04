@@ -17,6 +17,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   Palette listaCores = new Palette();
   List cores = [];
   String periodoFiltro = "";
+  String periodoFiltroResumido = "";
   DateTime periodoNext = new DateTime.now();
   String periodo = "mes";
 
@@ -123,6 +124,20 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                               });
                             }
                           );
+                        } else if(this.periodo == "semana") {
+                          lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                            (list) {
+                              setState(() {
+                                if(list.length > 0) {
+                                  this.listaDB = list[0];
+                                  this.periodoFiltro = list[1][1];
+                                  this.periodoFiltroResumido = list[1][1].substring(0, 7) + " à " + list[1][1].substring(17, 24);
+                                  print(this.periodoFiltro);
+                                  print(this.periodoFiltroResumido);
+                                }
+                              });
+                            }
+                          );
                         } else if(this.periodo == "mes") {
                           lancamentoDB.getLancamentoMes(this.periodoNext).then(
                             (list) {
@@ -184,6 +199,18 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new DialogItem(
                                   text: "Esta semana",
                                   onPressed: () {
+                                    lancamentoDB.getLancamentoSemana(new DateTime.now()).then(
+                                      (list) {
+                                        setState(() {
+                                          this.periodo = "semana";
+                                          if(list.length > 0) {
+                                            this.listaDB = list[0];
+                                            this.periodoFiltro = list[1][1];
+                                            this.periodoFiltroResumido = list[1][1].substring(0, 7) + " à " + list[1][1].substring(17, 24);
+                                          }
+                                        });
+                                      }
+                                    );
                                     Navigator.pop(context, new DateTime.now());
                                   }
                                 ),
@@ -215,7 +242,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                           );
                         },
                         child: new Text(
-                          this.periodoFiltro,
+                          this.periodoFiltro.length > 15 ? this.periodoFiltroResumido : this.periodoFiltro,
                           style: new TextStyle(
                             fontSize: 16.0,
                           )
@@ -240,6 +267,18 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 if(list.length > 0) {
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
+                                }
+                              });
+                            }
+                          );
+                        } else if(this.periodo == "semana") {
+                          lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                            (list) {
+                              setState(() {
+                                if(list.length > 0) {
+                                  this.listaDB = list[0];
+                                  this.periodoFiltro = list[1][1];
+                                  this.periodoFiltroResumido = list[1][1].substring(0, 7) + " à " + list[1][1].substring(17, 24);
                                 }
                               });
                             }
@@ -402,6 +441,17 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                       });
                                     }
                                   );
+                                } else if(this.periodo == "semana") {
+                                  lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                                    (list) {
+                                      setState(() {
+                                        if(list.length > 0) {
+                                          this.listaDB = list[0];
+                                          this.periodoFiltro = list[1][1];
+                                        }
+                                      });
+                                    }
+                                  );
                                 } else if(this.periodo == "mes") {
                                   lancamentoDB.getLancamentoMes(this.periodoNext).then(
                                     (list) {
@@ -434,6 +484,17 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                     lancamentoDB.deleteLancamento(id);
                                     if(this.periodo == "hoje") {
                                       lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
+                                              this.listaDB = list[0];
+                                              this.periodoFiltro = list[1][1];
+                                            }
+                                          });
+                                        }
+                                      );
+                                    } else if(this.periodo == "semana") {
+                                      lancamentoDB.getLancamentoSemana(this.periodoNext).then(
                                         (list) {
                                           setState(() {
                                             if(list.length > 0) {
@@ -498,6 +559,17 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                           });
                                         }
                                       );
+                                    } else if(this.periodo == "semana") {
+                                      lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
+                                              this.listaDB = list[0];
+                                              this.periodoFiltro = list[1][1];
+                                            }
+                                          });
+                                        }
+                                      );
                                     } else if(this.periodo == "mes") {
                                       lancamentoDB.getLancamentoMes(this.periodoNext).then(
                                         (list) {
@@ -550,6 +622,17 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                     lancamentoDB.updateLancamentoPago(id, pago);
                     if(this.periodo == "hoje") {
                       lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                            }
+                          });
+                        }
+                      );
+                    } else if(this.periodo == "semana") {
+                      lancamentoDB.getLancamentoSemana(this.periodoNext).then(
                         (list) {
                           setState(() {
                             if(list.length > 0) {
@@ -624,6 +707,17 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                     lancamentoDB.updateLancamentoPagoFatura(ids, pago);
                     if(this.periodo == "hoje") {
                       lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                            }
+                          });
+                        }
+                      );
+                    } else if(this.periodo == "semana") {
+                      lancamentoDB.getLancamentoSemana(this.periodoNext).then(
                         (list) {
                           setState(() {
                             if(list.length > 0) {
