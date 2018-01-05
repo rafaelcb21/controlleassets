@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import '../palette/palette.dart';
 import '../db/database.dart';
 import 'package:intl/intl.dart';
+import 'dart:async';
 
 class ConsultaLancamentoPage extends StatefulWidget {
   @override
@@ -232,8 +233,33 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 ),
                                 new DialogItem(
                                   text: "Escolher periodo",
-                                  onPressed: () {
-                                    Navigator.pop(context, new DateTime.now());
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    Navigator.push(context, new MaterialPageRoute<DismissDialogAction>(
+                                      builder: (BuildContext context) { new FullScreenPeriodoDate();},
+                                      fullscreenDialog: true,                                      
+                                    ));
+
+                                    await Navigator.of(context).push(new PageRouteBuilder(
+                                      opaque: false,
+                                      pageBuilder: (BuildContext context, _, __) {
+                                        return new FullScreenPeriodoDate();
+                                      },
+                                      transitionsBuilder: (
+                                        BuildContext context,
+                                        Animation<double> animation,
+                                        Animation<double> secondaryAnimation,
+                                        Widget child,
+                                      ) {
+                                        return new SlideTransition(
+                                          position: new Tween<Offset>(
+                                            begin:  const Offset(1.0, 0.0),
+                                            end: Offset.zero,
+                                          ).animate(animation),
+                                          child: child,
+                                        );
+                                      }
+                                    ));
                                   }
                                 ),
                               ]
@@ -1160,6 +1186,149 @@ class DialogItem extends StatelessWidget {
       )
     );
   }
+}
+
+class FullScreenPeriodoDate extends StatefulWidget {
+  @override
+  FullScreenPeriodoDateState createState() => new FullScreenPeriodoDateState();
+}
+
+class FullScreenPeriodoDateState extends State<FullScreenPeriodoDate> {
+  Color azulAppbar = new Color(0xFF26C6DA);
+  DateTime _fromDateTime = new DateTime.now();
+  DateTime _toDateTime = new DateTime.now();
+  bool _allDayValue = false;
+  bool _saveNeeded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
+    return new Scaffold(
+      appBar: new AppBar(
+        title: const Text('Período'),
+        backgroundColor: azulAppbar,
+        actions: <Widget> [
+          new FlatButton(
+            child: new Text('SALVAR', style: theme.textTheme.body1.copyWith(color: Colors.white)),
+            onPressed: () {
+              Navigator.pop(context);
+            }
+          )
+        ]
+      ),
+      body: new Container(
+        child: new Column(
+          children: <Widget>[
+            new _DateTimePicker(
+              labelText: 'de',
+              selectedDate: _fromDateTime,
+              selectDate: (DateTime date) {
+                setState((){
+
+                });
+              },              
+            ),
+            new _DateTimePicker(
+              labelText: 'à',
+              selectedDate: _toDateTime,
+              selectDate: (DateTime date) {
+                setState((){
+
+                });
+              },
+            ),
+          ],
+        ),
+      )
+    );
+  }
+}
+
+class _DateTimePicker extends StatelessWidget {
+  const _DateTimePicker({
+    Key key,
+    this.labelText,
+    this.selectedDate,
+    this.selectDate,
+  }) : super(key: key);
+ 
+  final String labelText;
+  final DateTime selectedDate;
+  final ValueChanged<DateTime> selectDate;
+ 
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: new DateTime(2015, 8),
+      lastDate: new DateTime(2101)
+    );
+    if (picked != null && picked != selectedDate)
+      selectDate(picked);
+  }
+ 
+  @override
+  Widget build(BuildContext context) {
+    final TextStyle valueStyle = Theme.of(context).textTheme.title;
+    return new Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: <Widget>[
+        new Expanded(
+          flex: 4,
+          child: new _InputDropdown(
+            labelText: labelText,
+            valueText: new DateFormat.yMd().format(selectedDate),
+            valueStyle: valueStyle,
+            onPressed: () { _selectDate(context); },
+          ),
+       ),
+      ],
+    );
+  }
+}
+
+class _InputDropdown extends StatelessWidget {
+  const _InputDropdown({
+    Key key,
+    this.child,
+    this.labelText,
+    this.valueText,
+    this.valueStyle,
+    this.onPressed }) : super(key: key);
+ 
+  final String labelText;
+  final String valueText;
+  final TextStyle valueStyle;
+  final VoidCallback onPressed;
+  final Widget child;
+ 
+  @override
+  Widget build(BuildContext context) {
+    return new InkWell(
+      onTap: onPressed,
+      child: new InputDecorator(
+        decoration: new InputDecoration(
+          labelText: labelText,
+          isDense: true,
+        ),
+        baseStyle: valueStyle,
+        child: new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            new Text(valueText, style: valueStyle),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+enum DismissDialogAction {
+  cancel,
+  discard,
+  save,
 }
 
 
