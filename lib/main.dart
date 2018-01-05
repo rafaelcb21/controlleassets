@@ -159,7 +159,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           this.listaDBCartao = dict['cartao'];
           this.cardCartaoNew = false;
         } else {
-          this.cardCartaoNew = dict['cartao'];
+          this.listaDBCartao = dict['cartao'];
           this.cardCartaoNew = true;
         }
 

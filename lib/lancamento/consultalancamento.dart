@@ -131,9 +131,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 if(list.length > 0) {
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
-                                  this.periodoFiltroResumido = list[1][1].substring(0, 7) + " à " + list[1][1].substring(17, 24);
-                                  print(this.periodoFiltro);
-                                  print(this.periodoFiltroResumido);
+                                  this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
                                 }
                               });
                             }
@@ -145,7 +143,6 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 if(list.length > 0) {
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
-                                  print(this.periodoFiltro);
                                 }
                               });
                             }
@@ -199,6 +196,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new DialogItem(
                                   text: "Esta semana",
                                   onPressed: () {
+                                    //DateTime agoraDate = new DateTime.now();
+                                    //lancamentoDB.getLancamentoSemana(new DateTime(agoraDate.year, agoraDate.month, agoraDate.day)).then(
                                     lancamentoDB.getLancamentoSemana(new DateTime.now()).then(
                                       (list) {
                                         setState(() {
@@ -206,7 +205,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                           if(list.length > 0) {
                                             this.listaDB = list[0];
                                             this.periodoFiltro = list[1][1];
-                                            this.periodoFiltroResumido = list[1][1].substring(0, 7) + " à " + list[1][1].substring(17, 24);
+                                            this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
                                           }
                                         });
                                       }
@@ -278,7 +277,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 if(list.length > 0) {
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
-                                  this.periodoFiltroResumido = list[1][1].substring(0, 7) + " à " + list[1][1].substring(17, 24);
+                                  this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
                                 }
                               });
                             }

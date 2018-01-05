@@ -769,21 +769,23 @@ class Lancamento {
     }
 
     if(periodo == 'semana') {
-      List listaMesAno = date.split(" "); // ['17', 'Dez', 'à', '23', 'Dez']
-      String nomeMes = listaMesAno[4];
-      int ano = int.parse(listaMesAno[2]);
-      int mes = mesEscolhido(nomeMes);
-      DateTime data = new DateTime(ano, mes, 1);
+      List listaMesAno = date.split(" "); // ['17', 'Dez', 'à', '23', 'Dez'] 01 Jan de 2018 à 07 Jan de 2018
+      String nomeMes = listaMesAno[6];
+      int dia = int.parse(listaMesAno[5]);
+      int ano = int.parse(listaMesAno[8]);
+      int mes = mesEscolhidoAbreviado(nomeMes);
+      DateTime data = new DateTime(ano, mes, dia);
       String dataString = new DateFormat("yyyy-MM-dd").format(data);
       DateTime nextDate;
 
       next ? 
-        nextDate = DateTime.parse(dataString).add(new Duration(days: 31)) 
+        nextDate = DateTime.parse(dataString).add(new Duration(days: 1)) 
       :
-        nextDate = DateTime.parse(dataString).subtract(new Duration(days: 5));     
+        nextDate = DateTime.parse(dataString).subtract(new Duration(days: 7));     
 
       String anoMesDia = new DateFormat.yMMMd("pt_BR").format(nextDate); // 23 de dez de 2017
       List yMMMd = anoMesDia.split(' ');
+
       String anoMesDiaApresentacao = yMMMd[0] + ' ' + yMMMd[2][0].toUpperCase() + yMMMd[2].substring(1) + ' ' + yMMMd[4]; // 23 Dez 2017
 
       return [anoMesDiaApresentacao, nextDate];
@@ -943,10 +945,11 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     List listaDataSemana = [];
     List listaIdCartao = [];
     List listaFaturaIdCartao = [];
+    String diaLabelInicio = "";
+    String diaLabelFim = "";
 
     var listaPorData = [];
     var listaDeFaturas = [];
-
 
     if(diaDeReferencia.weekday == 1) {
       inicioDaSemana = diaDeReferencia;
@@ -970,13 +973,14 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       inicioDaSemana = diaDeReferencia.subtract(new Duration(days: 6));
       fimDaSemana = diaDeReferencia;
     }
-
+    
     proximaData = inicioDaSemana;
-    while(proximaData.compareTo(fimDaSemana) != 1) {
+    
+    while(proximaData.compareTo(fimDaSemana) != 0) {
       listaDataSemana.add(
         new DateFormat("yyyy-MM-dd").format(proximaData)
       );
-      proximaData.add(new Duration(days: 1));
+      proximaData = proximaData.add(new Duration(days: 1));
     }
 
     listaDataSemana.add(
@@ -985,52 +989,64 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
     var anoMesDiaInicio = new DateFormat.yMMMd("pt_BR").format(inicioDaSemana); // 23 de dezembro de 2017
     List yMMMdInicio = anoMesDiaInicio.split(' ');
-    String diaMesInicio = yMMMdInicio[0] + ' ' + yMMMdInicio[2][0].toUpperCase() + yMMMdInicio[2].substring(1); // 23 Dez
+
+
+    yMMMdInicio[0].length == 1 ? diaLabelInicio = '0' + yMMMdInicio[0] : diaLabelInicio = yMMMdInicio[0];
+    String diaMesInicio = diaLabelInicio + ' ' + yMMMdInicio[2][0].toUpperCase() + yMMMdInicio[2].substring(1); // 23 Dez
 
     var anoMesDiaFim = new DateFormat.yMMMd("pt_BR").format(fimDaSemana); // 23 de dezembro de 2017
     List yMMMdFim = anoMesDiaFim.split(' ');
-    String diaMesFim = yMMMdFim[0] + ' ' + yMMMdFim[2][0].toUpperCase() + yMMMdFim[2].substring(1); // 29 Dez
+
+    yMMMdFim[0].length == 1 ? diaLabelFim = '0' + yMMMdFim[0] : diaLabelFim = yMMMdFim[0];
+    
+    String diaMesFim = diaLabelFim + ' ' + yMMMdFim[2][0].toUpperCase() + yMMMdFim[2].substring(1); // 29 Dez
 
     String label = diaMesInicio + " de " +  yMMMdInicio[4] + " à " + diaMesFim + " de " +  yMMMdFim[4]; // 23 Dez de 2017 à 29 Dez de 2018
 
     for(var i in listaDataSemana) {
-      String dia = i.substring(8, 10);
+      String dia = int.parse(i.substring(8, 10)).toString();
       String mes = mesEscolhidoNome(int.parse(i.substring(5, 7))); //Janeiro
       String ano = i.substring(0, 4);
       String fatura = mes + " de " + ano; //Janeiro de 2017
+
+      List listaIdCartaoww = await db.rawQuery("SELECT id, vencimento FROM cartao");
+      
       listaIdCartao = await db.rawQuery("SELECT id, vencimento FROM cartao WHERE vencimento = ?", [dia]); //todos os ids de cartao de um determinado dia
       listaFaturaIdCartao.add([fatura, listaIdCartao]);
     }
 
     for(List i in listaFaturaIdCartao) {
-      List somaFaturaCartao = await db.rawQuery(
-        '''SELECT c.vencimento, l.fatura, c.cartao, SUM(valor), SUM(pago)
-              FROM lancamento AS l
-                LEFT JOIN cartao AS c ON l.idcartao = c.id
-              WHERE l.idcartao = ? AND l.fatura = ?
-        ''', [ i[1].idCartao['id'], i[0] ]);
-      
-      List idsLancamentosFatura = await db.rawQuery(
-        'SELECT l.id FROM lancamento AS l WHERE l.idcartao = ? AND l.fatura = ?', [ i[1].idCartao['id'], i[0] ]);
 
-      String hojeMesDescrito = i[0][0].toLowerCase() + i[0].substring(1);
+      if(i[1].length > 0) {
+        List somaFaturaCartao = await db.rawQuery(
+          '''SELECT c.vencimento, l.fatura, c.cartao, SUM(valor), SUM(pago)
+                FROM lancamento AS l
+                  LEFT JOIN cartao AS c ON l.idcartao = c.id
+                WHERE l.idcartao = ? AND l.fatura = ?
+          ''', [ i[1][0]['id'], i[0] ]);
+        
+        List idsLancamentosFatura = await db.rawQuery(
+          'SELECT l.id FROM lancamento AS l WHERE l.idcartao = ? AND l.fatura = ?', [ i[1][0]['id'], i[0] ]);
 
-      if(somaFaturaCartao[0]['vencimento'] != null) {
-        String dataFatura = stringDateInDateTimeString(hojeMesDescrito, somaFaturaCartao[0]['vencimento']);
-        DateTime dataFaturaDateTime = DateTime.parse(dataFatura);
-        var pagoFatura = somaFaturaCartao[0]['SUM(pago)'];
-        int resultadoPagamentoFatura;
+        String hojeMesDescrito = i[0][0].toLowerCase() + i[0].substring(1);
 
-        if(pagoFatura > 0) {
-          resultadoPagamentoFatura = 1;
-        } else {
-          resultadoPagamentoFatura = 0;
+        if(somaFaturaCartao[0]['vencimento'] != null) {
+          String dataFatura = stringDateInDateTimeString(hojeMesDescrito, somaFaturaCartao[0]['vencimento']);
+          DateTime dataFaturaDateTime = DateTime.parse(dataFatura);
+          var pagoFatura = somaFaturaCartao[0]['SUM(pago)'];
+          int resultadoPagamentoFatura;
+
+          if(pagoFatura > 0) {
+            resultadoPagamentoFatura = 1;
+          } else {
+            resultadoPagamentoFatura = 0;
+          }
+
+          if(somaFaturaCartao[0]['SUM(valor)'] != 0) { // se tiver valor na fatura
+            listaDeFaturas.add([dataFaturaDateTime, dataFatura, 'comCartao', somaFaturaCartao[0], resultadoPagamentoFatura, idsLancamentosFatura]);
+          }
         }
-
-        if(somaFaturaCartao[0]['SUM(valor)'] != 0) { // se tiver valor na fatura
-          listaDeFaturas.add([dataFaturaDateTime, dataFatura, 'comCartao', somaFaturaCartao[0], resultadoPagamentoFatura, idsLancamentosFatura]);
-        }
-      }      
+      }
     }
 
     for(var data in listaDataSemana){
@@ -1050,7 +1066,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         int.parse(dataAnoMesDia[0]), int.parse(dataAnoMesDia[1]), int.parse(dataAnoMesDia[2])
       );
 
-      var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
+      var dataFormatada = new DateFormat.MMMMd("pt_BR").format(dataDateTime).toString();
       
       if(lista.length > 0) {
         listaPorData.add([dataDateTime, dataFormatada, 'semCartao', lista]);
@@ -1122,6 +1138,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     
 
     await db.close();
+
     return [listaUnica, [diaDeReferencia, label]]; //label: 23 Dez de 2017 à 29 Dez de 2018
   }
 
