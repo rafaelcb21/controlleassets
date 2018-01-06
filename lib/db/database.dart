@@ -1334,6 +1334,189 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     return list;
   }
 
+  Future getLancamentoPeriodo(DateTime from, DateTime to) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    DateTime proximaData;
+    List listaDataSemana = [];
+    List listaIdCartao = [];
+    List listaFaturaIdCartao = [];
+    String diaLabelInicio = "";
+    String diaLabelFim = "";
+
+    var listaPorData = [];
+    var listaDeFaturas = [];
+    
+    proximaData = from;
+    
+    while(proximaData.compareTo(to) != 0) {
+      listaDataSemana.add(
+        new DateFormat("yyyy-MM-dd").format(proximaData)
+      );
+      proximaData = proximaData.add(new Duration(days: 1));
+    }
+
+    listaDataSemana.add(
+        new DateFormat("yyyy-MM-dd").format(to)
+      );
+
+    var anoMesDiaInicio = new DateFormat.yMMMd("pt_BR").format(from); // 23 de dezembro de 2017
+    List yMMMdInicio = anoMesDiaInicio.split(' ');
+
+
+    yMMMdInicio[0].length == 1 ? diaLabelInicio = '0' + yMMMdInicio[0] : diaLabelInicio = yMMMdInicio[0];
+    String diaMesInicio = diaLabelInicio + ' ' + yMMMdInicio[2][0].toUpperCase() + yMMMdInicio[2].substring(1); // 23 Dez
+
+    var anoMesDiaFim = new DateFormat.yMMMd("pt_BR").format(to); // 23 de dezembro de 2017
+    List yMMMdFim = anoMesDiaFim.split(' ');
+
+    yMMMdFim[0].length == 1 ? diaLabelFim = '0' + yMMMdFim[0] : diaLabelFim = yMMMdFim[0];
+    
+    String diaMesFim = diaLabelFim + ' ' + yMMMdFim[2][0].toUpperCase() + yMMMdFim[2].substring(1); // 29 Dez
+
+    String label = diaMesInicio + " de " +  yMMMdInicio[4] + " à " + diaMesFim + " de " +  yMMMdFim[4]; // 23 Dez de 2017 à 29 Dez de 2018
+
+    for(var i in listaDataSemana) {
+      String dia = int.parse(i.substring(8, 10)).toString();
+      String mes = mesEscolhidoNome(int.parse(i.substring(5, 7))); //Janeiro
+      String ano = i.substring(0, 4);
+      String fatura = mes + " de " + ano; //Janeiro de 2017
+
+      List listaIdCartaoww = await db.rawQuery("SELECT id, vencimento FROM cartao");
+      
+      listaIdCartao = await db.rawQuery("SELECT id, vencimento FROM cartao WHERE vencimento = ?", [dia]); //todos os ids de cartao de um determinado dia
+      listaFaturaIdCartao.add([fatura, listaIdCartao]);
+    }
+
+    for(List i in listaFaturaIdCartao) {
+
+      if(i[1].length > 0) {
+        List somaFaturaCartao = await db.rawQuery(
+          '''SELECT c.vencimento, l.fatura, c.cartao, SUM(valor), SUM(pago)
+                FROM lancamento AS l
+                  LEFT JOIN cartao AS c ON l.idcartao = c.id
+                WHERE l.idcartao = ? AND l.fatura = ?
+          ''', [ i[1][0]['id'], i[0] ]);
+        
+        List idsLancamentosFatura = await db.rawQuery(
+          'SELECT l.id FROM lancamento AS l WHERE l.idcartao = ? AND l.fatura = ?', [ i[1][0]['id'], i[0] ]);
+
+        String hojeMesDescrito = i[0][0].toLowerCase() + i[0].substring(1);
+
+        if(somaFaturaCartao[0]['vencimento'] != null) {
+          String dataFatura = stringDateInDateTimeString(hojeMesDescrito, somaFaturaCartao[0]['vencimento']);
+          DateTime dataFaturaDateTime = DateTime.parse(dataFatura);
+          var pagoFatura = somaFaturaCartao[0]['SUM(pago)'];
+          int resultadoPagamentoFatura;
+
+          if(pagoFatura > 0) {
+            resultadoPagamentoFatura = 1;
+          } else {
+            resultadoPagamentoFatura = 0;
+          }
+
+          if(somaFaturaCartao[0]['SUM(valor)'] != 0) { // se tiver valor na fatura
+            listaDeFaturas.add([dataFaturaDateTime, dataFatura, 'comCartao', somaFaturaCartao[0], resultadoPagamentoFatura, idsLancamentosFatura]);
+          }
+        }
+      }
+    }
+
+    for(var data in listaDataSemana){
+      List lista = await db.rawQuery('''
+        SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
+                l.valor, l.pago, l.hash 
+                  FROM lancamento AS l
+          LEFT JOIN categoria AS c ON l.idcategoria = c.id
+          LEFT JOIN tag ON l.idtag = tag.id
+          LEFT JOIN conta ON l.idconta = conta.id
+          LEFT JOIN cartao ON l.idcartao = cartao.id
+            WHERE l.data = ? AND l.idcartao = 0
+      ''', [data]);
+      
+      List dataAnoMesDia = data.split("-");
+      DateTime dataDateTime = new DateTime(
+        int.parse(dataAnoMesDia[0]), int.parse(dataAnoMesDia[1]), int.parse(dataAnoMesDia[2])
+      );
+
+      var dataFormatada = new DateFormat.MMMMd("pt_BR").format(dataDateTime).toString();
+      
+      if(lista.length > 0) {
+        listaPorData.add([dataDateTime, dataFormatada, 'semCartao', lista]);
+      }        
+      
+    }
+
+    var dateMap = new LinkedHashMap();
+    
+    List allDate = [];
+
+    for(var key in listaDeFaturas) {
+      allDate.add(key[0]); //pega todas as datas
+    }
+
+    for(var key in listaPorData) {
+      allDate.add(key[0]); //pega todas as datas
+    }
+
+    allDate.sort();
+
+    for(var key in allDate) {
+      dateMap.putIfAbsent(key, () => []); //insere todas as datas de forma ordenada no {}
+    }
+
+    for(var lista in listaPorData) {
+      DateTime dateKey = lista[0];
+      String dateNome = lista[1];
+      String tipoLancamento = lista[2];
+      List lancamentos = lista[3];
+      
+      for(var itemLancamento in lancamentos) {
+        dateMap[dateKey].add([
+          dateKey,
+          itemLancamento['descricao'], dateNome, tipoLancamento, itemLancamento['categoria'],
+          itemLancamento['pago'], itemLancamento['hash'], itemLancamento['valor'],
+          itemLancamento['id'], itemLancamento['data'], itemLancamento['tipo']
+        ]);
+      }
+    }
+
+    for(var lista in listaDeFaturas) {
+
+      DateTime dateKey = lista[0];
+      String dateString = lista[1];
+      int pago = lista[4];
+      List idsFatura = lista[5];
+
+      var data = new DateFormat("yyyy-MM-dd").parse(dateString);
+      var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
+      
+      String tipoLancamento = lista[2];
+      double somaValor = lista[3]['SUM(valor)'];
+      String faturaLancamento = lista[3]['fatura'];
+      String vencimentoLancamento = lista[3]['vencimento'];
+      String cartaoLancamento = lista[3]['cartao'];
+      
+      dateMap[dateKey].add([
+        dateKey,
+        faturaLancamento, dataFormatada, tipoLancamento, cartaoLancamento, somaValor, vencimentoLancamento, pago, idsFatura
+      ]);
+    }
+
+    List listaUnica = [];
+
+    dateMap.forEach((key, value) {
+      listaUnica.add(value);
+    });
+    
+
+    await db.close();
+
+    return [listaUnica, [[from, to], label]]; //label: 23 Dez de 2017 à 29 Dez de 2018
+  }
+
   Future updateLancamentoPago(int id, int pago) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");

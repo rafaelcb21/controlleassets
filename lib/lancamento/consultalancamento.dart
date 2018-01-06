@@ -235,12 +235,12 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                   text: "Escolher periodo",
                                   onPressed: () async {
                                     Navigator.pop(context);
-                                    Navigator.push(context, new MaterialPageRoute<DismissDialogAction>(
-                                      builder: (BuildContext context) { new FullScreenPeriodoDate();},
-                                      fullscreenDialog: true,                                      
-                                    ));
+                                    //Navigator.push(context, new MaterialPageRoute<DismissDialogAction>(
+                                    //  builder: (BuildContext context) { new FullScreenPeriodoDate();},
+                                    //  fullscreenDialog: true,                                      
+                                    //));
 
-                                    await Navigator.of(context).push(new PageRouteBuilder(
+                                    List fromAndTo = await Navigator.of(context).push(new PageRouteBuilder(
                                       opaque: false,
                                       pageBuilder: (BuildContext context, _, __) {
                                         return new FullScreenPeriodoDate();
@@ -260,6 +260,19 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                         );
                                       }
                                     ));
+
+                                    lancamentoDB.getLancamentoPeriodo(fromAndTo[0], fromAndTo[1]).then(
+                                      (list) {
+                                        setState(() {
+                                          this.periodo = "periodo";
+                                          if(list.length > 0) {
+                                            this.listaDB = list[0];
+                                            this.periodoFiltro = list[1][1];
+                                          }
+                                        });
+                                      }
+                                    );
+
                                   }
                                 ),
                               ]
@@ -1208,11 +1221,22 @@ class FullScreenPeriodoDateState extends State<FullScreenPeriodoDate> {
       appBar: new AppBar(
         title: const Text('Período'),
         backgroundColor: azulAppbar,
+        leading: new GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: new Container(
+            child: new Icon(
+              Icons.close,
+              color: Colors.white,
+            ),
+          ),
+        ),
         actions: <Widget> [
           new FlatButton(
-            child: new Text('SALVAR', style: theme.textTheme.body1.copyWith(color: Colors.white)),
+            child: new Text('OK', style: theme.textTheme.body1.copyWith(color: Colors.white)),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(context, [_fromDateTime, _toDateTime]);
             }
           )
         ]
@@ -1220,23 +1244,29 @@ class FullScreenPeriodoDateState extends State<FullScreenPeriodoDate> {
       body: new Container(
         child: new Column(
           children: <Widget>[
-            new _DateTimePicker(
-              labelText: 'de',
-              selectedDate: _fromDateTime,
-              selectDate: (DateTime date) {
-                setState((){
-
-                });
-              },              
+            new Container(
+              margin: new EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+              child: new _DateTimePicker(
+                labelText: 'de',
+                selectedDate: _fromDateTime,
+                selectDate: (DateTime date) {
+                  setState((){
+                    _fromDateTime = date;
+                  });
+                },              
+              ),
             ),
-            new _DateTimePicker(
-              labelText: 'à',
-              selectedDate: _toDateTime,
-              selectDate: (DateTime date) {
-                setState((){
-
-                });
-              },
+            new Container(
+              margin: new EdgeInsets.only(left: 16.0, right: 16.0),
+              child: new _DateTimePicker(
+                labelText: 'à',
+                selectedDate: _toDateTime,
+                selectDate: (DateTime date) {
+                  setState((){
+                    _toDateTime = date;
+                  });
+                },              
+              ),
             ),
           ],
         ),
