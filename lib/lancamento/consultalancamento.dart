@@ -283,15 +283,23 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                     lancamentoDB.getLancamentoPeriodo(fromAndTo[0], fromAndTo[1]).then(
                                       (list) {
                                         setState(() {
-                                          this.periodo = "periodo";
-                                          if(list.length > 0) {
+                                          this.periodo = list[1][2];
+                                          if(list.length > 0) {                                            
                                             this.listaDB = list[0];
                                             this.periodoFiltro = list[1][1];
                                             //this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
-                                            this.periodoFiltroResumido = //23 Dez 17 à 29 Dez 18
+                                            
+                                            if(this.periodo == "periodo") {
+                                              this.periodoFiltroResumido = //23 Dez 17 à 29 Dez 18
                                               list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
                                               + " à " + 
                                               list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                            } else if(this.periodo == "mes") {
+                                              this.periodoFiltroResumido = this.periodoFiltro;
+                                            } else if(this.periodo == "semana") {
+                                              this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                            }
+                                            
                                           }
                                         });
                                       }

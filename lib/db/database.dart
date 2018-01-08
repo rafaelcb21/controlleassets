@@ -913,6 +913,7 @@ class Lancamento {
     List listaDeFaturas = [];
     List listaPorDataHoje = [];
     List dateMap = [];
+    String diaLabelInicio = "";
 
     //String dataHoje = new DateFormat.yMd().format(hoje); // 23/12/2017
     String dataFormatada = new DateFormat.MMMMd("pt_BR").format(hoje).toString(); // 23 de dezembro
@@ -927,7 +928,9 @@ class Lancamento {
 
     List yMMMd = anoMesDia.split(' ');
 
-    String anoMesDiaApresentacao = yMMMd[0] + ' ' + yMMMd[2][0].toUpperCase() + yMMMd[2].substring(1) + ' ' + yMMMd[4]; // 23 Dez 2017
+    yMMMd[0].length == 1 ? diaLabelInicio = '0' + yMMMd[0] : diaLabelInicio = yMMMd[0];
+    
+    String anoMesDiaApresentacao = diaLabelInicio + ' ' + yMMMd[2][0].toUpperCase() + yMMMd[2].substring(1) + ' ' + yMMMd[4]; // 23 Dez 2017
 
     var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(hoje).toString(); // dezembro de 2017
 
@@ -1435,11 +1438,23 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     List listaFaturaIdCartao = [];
     String diaLabelInicio = "";
     String diaLabelFim = "";
+    String label = "";
 
     var listaPorData = [];
     var listaDeFaturas = [];
     
     //proximaData = from;
+    int diaFrom = from.day;
+    int mesFrom = from.month;
+    int anoFrom = from.year;
+    int semanaFrom = from.weekday;
+    int diaTo = to.day;
+    int mesTo = to.month;
+    int anoTo = to.year;
+    int semanaTo = to.weekday;
+    String periodo = "periodo";
+
+    int ultimoDiaTo = new DateTime(anoTo, mesTo + 1, 0).day;
     
     int diferencaDias = to.difference(from).inDays;
 
@@ -1479,7 +1494,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     
     String diaMesFim = diaLabelFim + ' ' + yMMMdFim[2][0].toUpperCase() + yMMMdFim[2].substring(1); // 29 Dez
 
-    String label = diaMesInicio + " de " +  yMMMdInicio[4] + " à " + diaMesFim + " de " +  yMMMdFim[4]; // 23 Dez de 2017 à 29 Dez de 2018
+    label = diaMesInicio + " de " +  yMMMdInicio[4] + " à " + diaMesFim + " de " +  yMMMdFim[4]; // 23 Dez de 2017 à 29 Dez de 2018
 
     for(var i in listaDataSemana) {
       String dia = int.parse(i.substring(8, 10)).toString();
@@ -1616,7 +1631,17 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
     await db.close();
 
-    return [listaUnica, [[from, to], label]]; //label: 23 Dez de 2017 à 29 Dez de 2018
+    if(mesFrom == mesTo && anoFrom == anoTo && ultimoDiaTo == diaTo && diaFrom == 1) {
+      label = new DateFormat.yMMMM("pt_BR").format(new DateTime(anoTo, mesTo, diaTo)).toString(); // dezembro de 2017
+      periodo = "mes";
+    } else if(mesFrom == mesTo && anoFrom == anoTo && semanaFrom == 1 && semanaTo == 7) {
+      periodo = "semana";
+    } else if(mesFrom == mesTo && anoFrom == anoTo && diaFrom == diaTo) {
+      periodo = "hoje";
+      label = label.substring(0, 7) + label.substring(10, 14);
+    }
+
+    return [listaUnica, [[from, to], label, periodo]]; //label: 23 Dez de 2017 à 29 Dez de 2018
   }
 
   Future updateLancamentoPago(int id, int pago) async {
