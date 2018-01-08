@@ -16,17 +16,20 @@ import 'package:uuid/uuid.dart';
 class LancamentoPage extends StatefulWidget {
   final Color color;
   final bool editar;
-  final Lancamento lancamentoDB;
-  LancamentoPage(this.editar, lancamentoDB, this.color);
-  LancamentoPageStatus createState() => new LancamentoPageStatus(this.editar, lancamentoDB, this.color);
+  Lancamento lancamentoEditarDB;
+  final int idEditar;
+  LancamentoPage(this.editar, this.lancamentoEditarDB, this.color);
+  LancamentoPageStatus createState() => new LancamentoPageStatus(this.editar, this.lancamentoEditarDB, this.color);
 }
  
 class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStateMixin{
-  LancamentoPageStatus(this.editar, lancamentoDB, this.color);
+  LancamentoPageStatus(this.editar, this.lancamentoEditarDB, this.color);
   final Color color;
   final bool editar;
+  Lancamento lancamentoEditarDB;
   final Lancamento lancamentoDB;
   ValueNotifier<List<int>> numeros;
+  List numerosEditar = [];
  
   AnimationController _controller;
   //AnimationController _controller2;
@@ -61,16 +64,6 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
   @override
   void initState() {
 
-    if(this.editar) {
-      List<String> x = lancamentoDB.valor.toString().split(".");     
-      List<String> y = new List.from( x[0].split(""))..addAll(x[1].split(""));
-      List<int> numbersList = y.map((i) => int.parse(i));
-      ValueNotifier<List<int>> numeros = new ValueNotifier<List<int>>(numbersList);
-      action();
-    } else {
-      this.numeros = new ValueNotifier<List<int>>(<int>[]);
-    }
-
     _controller = new AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 180),
@@ -99,6 +92,29 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
     );
  
     _controller.forward();
+    
+    if(this.editar) {
+      List<String> x = this.lancamentoEditarDB.valor.toString().split(".");
+      List<String> y;
+
+      if(this.lancamentoEditarDB.valor > 0) {        
+        y = new List.from(x[0].split(""))..addAll(x[1].split(""));
+      } else {        
+        y = new List.from(x[0].substring(1).split(""))..addAll(x[1].split(""));
+      }
+      List<int> numbersList = y.map((i) => int.parse(i));
+
+      for(var i in numbersList) {
+        this.numerosEditar.add(i);
+      }
+      this.numeros = new ValueNotifier<List<int>>(this.numerosEditar);
+      action();
+
+    } else {
+      this.numeros = new ValueNotifier<List<int>>(<int>[]);
+    }
+
+
 
     super.initState();
   }
@@ -713,10 +729,6 @@ class FormularioState extends State<Formulario> {
     //DateTime vencimentoDefinido;
     //DateTime fechamentoDefinido;
 
-    //print(diaLancamento);
-    //print(vencimento);
-    //print(fechamento);
-
     //DateTime diaVencimento = new DateTime(ano, mes, int.parse(vencimento));
 
     //if(diaVencimento.isBefore(diaLancamento)) {
@@ -733,8 +745,6 @@ class FormularioState extends State<Formulario> {
     //  } 
     //}
 
-    //print(vencimentoDefinido);
-
     //DateTime diaFechamento = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
     //if(vencimentoDefinido.isBefore(diaFechamento)) {
     //  if(vencimentoDefinido.month == 1) {
@@ -745,8 +755,6 @@ class FormularioState extends State<Formulario> {
     //} else {
     //  fechamentoDefinido = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
     //}
-
-    //print(fechamentoDefinido);
 
     if(!arbitrario) {
       if(diaLancamento.isAfter(fechamentoDefinido)) {

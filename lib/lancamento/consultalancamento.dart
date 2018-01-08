@@ -5,6 +5,8 @@ import '../db/database.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 
+import "./lancamento.dart";
+
 class ConsultaLancamentoPage extends StatefulWidget {
   @override
   ConsultaLancamentoPageState createState() => new ConsultaLancamentoPageState();
@@ -485,6 +487,57 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                   pago: pago,
                   textoPago: textoPago,
                   hash: hash,
+                  onPressed: () async {                    
+                    lancamentoDB.getLancamento(id).then(
+                      (list) {                        
+                        lancamentoDB.idcategoria = list[0]['idcategoria'];
+                        lancamentoDB.idconta = list[0]['idconta'];
+                        lancamentoDB.fatura = list[0]['fatura'];
+                        lancamentoDB.hash = list[0]['hash'];
+                        lancamentoDB.valor = list[0]['valor'];
+                        lancamentoDB.data = list[0]['data'];
+                        lancamentoDB.idcontadestino = list[0]['idcontadestino'];
+                        lancamentoDB.idtag = list[0]['idtag'];
+                        lancamentoDB.pago = list[0]['pago'];
+                        lancamentoDB.descricao = list[0]['descricao'];
+                        lancamentoDB.id = list[0]['id'];
+                        lancamentoDB.quantidaderepeticao = list[0]['quantidaderepeticao'];
+                        lancamentoDB.idcartao = list[0]['idcartao'];
+                        lancamentoDB.tipo = list[0]['tipo'];
+                        lancamentoDB.datafatura = list[0]['datafatura'];
+                        lancamentoDB.periodorepeticao = list[0]['periodorepeticao'];
+                        lancamentoDB.tiporepeticao = list[0]['tiporepeticao'];
+
+                        Navigator.of(context).push(new PageRouteBuilder(
+                          opaque: false,
+                          pageBuilder: (BuildContext context, _, __) {
+                            return new LancamentoPage(true, lancamentoDB, new Color(0xFFE57373));
+                          },
+                          transitionsBuilder: (
+                            BuildContext context,
+                            Animation<double> animation,
+                            Animation<double> secondaryAnimation,
+                            Widget child,
+                          ) {
+                            return new SlideTransition(
+                              position: new Tween<Offset>(
+                                begin:  const Offset(1.0, 0.0),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            );
+                          }
+                        ));
+                                
+                      }
+                    );
+                    
+
+                    
+
+
+                    
+                  },
                   onPressed2: () async {
                     void showDeleteDialog<T>({ BuildContext context, Widget child }) {
                       showDialog<T>(

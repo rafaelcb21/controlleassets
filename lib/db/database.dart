@@ -1738,6 +1738,18 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
     return lancamento;
   }
+
+  Future getLancamento(int id) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+   List lancamento = await db.rawQuery("SELECT * FROM lancamento WHERE id = ?", [id]);    
+
+    await db.close();
+
+    return lancamento;
+  }
 }
 
 
