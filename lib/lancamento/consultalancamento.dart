@@ -20,6 +20,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   String periodoFiltro = "";
   String periodoFiltroResumido = "";
   DateTime periodoNext = new DateTime.now();
+  DateTime from;
+  DateTime to;
   String periodo = "mes";
 
   @override
@@ -114,6 +116,11 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                         var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, false, this.periodo);
                         this.periodoNext = listaFiltro[1];
 
+                        if(this.periodo == 'periodo') {
+                          this.from = listaFiltro[0];
+                          this.to = listaFiltro[1];
+                        }
+
                         if(this.periodo == "hoje") {
                           lancamentoDB.getLancamentoHoje(this.periodoNext).then(
                             (list) {
@@ -144,12 +151,29 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 if(list.length > 0) {
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
+                                  this.periodoFiltroResumido = this.periodoFiltro;
                                 }
                               });
                             }
                           );
-                        }
-                        
+                        } else if(this.periodo == "periodo") {
+                          lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                            (list) {
+                              setState(() {
+                                if(list.length > 0) {
+                                  this.listaDB = list[0];
+                                  this.periodoFiltro = list[1][1];
+                                  //23 Dez de 2017 à 29 Dez de 2018
+                                  //this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                  this.periodoFiltroResumido = //23 Dez 17 à 29 Dez 18
+                                    list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                    + " à " + 
+                                    list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                }
+                              });
+                            }
+                          );
+                        }                         
                       });
                     },
                     child: new Icon(
@@ -217,7 +241,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 new DialogItem(
                                   text: "Este mes",
                                   onPressed: () {
-                                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                    lancamentoDB.getLancamentoMes(new DateTime.now()).then(
                                       (list) {
                                         setState(() {
                                           this.periodo = "mes";
@@ -235,11 +259,6 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                   text: "Escolher periodo",
                                   onPressed: () async {
                                     Navigator.pop(context);
-                                    //Navigator.push(context, new MaterialPageRoute<DismissDialogAction>(
-                                    //  builder: (BuildContext context) { new FullScreenPeriodoDate();},
-                                    //  fullscreenDialog: true,                                      
-                                    //));
-
                                     List fromAndTo = await Navigator.of(context).push(new PageRouteBuilder(
                                       opaque: false,
                                       pageBuilder: (BuildContext context, _, __) {
@@ -268,11 +287,15 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                           if(list.length > 0) {
                                             this.listaDB = list[0];
                                             this.periodoFiltro = list[1][1];
+                                            //this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                            this.periodoFiltroResumido = //23 Dez 17 à 29 Dez 18
+                                              list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                              + " à " + 
+                                              list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
                                           }
                                         });
                                       }
                                     );
-
                                   }
                                 ),
                               ]
@@ -295,8 +318,12 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                     onTap: () {
                       setState(() {
                         var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true, this.periodo);
-                        //this.periodoFiltro = listaFiltro[0];
                         this.periodoNext = listaFiltro[1];
+
+                        if(this.periodo == 'periodo') {
+                          this.from = listaFiltro[0];
+                          this.to = listaFiltro[1];
+                        }                        
 
                         if(this.periodo == "hoje") {
                           lancamentoDB.getLancamentoHoje(this.periodoNext).then(
@@ -328,11 +355,28 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 if(list.length > 0) {
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
+                                  this.periodoFiltroResumido = this.periodoFiltro;
                                 }
                               });
                             }
                           );
-                        }
+                        } else if(this.periodo == "periodo") {
+                          lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                            (list) {
+                              setState(() {
+                                if(list.length > 0) {
+                                  this.listaDB = list[0];
+                                  this.periodoFiltro = list[1][1];
+                                  //this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                  this.periodoFiltroResumido = //23 Dez 17 à 29 Dez 18
+                                    list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                    + " à " + 
+                                    list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                }
+                              });
+                            }
+                          );
+                        } 
                       });
                     },
                     child: new Icon(
@@ -1213,6 +1257,20 @@ class FullScreenPeriodoDateState extends State<FullScreenPeriodoDate> {
   bool _allDayValue = false;
   bool _saveNeeded = false;
 
+  void showDateErroDialog<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) {
+      if (value != null) {
+        setState(() {
+          
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -1232,20 +1290,21 @@ class FullScreenPeriodoDateState extends State<FullScreenPeriodoDate> {
             ),
           ),
         ),
-        actions: <Widget> [
-          new FlatButton(
-            child: new Text('OK', style: theme.textTheme.body1.copyWith(color: Colors.white)),
-            onPressed: () {
-              Navigator.pop(context, [_fromDateTime, _toDateTime]);
-            }
-          )
-        ]
+        //actions: <Widget> [
+        //  new FlatButton(
+        //    child: new Text('OK', style: theme.textTheme.body1.copyWith(color: Colors.white)),
+        //    onPressed: () {
+        //      Navigator.pop(context, [_fromDateTime, _toDateTime]);
+        //    }
+        //  )
+        //]
       ),
       body: new Container(
         child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             new Container(
-              margin: new EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+              margin: new EdgeInsets.all(16.0),
               child: new _DateTimePicker(
                 labelText: 'de',
                 selectedDate: _fromDateTime,
@@ -1257,7 +1316,7 @@ class FullScreenPeriodoDateState extends State<FullScreenPeriodoDate> {
               ),
             ),
             new Container(
-              margin: new EdgeInsets.only(left: 16.0, right: 16.0),
+              margin: new EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
               child: new _DateTimePicker(
                 labelText: 'à',
                 selectedDate: _toDateTime,
@@ -1268,6 +1327,56 @@ class FullScreenPeriodoDateState extends State<FullScreenPeriodoDate> {
                 },              
               ),
             ),
+            new Container(
+              margin: new EdgeInsets.only(top: 24.0),
+              child: new RaisedButton(
+                color: this.azulAppbar,
+                child: const Text(
+                  'OK',
+                  style: const TextStyle(
+                    color: const Color(0xFFFFFFFF),
+                    fontSize: 24.0
+                  ),  
+                ),
+                onPressed: () {
+                  if(_fromDateTime.isAfter(_toDateTime)) {
+                    showDateErroDialog<String>(
+                      context: context,
+                      child: new SimpleDialog(
+                        title: const Text('Erro'),
+                        children: <Widget>[
+                          new Container(
+                            margin: new EdgeInsets.only(left: 24.0),
+                            child: new Row(
+                              children: <Widget>[
+                                new Container(
+                                  margin: new EdgeInsets.only(right: 10.0),
+                                  child: new Icon(
+                                    Icons.error,
+                                    color: const Color(0xFFE57373)),
+                                ),
+                                new Text(
+                                  "Data inicial maior\nque a data final",
+                                  softWrap: true,
+                                  style: new TextStyle(
+                                    color: Colors.black45,
+                                    fontSize: 16.0,
+                                    fontFamily: "Roboto",
+                                    fontWeight: FontWeight.w500,
+                                  )
+                                )
+                              ],
+                            ),
+                          )
+                        ]
+                      )
+                    );
+                  } else {
+                    Navigator.pop(context, [_fromDateTime, _toDateTime]);
+                  }                  
+                }
+              ),
+            )
           ],
         ),
       )

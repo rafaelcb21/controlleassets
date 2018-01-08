@@ -786,7 +786,7 @@ class Lancamento {
       String anoMesDia = new DateFormat.yMMMd("pt_BR").format(nextDate); // 23 de dez de 2017
       List yMMMd = anoMesDia.split(' ');
 
-      String anoMesDiaApresentacao = yMMMd[0] + ' ' + yMMMd[2][0].toUpperCase() + yMMMd[2].substring(1) + ' ' + yMMMd[4]; // 23 Dez 2017
+      String anoMesDiaApresentacao = yMMMd[0] + ' ' + yMMMd[2][0].toUpperCase() + yMMMd[2].substring(1) + ' ' + yMMMd[4]; // 01 Dez à 07 Jan
 
       return [anoMesDiaApresentacao, nextDate];
     }
@@ -810,6 +810,97 @@ class Lancamento {
       String anoMesDiaApresentacao = yMMMd[0] + ' ' + yMMMd[2][0].toUpperCase() + yMMMd[2].substring(1) + ' ' + yMMMd[4]; // 23 Dez 2017
 
       return [anoMesDiaApresentacao, nextDate];
+    }
+
+    if(periodo == 'periodo') {
+      DateTime nextDateInicio;
+      DateTime nextDateFim;
+      DateTime resultadoDataInicio;
+      DateTime resultadoDataFim;
+      String newNextDateInicioString;
+      String newNextDateFimString;
+      //List mesesNaoPossuemDia31 = [2, 4, 6, 7, 9, 11];
+
+      List listaMesAno = date.split(" "); // ['17', 'Dez', 'à', '23', 'Dez'] 01 Jan de 2018 à 07 Jan de 2018
+      String nomeMesInicio = listaMesAno[1];
+      int diaInicio = int.parse(listaMesAno[0]);
+      int anoInicio = int.parse(listaMesAno[3]);
+      int mesInicio = mesEscolhidoAbreviado(nomeMesInicio);
+      DateTime dataInicio = new DateTime(anoInicio, mesInicio, diaInicio);
+      String dataStringInicio = new DateFormat("yyyy-MM-dd").format(dataInicio);
+
+      String nomeMesFim = listaMesAno[6];
+      int diaFim = int.parse(listaMesAno[5]);
+      int anoFim = int.parse(listaMesAno[8]);
+      int mesFim = mesEscolhidoAbreviado(nomeMesFim);
+      DateTime dataFim = new DateTime(anoFim, mesFim, diaFim);
+      String dataStringFim = new DateFormat("yyyy-MM-dd").format(dataFim);
+      int diferencaDias = dataFim.difference(dataInicio).inDays;
+
+      //verificar se escolheu um periodo fechado ou não
+      //periodo Fechado
+
+      if(dataFim.add(new Duration(days: 1)).day == diaInicio) {        
+
+        //avancar data right
+        if(next) {
+          nextDateInicio = DateTime.parse(dataStringFim).add(new Duration(days: 1)); //DateTime
+          newNextDateInicioString = new DateFormat("yyyy-MM-dd").format(nextDateInicio); //String Resultado data Inicio
+          
+          //diferença entre datas
+          nextDateFim = DateTime.parse(newNextDateInicioString).add(new Duration(days: diferencaDias));
+          
+          String nextDateFimString = new DateFormat("yyyy-MM-dd").format(nextDateFim);
+          newNextDateFimString = nextDateFimString.substring(0, 8) + dataStringFim.substring(8,10); // 2017-12-20 Resultado data Fim
+        
+        //recuar data left
+        } else {
+          nextDateFim = DateTime.parse(dataStringInicio).subtract(new Duration(days: 1));
+          newNextDateFimString = new DateFormat("yyyy-MM-dd").format(nextDateFim); // Resultado data Fim
+
+          nextDateInicio = DateTime.parse(newNextDateFimString).subtract(new Duration(days: diferencaDias));
+
+          String nextDateInicioString = new DateFormat("yyyy-MM-dd").format(nextDateInicio);
+          newNextDateInicioString = nextDateInicioString.substring(0, 8) + dataStringInicio.substring(8,10); //String Resultado data Inicio
+        }
+
+      //periodo Continuo
+      } else {
+        //avancar data right
+        if(next) {
+          nextDateInicio = DateTime.parse(dataStringFim).add(new Duration(days: 1)); //DateTime
+          newNextDateInicioString = new DateFormat("yyyy-MM-dd").format(nextDateInicio); //String Resultado data Inicio
+          
+          //diferença entre datas
+          nextDateFim = DateTime.parse(newNextDateInicioString).add(new Duration(days: diferencaDias));
+          
+          newNextDateFimString = new DateFormat("yyyy-MM-dd").format(nextDateFim);
+          
+        //recuar data left
+        } else {
+          nextDateFim = DateTime.parse(dataStringInicio).subtract(new Duration(days: 1));
+          newNextDateFimString = new DateFormat("yyyy-MM-dd").format(nextDateFim); // Resultado data Fim
+          
+          nextDateInicio = DateTime.parse(newNextDateFimString).subtract(new Duration(days: diferencaDias));
+
+          newNextDateInicioString = new DateFormat("yyyy-MM-dd").format(nextDateInicio);
+          
+        }
+      }     
+
+      resultadoDataInicio = new DateTime(
+        int.parse(newNextDateInicioString.substring(0, 4)),
+        int.parse(newNextDateInicioString.substring(5, 7)),
+        int.parse(newNextDateInicioString.substring(8, 10))
+      );
+
+      resultadoDataFim = new DateTime(
+        int.parse(newNextDateFimString.substring(0, 4)),
+        int.parse(newNextDateFimString.substring(5, 7)),
+        int.parse(newNextDateFimString.substring(8, 10))
+      );
+
+      return [resultadoDataInicio, resultadoDataFim];
     }
     
   }
@@ -975,7 +1066,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     }
     
     proximaData = inicioDaSemana;
-    
     while(proximaData.compareTo(fimDaSemana) != 0) {
       listaDataSemana.add(
         new DateFormat("yyyy-MM-dd").format(proximaData)
@@ -1339,7 +1429,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    DateTime proximaData;
+    //DateTime proximaData;
     List listaDataSemana = [];
     List listaIdCartao = [];
     List listaFaturaIdCartao = [];
@@ -1349,18 +1439,31 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     var listaPorData = [];
     var listaDeFaturas = [];
     
-    proximaData = from;
+    //proximaData = from;
     
-    while(proximaData.compareTo(to) != 0) {
+    int diferencaDias = to.difference(from).inDays;
+
+    for(int i = 1; i <= diferencaDias; i++) {
+      //from = from.add(new Duration(days: 1));
       listaDataSemana.add(
-        new DateFormat("yyyy-MM-dd").format(proximaData)
+        new DateFormat("yyyy-MM-dd").format(
+          from.add(new Duration(days: i))
+        )
       );
-      proximaData = proximaData.add(new Duration(days: 1));
+      
     }
+    
+    //while(proximaData.compareTo(to) != 0) {
+    //  listaDataSemana.add(
+    //    new DateFormat("yyyy-MM-dd").format(proximaData)
+    //  );
+    //  from = from.add(new Duration(days: 1));
+    //  proximaData = new DateTime(from.year, from.month, from.day);
+    //}
 
     listaDataSemana.add(
-        new DateFormat("yyyy-MM-dd").format(to)
-      );
+      new DateFormat("yyyy-MM-dd").format(to)
+    );
 
     var anoMesDiaInicio = new DateFormat.yMMMd("pt_BR").format(from); // 23 de dezembro de 2017
     List yMMMdInicio = anoMesDiaInicio.split(' ');
@@ -1384,7 +1487,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       String ano = i.substring(0, 4);
       String fatura = mes + " de " + ano; //Janeiro de 2017
 
-      List listaIdCartaoww = await db.rawQuery("SELECT id, vencimento FROM cartao");
+      List listaIdCartao = await db.rawQuery("SELECT id, vencimento FROM cartao");
       
       listaIdCartao = await db.rawQuery("SELECT id, vencimento FROM cartao WHERE vencimento = ?", [dia]); //todos os ids de cartao de um determinado dia
       listaFaturaIdCartao.add([fatura, listaIdCartao]);
@@ -1510,7 +1613,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     dateMap.forEach((key, value) {
       listaUnica.add(value);
     });
-    
 
     await db.close();
 
