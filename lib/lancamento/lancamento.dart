@@ -27,7 +27,7 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
   final Color color;
   final bool editar;
   Lancamento lancamentoEditarDB;
-  final Lancamento lancamentoDB;
+  Lancamento lancamentoDB;
   ValueNotifier<List<int>> numeros;
   List numerosEditar = [];
  
@@ -167,7 +167,7 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
                     ),
                     new AnimatedBuilder(
                       animation: _frontScale,
-                      child: new Formulario(this.color, this.editar, lancamentoDB, this.numeros),
+                      child: new Formulario(this.color, this.editar, this.lancamentoEditarDB, this.numeros),
                       builder: (BuildContext context, Widget child) {
                         final Matrix4 transform = new Matrix4.identity()
                           ..scale(1.0, _frontScale.value, 1.0);
@@ -533,10 +533,10 @@ class Formulario extends StatefulWidget {
 class FormularioState extends State<Formulario> {
   final Color color;
   final bool editar;
-  final Lancamento lancamentoDBEditar;
+  Lancamento lancamentoDBEditar;
   final ValueNotifier<List<int>> numeros;
 
-  FormularioState(this.color, this.editar, lancamentoDBEditar, this.numeros);
+  FormularioState(this.color, this.editar, this.lancamentoDBEditar, this.numeros);
   //RadioGroup itemType = RadioGroup.fixo;
   DateTime _toDate = new DateTime.now();
   String _valueText = " ";
@@ -596,6 +596,59 @@ class FormularioState extends State<Formulario> {
 
     if(!this.editar) {
       lancamentoDB.pago = 0;
+    } else {
+      lancamentoDB.idcategoria = this.lancamentoDBEditar.idcategoria;
+      lancamentoDB.idconta = this.lancamentoDBEditar.idconta;
+      lancamentoDB.fatura = this.lancamentoDBEditar.fatura;
+      lancamentoDB.hash = this.lancamentoDBEditar.hash;
+      lancamentoDB.valor = this.lancamentoDBEditar.valor;
+      lancamentoDB.data = this.lancamentoDBEditar.data;
+      lancamentoDB.idcontadestino = this.lancamentoDBEditar.idcontadestino;
+      lancamentoDB.idtag = this.lancamentoDBEditar.idtag;
+      lancamentoDB.pago = this.lancamentoDBEditar.pago;
+      lancamentoDB.descricao = this.lancamentoDBEditar.descricao;
+      lancamentoDB.id = this.lancamentoDBEditar.id;
+      lancamentoDB.quantidaderepeticao = this.lancamentoDBEditar.quantidaderepeticao;
+      lancamentoDB.idcartao = this.lancamentoDBEditar.idcartao;
+      lancamentoDB.tipo = this.lancamentoDBEditar.tipo;
+      lancamentoDB.datafatura = this.lancamentoDBEditar.datafatura;
+      lancamentoDB.periodorepeticao = this.lancamentoDBEditar.periodorepeticao;
+      lancamentoDB.tiporepeticao = this.lancamentoDBEditar.tiporepeticao;
+
+      this.formSubmit['idcategoria'] = this.lancamentoDBEditar.idcategoria;
+      this.formSubmit['idconta'] = this.lancamentoDBEditar.idconta;
+      this.formSubmit['fatura'] = this.lancamentoDBEditar.fatura;
+      this.formSubmit['valor'] = this.lancamentoDBEditar.valor;
+      this.formSubmit['data'] = this.lancamentoDBEditar.data;
+      this.formSubmit['idcontadestino'] = this.lancamentoDBEditar.idcontadestino;
+      this.formSubmit['idtag'] = this.lancamentoDBEditar.idtag;
+      this.formSubmit['descricao'] = this.lancamentoDBEditar.descricao;
+      this.formSubmit['idcartao'] = this.lancamentoDBEditar.idcartao;
+      this.formSubmit['tipo'] = this.lancamentoDBEditar.tipo;
+
+      this._toDate = DateTime.parse(this.lancamentoDBEditar.data);
+
+      categoriaDB.getCategoria(this.lancamentoDBEditar.idcategoria).then((categoria) {
+        setState(() {
+          _valueText = categoria;
+        });
+      });
+
+      tagDB.getTag(this.lancamentoDBEditar.idtag).then((tag) {
+        setState(() {
+          this.valueTextTag = tag;
+        });
+      });
+
+      contaDB.getConta(this.lancamentoDBEditar.idconta).then((conta) {
+        setState(() {
+          this._valueTextCartao = conta[0]['conta'];
+        });
+      });
+
+      _controller.text = this.lancamentoDBEditar.descricao;
+      //this.nomeMes = this.lancamentoDBEditar.fatura;
+
     }
 
     if(color == const Color(0xFFE57373)){
@@ -1177,6 +1230,7 @@ class FormularioState extends State<Formulario> {
       padding: new EdgeInsets.only(right: 24.0, left: 24.0, top: 0.0, bottom: 0.0),
       child: new Column(
         children: <Widget>[
+          this.editar ? new Container(margin: new EdgeInsets.only(top: 8.0),) : 
           new Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[

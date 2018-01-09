@@ -358,6 +358,30 @@ class Tag {
     return lista; 
   }
 
+  //Future getTag(int id) async {
+  //  Directory path = await getApplicationDocumentsDirectory();
+  //  String dbPath = join(path.path, "database.db");
+  //  Database db = await openDatabase(dbPath);
+
+  //  List results = await db.query('tag',
+  //    columns: Tag.columns, where: "id = ?", whereArgs: [id]);
+  //  Tag tag = Tag.fromMap(results[0]);
+
+  //  await db.close();
+  //  return tag.tag; 
+  //}
+
+  Future getTag(int id) async {
+      Directory path = await getApplicationDocumentsDirectory();
+      String dbPath = join(path.path, "database.db");
+      Database db = await openDatabase(dbPath);
+      List lista = await db.rawQuery("SELECT * FROM tag WHERE id = ?", [id]);
+
+      await db.close();
+
+      return lista[0]['tag'];
+    }
+
   Future getTagGroup(name) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
