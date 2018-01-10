@@ -94,7 +94,9 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
     _controller.forward();
     
     if(this.editar) {
-      List<String> x = this.lancamentoEditarDB.valor.toString().split(".");
+
+      String doubleToString = this.lancamentoEditarDB.valor.toStringAsFixed(2);
+      List<String> x = doubleToString.split(".");
       List<String> y;
 
       if(this.lancamentoEditarDB.valor > 0) {        
@@ -107,14 +109,13 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
       for(var i in numbersList) {
         this.numerosEditar.add(i);
       }
+
       this.numeros = new ValueNotifier<List<int>>(this.numerosEditar);
       action();
 
     } else {
       this.numeros = new ValueNotifier<List<int>>(<int>[]);
     }
-
-
 
     super.initState();
   }
@@ -1681,7 +1682,7 @@ class FormularioState extends State<Formulario> {
                           Lancamento lancamento = new Lancamento();
                           lancamento.tipo = lancamentoDB.tipo;
                           lancamento.idcategoria = lancamentoDB.idcategoria;
-                          lancamento.idtag = lancamentoDB.idcategoria;
+                          lancamento.idtag = lancamentoDB.idtag;
                           lancamento.idconta = lancamentoDB.idconta;
                           lancamento.idcontadestino = lancamentoDB.idcontadestino;
                           lancamento.idcartao = lancamentoDB.idcartao;
@@ -1744,7 +1745,7 @@ class FormularioState extends State<Formulario> {
                           Lancamento lancamento = new Lancamento();
                           lancamento.tipo = lancamentoDB.tipo;
                           lancamento.idcategoria = lancamentoDB.idcategoria;
-                          lancamento.idtag = lancamentoDB.idcategoria;
+                          lancamento.idtag = lancamentoDB.idtag;
                           lancamento.idconta = lancamentoDB.idconta;
                           lancamento.idcontadestino = lancamentoDB.idcontadestino;
                           lancamento.idcartao = lancamentoDB.idcartao;
@@ -1795,7 +1796,7 @@ class FormularioState extends State<Formulario> {
                         Lancamento lancamento = new Lancamento();
                         lancamento.tipo = lancamentoDB.tipo;
                         lancamento.idcategoria = lancamentoDB.idcategoria;
-                        lancamento.idtag = lancamentoDB.idcategoria;
+                        lancamento.idtag = lancamentoDB.idtag;
                         lancamento.idconta = lancamentoDB.idconta;
                         lancamento.idcontadestino = lancamentoDB.idcontadestino;
                         lancamento.idcartao = lancamentoDB.idcartao;
@@ -1827,7 +1828,7 @@ class FormularioState extends State<Formulario> {
                           Lancamento lancamento = new Lancamento();
                           lancamento.tipo = lancamentoDB.tipo;
                           lancamento.idcategoria = lancamentoDB.idcategoria;
-                          lancamento.idtag = lancamentoDB.idcategoria;
+                          lancamento.idtag = lancamentoDB.idtag;
                           lancamento.idconta = lancamentoDB.idconta;
                           lancamento.idcontadestino = lancamentoDB.idcontadestino;
                           lancamento.idcartao = lancamentoDB.idcartao;
@@ -1856,7 +1857,7 @@ class FormularioState extends State<Formulario> {
                             String dia = lancamentoDB.data.substring(8, 10); //dia do lancamento ex '2017-12-[16]'
 
                             
-                            print(this.fechamento+"/"+mesFatura.toString()+"/"+lancamentoDB.data.substring(4));
+                            //print(this.fechamento+"/"+mesFatura.toString()+"/"+lancamentoDB.data.substring(4));
 
                             //print(faturaNomeNovo); // novembro de 2017
                             //print(dia); // ex:16   inserir logica de mes para dias 31 e a logica para mes de fevereiro
@@ -1878,7 +1879,7 @@ class FormularioState extends State<Formulario> {
 
                             //print(lancamento.data); // ex: 2017-12-16 
                             //print(dataString); // ex: ex: 2017-11-16
-                            print(lancamento.datafatura);
+                            //print(lancamento.datafatura);
                             //print(dataFaturaFunction);
 
                             this.formSubmit["fatura"] = resultado;
@@ -1978,7 +1979,7 @@ class FormularioState extends State<Formulario> {
                           Lancamento lancamento = new Lancamento();
                           lancamento.tipo = lancamentoDB.tipo;
                           lancamento.idcategoria = lancamentoDB.idcategoria;
-                          lancamento.idtag = lancamentoDB.idcategoria;
+                          lancamento.idtag = lancamentoDB.idtag;
                           lancamento.idconta = lancamentoDB.idconta;
                           lancamento.idcontadestino = lancamentoDB.idcontadestino;
                           lancamento.idcartao = lancamentoDB.idcartao;
@@ -2103,7 +2104,7 @@ class FormularioState extends State<Formulario> {
                         Lancamento lancamento = new Lancamento();
                         lancamento.tipo = lancamentoDB.tipo;
                         lancamento.idcategoria = lancamentoDB.idcategoria;
-                        lancamento.idtag = lancamentoDB.idcategoria;
+                        lancamento.idtag = lancamentoDB.idtag;
                         lancamento.idconta = lancamentoDB.idconta;
                         lancamento.idcontadestino = lancamentoDB.idcontadestino;
                         lancamento.idcartao = lancamentoDB.idcartao;

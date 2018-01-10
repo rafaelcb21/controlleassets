@@ -375,6 +375,7 @@ class Tag {
       Directory path = await getApplicationDocumentsDirectory();
       String dbPath = join(path.path, "database.db");
       Database db = await openDatabase(dbPath);
+
       List lista = await db.rawQuery("SELECT * FROM tag WHERE id = ?", [id]);
 
       await db.close();
