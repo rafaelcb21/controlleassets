@@ -508,10 +508,20 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                         lancamentoDB.periodorepeticao = list[0]['periodorepeticao'];
                         lancamentoDB.tiporepeticao = list[0]['tiporepeticao'];
 
+                        Color corLancamento;
+
+                        if(list[0]['tipo'] == 'Despesa') {
+                          corLancamento = new Color(0xFFE57373);
+                        } else if(list[0]['tipo'] == 'Transferência') {
+                          corLancamento = new Color(0xFF9E9E9E);
+                        } else {
+                          corLancamento = new Color(0xFF00BFA5);
+                        }
+
                         Navigator.of(context).push(new PageRouteBuilder(
                           opaque: false,
                           pageBuilder: (BuildContext context, _, __) {
-                            return new LancamentoPage(true, lancamentoDB, new Color(0xFFE57373));
+                            return new LancamentoPage(true, lancamentoDB, corLancamento);
                           },
                           transitionsBuilder: (
                             BuildContext context,
@@ -528,7 +538,19 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                             );
                           }
                         ));
-                                
+
+                        setState(() {
+                          lancamentoDB.getLancamentoMes(new DateTime.now()).then(
+                            (list) {
+                              setState(() {
+                                if(list.length > 0) {
+                                  this.listaDB = list[0];
+                                  this.periodoFiltro = list[1][1];
+                                }            
+                              });
+                            } //[[11 de dezembro, [{idcategoria: 8, idconta: 1, fatura: null, hash
+                          );
+                        });
                       }
                     );
                     

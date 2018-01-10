@@ -1794,6 +1794,7 @@ class FormularioState extends State<Formulario> {
 
                       } else { //não é cartão e não é parcelado e nem dividido
                         Lancamento lancamento = new Lancamento();
+                        lancamento.id = lancamentoDB.id;
                         lancamento.tipo = lancamentoDB.tipo;
                         lancamento.idcategoria = lancamentoDB.idcategoria;
                         lancamento.idtag = lancamentoDB.idtag;
