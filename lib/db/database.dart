@@ -1495,6 +1495,10 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     
     int diferencaDias = to.difference(from).inDays;
 
+    listaDataSemana.add(
+      new DateFormat("yyyy-MM-dd").format(from)
+    );
+
     for(int i = 1; i <= diferencaDias; i++) {
       //from = from.add(new Duration(days: 1));
       listaDataSemana.add(
@@ -1513,9 +1517,9 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     //  proximaData = new DateTime(from.year, from.month, from.day);
     //}
 
-    listaDataSemana.add(
-      new DateFormat("yyyy-MM-dd").format(to)
-    );
+    //listaDataSemana.add(
+    //  new DateFormat("yyyy-MM-dd").format(to)
+    //);
 
     var anoMesDiaInicio = new DateFormat.yMMMd("pt_BR").format(from); // 23 de dezembro de 2017
     List yMMMdInicio = anoMesDiaInicio.split(' ');
@@ -1680,7 +1684,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     } else if(mesFrom == mesTo && anoFrom == anoTo && diaFrom == diaTo) {
       periodo = "hoje";
       label = label.substring(0, 7) + label.substring(10, 14);
-    }    
+    }
 
     return [listaUnica, [[from, to], label, periodo]]; //label: 23 Dez de 2017 à 29 Dez de 2018
   }
