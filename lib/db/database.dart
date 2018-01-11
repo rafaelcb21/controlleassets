@@ -1429,12 +1429,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
 
     //listaUnica.add([hoje, hojeMesDescrito]);
-    print(listaUnica);
-    print("=====================");
-    print(diaSearch);
-    print("=====================");
-    print(hojeMesDescrito);
-    print("=====================");
 
     //fruits.sort((a, b) => getPrice(a).compareTo(getPrice(b)));
     for(List dia in listaUnica) {
