@@ -1047,6 +1047,10 @@ class Lancamento {
       listaUnica.add(dateMap);
     }
 
+    for(List dia in listaUnica) {
+      dia.sort((a, b) => a[1].compareTo(b[1]));
+    }
+
     await db.close();
 
     return [listaUnica, [hoje, anoMesDiaApresentacao]];
@@ -1254,6 +1258,9 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       listaUnica.add(value);
     });
     
+    for(List dia in listaUnica) {
+      dia.sort((a, b) => a[1].compareTo(b[1]));
+    }
 
     await db.close();
 
@@ -1659,6 +1666,10 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       listaUnica.add(value);
     });
 
+    for(List dia in listaUnica) {
+      dia.sort((a, b) => a[1].compareTo(b[1]));
+    }
+
     await db.close();
 
     if(mesFrom == mesTo && anoFrom == anoTo && ultimoDiaTo == diaTo && diaFrom == 1) {
@@ -1669,7 +1680,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     } else if(mesFrom == mesTo && anoFrom == anoTo && diaFrom == diaTo) {
       periodo = "hoje";
       label = label.substring(0, 7) + label.substring(10, 14);
-    }
+    }    
 
     return [listaUnica, [[from, to], label, periodo]]; //label: 23 Dez de 2017 à 29 Dez de 2018
   }
