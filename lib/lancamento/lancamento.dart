@@ -635,17 +635,27 @@ class FormularioState extends State<Formulario> {
         });
       });
 
-      tagDB.getTag(this.lancamentoDBEditar.idtag).then((tag) {
-        setState(() {
-          this.valueTextTag = tag;
+      if(this.lancamentoDBEditar.idcontadestino == null) {
+        tagDB.getTag(this.lancamentoDBEditar.idtag).then((tag) {
+          setState(() {
+            this.valueTextTag = tag;
+          });
         });
-      });
+      }      
 
       contaDB.getConta(this.lancamentoDBEditar.idconta).then((conta) {
         setState(() {
           this._valueTextCartao = conta[0]['conta'];
         });
       });
+
+      if(this.lancamentoDBEditar.idcontadestino != null) {
+        contaDB.getConta(this.lancamentoDBEditar.idcontadestino).then((contaDestino) {
+          setState(() {
+            this._valueTextContaDestino = contaDestino[0]['conta'];
+          });
+        }); 
+      }           
 
       _controller.text = this.lancamentoDBEditar.descricao;
       //this.nomeMes = this.lancamentoDBEditar.fatura;
@@ -2103,6 +2113,7 @@ class FormularioState extends State<Formulario> {
                       } else { //lancamento de cartao não parcelado e nem dividido
                       
                         Lancamento lancamento = new Lancamento();
+                        lancamento.id = lancamentoDB.id;
                         lancamento.tipo = lancamentoDB.tipo;
                         lancamento.idcategoria = lancamentoDB.idcategoria;
                         lancamento.idtag = lancamentoDB.idtag;
