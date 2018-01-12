@@ -1583,6 +1583,26 @@ class FormularioState extends State<Formulario> {
                         ]
                       )
                     );
+                  } else if(lancamentoDB.hash != null && this.editar) {
+                    print(lancamentoDB.idcategoria);
+                    print(lancamentoDB.idconta);
+                    print(lancamentoDB.fatura);
+                    print(lancamentoDB.hash);
+                    print(lancamentoDB.valor);
+                    print(lancamentoDB.data);
+                    print(lancamentoDB.idcontadestino);
+                    print(lancamentoDB.idtag);
+                    print(lancamentoDB.pago);
+                    print(lancamentoDB.descricao);
+                    print(lancamentoDB.id);
+                    print(lancamentoDB.quantidaderepeticao);
+                    print(lancamentoDB.idcartao);
+                    print(lancamentoDB.tipo);
+                    print(lancamentoDB.datafatura);
+                    print(lancamentoDB.periodorepeticao);
+                    print(lancamentoDB.tiporepeticao);
+
+                    
                   } else { //inicia-se o envio ao banco de dados
 
                     if(this.color == const Color(0xffe57373)) {
