@@ -1464,6 +1464,24 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     return list;
   }
 
+  Future atualizarLandamento(int id, String hash, bool todos) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    for(var lancamento in list) {
+      if (lancamento.id == null) {
+        lancamento.id = await db.insert("lancamento", lancamento.toMap());
+      } else {
+        await db.update("lancamento", lancamento.toMap(),
+          where: "id = ?", whereArgs: [lancamento.id]);
+      }
+    }
+    await db.close();
+
+    return list;
+  }
+
   Future getLancamentoPeriodo(DateTime from, DateTime to) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");

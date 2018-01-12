@@ -519,6 +519,10 @@ class Teclado extends StatelessWidget {
 //  fixo,
 //  parcelado
 //}
+enum DialogOptionsAction {
+  cancel,
+  ok
+}
 
 class Formulario extends StatefulWidget {
   final Color color;
@@ -1601,6 +1605,91 @@ class FormularioState extends State<Formulario> {
                     print(lancamentoDB.datafatura);
                     print(lancamentoDB.periodorepeticao);
                     print(lancamentoDB.tiporepeticao);
+                    void showUpdateDialog<T>({ BuildContext context, Widget child }) {
+                      showDialog<T>(
+                        context: context,
+                        child: child,
+                      )
+                      .then<Null>((T value) { });
+                    }
+
+                    showUpdateDialog<DialogOptionsAction>(
+                      context: context,
+                      child: new AlertDialog(
+                        title: const Text('Atualizar Lançamento'),
+                        content: new Container(
+                          height: 120.0,
+                          child: new Column(
+                            children: <Widget>[
+                              new GestureDetector(
+                                onTap: (){
+                                  lancamentoDB.atualizarLandamento(lancamentoDB.id, lancamentoDB.hash, false);                                  
+                                  Navigator.pop(context);
+                                },
+                                child: new Container(
+                                  margin: new EdgeInsets.only(bottom: 16.0),
+                                  padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                
+                                  width: 250.0,
+                                  height: 40.0,
+                                  decoration: new BoxDecoration(
+                                    color: new Color(0xFF9E9E9E),
+                                    borderRadius: new BorderRadius.circular(3.0)
+                                  ),
+                                  child: new Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      new Text(
+                                        'Apenas esse',
+                                        softWrap: true,
+                                        style: new TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16.0,
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500,
+                                        )
+                                      ),
+                                    ],
+                                  )
+                                ),
+                              ),
+                              new GestureDetector(
+                                onTap: (){
+                                  lancamentoDB.atualizarLandamento(lancamentoDB.id, lancamentoDB.hash, true); 
+                                  Navigator.pop(context);
+                                },
+                                child: new Container(
+                                  margin: new EdgeInsets.only(bottom: 16.0),
+                                  padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                
+                                  width: 250.0,
+                                  height: 40.0,
+                                  decoration: new BoxDecoration(
+                                    color: new Color(0xFF9E9E9E),
+                                    borderRadius: new BorderRadius.circular(3.0)
+                                  ),
+                                  child: new Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      new Text(
+                                        'Esse e os próximos',
+                                        softWrap: true,
+                                        style: new TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16.0,
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500,
+                                        )
+                                      ),
+                                    ],
+                                  )
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    );
 
                     
                   } else { //inicia-se o envio ao banco de dados
