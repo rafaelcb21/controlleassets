@@ -573,6 +573,7 @@ class FormularioState extends State<Formulario> {
   List meses = [];
   var uuid = new Uuid();
   bool arbitrario = false;
+  bool campoRepeticao = true;
   
   List cores = [];
   Palette listaCores = new Palette();  
@@ -632,6 +633,10 @@ class FormularioState extends State<Formulario> {
       this.formSubmit['tipo'] = this.lancamentoDBEditar.tipo;
 
       this._toDate = DateTime.parse(this.lancamentoDBEditar.data);
+
+      if(this.editar && lancamentoDB.tiporepeticao != null) {
+        this.campoRepeticao = false;
+      }
 
       categoriaDB.getCategoria(this.lancamentoDBEditar.idcategoria).then((categoria) {
         setState(() {
@@ -1245,7 +1250,7 @@ class FormularioState extends State<Formulario> {
       padding: new EdgeInsets.only(right: 24.0, left: 24.0, top: 0.0, bottom: 0.0),
       child: new Column(
         children: <Widget>[
-          this.editar ? new Container(margin: new EdgeInsets.only(top: 8.0),) : 
+          !this.campoRepeticao ? new Container(margin: new EdgeInsets.only(top: 8.0),) : 
           new Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -1588,29 +1593,52 @@ class FormularioState extends State<Formulario> {
                       )
                     );
                   } else if(lancamentoDB.hash != null && this.editar) {
-                    print(lancamentoDB.idcategoria);
-                    print(lancamentoDB.idconta);
-                    print(lancamentoDB.fatura);
-                    print(lancamentoDB.hash);
-                    print(lancamentoDB.valor);
-                    print(lancamentoDB.data);
-                    print(lancamentoDB.idcontadestino);
-                    print(lancamentoDB.idtag);
-                    print(lancamentoDB.pago);
-                    print(lancamentoDB.descricao);
-                    print(lancamentoDB.id);
-                    print(lancamentoDB.quantidaderepeticao);
-                    print(lancamentoDB.idcartao);
-                    print(lancamentoDB.tipo);
-                    print(lancamentoDB.datafatura);
-                    print(lancamentoDB.periodorepeticao);
-                    print(lancamentoDB.tiporepeticao);
+                    //print(lancamentoDB.idcategoria); == normal
+                    //print(lancamentoDB.idconta); == normal
+                    //print(lancamentoDB.fatura); ~~ cartao
+                    //print(lancamentoDB.hash);
+                    //print(lancamentoDB.valor); == normal
+                    //print(lancamentoDB.data); == normal
+                    //print(lancamentoDB.idcontadestino); ++ transferencia
+                    //print(lancamentoDB.idtag); == normal
+                    //print(lancamentoDB.pago);
+                    //print(lancamentoDB.descricao); == normal
+                    //print(lancamentoDB.id);
+                    //print(lancamentoDB.quantidaderepeticao);
+                    //print(lancamentoDB.idcartao); ~~ cartao
+                    //print(lancamentoDB.tipo);
+                    //print(lancamentoDB.datafatura);
+                    //print(lancamentoDB.periodorepeticao);
+                    //print(lancamentoDB.tiporepeticao);
+
+                    var valor = this.numeroUSA(this.numeros.value);
+                    this.formSubmit['valor'] = valor;
+                    
+                    if(this.color == const Color(0xffe57373)) {
+                      this.formSubmit['tipo'] = 'Despesa';
+                    } else if(this.color == const Color(0xff9e9e9e)) {
+                      this.formSubmit['tipo'] = 'Transferência';
+                    } else {
+                      this.formSubmit['tipo'] = 'Receita';
+                    }
+                    
+                    lancamentoDB.idcategoria = this.formSubmit['idcategoria'];
+                    lancamentoDB.idtag = this.formSubmit['idtag'];
+                    lancamentoDB.idconta = this.formSubmit['idconta'];
+                    lancamentoDB.idcartao = this.formSubmit['idcartao'];
+                    lancamentoDB.idcontadestino = this.formSubmit['idcontadestino'];
+                    lancamentoDB.data = this.formSubmit['data'];
+                    lancamentoDB.valor = this.formSubmit['tipo'] == 'Despesa' ? -1*this.formSubmit['valor'] : this.formSubmit['valor'];
+                    lancamentoDB.descricao = this.formSubmit['descricao'];
+
                     void showUpdateDialog<T>({ BuildContext context, Widget child }) {
                       showDialog<T>(
                         context: context,
                         child: child,
                       )
-                      .then<Null>((T value) { });
+                      .then<Null>((T value) { 
+                        Navigator.pop(context, true);
+                      });
                     }
 
                     showUpdateDialog<DialogOptionsAction>(
@@ -1622,9 +1650,9 @@ class FormularioState extends State<Formulario> {
                           child: new Column(
                             children: <Widget>[
                               new GestureDetector(
-                                onTap: (){
-                                  lancamentoDB.atualizarLandamento(lancamentoDB.id, lancamentoDB.hash, false);                                  
-                                  Navigator.pop(context);
+                                onTap: () {
+                                  lancamentoDB.atualizarLandamento(lancamentoDB, false);
+                                  Navigator.pop(context, true);
                                 },
                                 child: new Container(
                                   margin: new EdgeInsets.only(bottom: 16.0),
@@ -1655,8 +1683,8 @@ class FormularioState extends State<Formulario> {
                               ),
                               new GestureDetector(
                                 onTap: (){
-                                  lancamentoDB.atualizarLandamento(lancamentoDB.id, lancamentoDB.hash, true); 
-                                  Navigator.pop(context);
+                                  lancamentoDB.atualizarLandamento(lancamentoDB, true);
+                                  Navigator.pop(context, true);
                                 },
                                 child: new Container(
                                   margin: new EdgeInsets.only(bottom: 16.0),
@@ -1690,8 +1718,6 @@ class FormularioState extends State<Formulario> {
                         ),
                       )
                     );
-
-                    
                   } else { //inicia-se o envio ao banco de dados
 
                     if(this.color == const Color(0xffe57373)) {
@@ -1742,55 +1768,6 @@ class FormularioState extends State<Formulario> {
                     if(lancamentoDB.idcartao == 0) { //lancamento não é de cartão
                       if(lancamentoDB.tiporepeticao == 'Parcelada') { //não é cartão mas é parcelado
                         
-                        //for(var i = 0; i < lancamentoDB.quantidaderepeticao; i++) {
-                        //  if(this.meses.length == 0) {
-                        //    int monthToList = int.parse(lancamentoDB.data.substring(5,7));
-                        //    this.meses.add(monthToList);
-                        //  } else {
-                        //    if(lancamentoDB.periodorepeticao == 'Meses') {
-                        //      if(this.meses[i-1] == 12) {
-                        //        this.meses.add(1);
-                        //      } else {
-                        //        this.meses.add(this.meses[i-1] + 1);
-                        //      }
-                        //    } else if(lancamentoDB.periodorepeticao == 'Bimestres') {
-                        //      if(this.meses[i-1] == 12) {
-                        //        this.meses.add(2);
-                        //      } else if(this.meses[i-1] == 11) {
-                        //        this.meses.add(1);
-                        //      } else {
-                        //        this.meses.add(this.meses[i-1] + 2);
-                        //      }
-                        //    } else if(lancamentoDB.periodorepeticao == 'Trimestres') {
-                        //      if(this.meses[i-1] == 12) {
-                        //        this.meses.add(3);
-                        //      } else if(this.meses[i-1] == 11) {
-                        //        this.meses.add(2);
-                        //      } else if(this.meses[i-1] == 10) {
-                        //        this.meses.add(1);
-                        //      } else {
-                        //        this.meses.add(this.meses[i-1] + 3);
-                        //      }
-                        //    } else if(lancamentoDB.periodorepeticao == 'Semestres') {
-                        //      if(this.meses[i-1] == 12) {
-                        //        this.meses.add(6);
-                        //      } else if(this.meses[i-1] == 11) {
-                        //        this.meses.add(5);
-                        //      } else if(this.meses[i-1] == 10) {
-                        //        this.meses.add(4);
-                        //      } else if(this.meses[i-1] == 9) {
-                        //        this.meses.add(3);
-                        //      } else if(this.meses[i-1] == 8) {
-                        //        this.meses.add(2);
-                        //      } else if(this.meses[i-1] == 7) {
-                        //        this.meses.add(1);
-                        //      } else {
-                        //        this.meses.add(this.meses[i-1] + 6);
-                        //      }
-                        //    }
-                        //  }
-                        //}
-
                         List mesesLista = listaDosMeses(
                           lancamentoDB.quantidaderepeticao,
                           lancamentoDB.data,
@@ -1799,6 +1776,7 @@ class FormularioState extends State<Formulario> {
 
                         for(var i = 0; i < lancamentoDB.quantidaderepeticao; i++) {
                           Lancamento lancamento = new Lancamento();
+                          
                           lancamento.tipo = lancamentoDB.tipo;
                           lancamento.idcategoria = lancamentoDB.idcategoria;
                           lancamento.idtag = lancamentoDB.idtag;
@@ -1846,9 +1824,15 @@ class FormularioState extends State<Formulario> {
                           lancamentoList.add(lancamento);
                         } //for
                         
-                        lancamentoDB.upsertLancamento(lancamentoList);
+                        //lancamentoDB.upsertLancamento(lancamentoList, lancamentoDB.id);
+                        lancamentoDB.deleteLancamento(lancamentoDB.id);
+                        lancamentoDB.upsertLancamento(lancamentoList).then(
+                          (retorno) {
+                            Navigator.pop(context, retorno);
+                          }
+                        );
 
-                      } else if (lancamentoDB.tiporepeticao == 'dividir') { //não é cartão mas é dividido
+                      } else if(lancamentoDB.tiporepeticao == 'dividir') { //não é cartão mas é dividido
 
                         List mesesLista = listaDosMeses(
                           lancamentoDB.quantidaderepeticao,
@@ -1909,7 +1893,11 @@ class FormularioState extends State<Formulario> {
                           lancamentoList.add(lancamento);
                         } //for                        
                         
-                        lancamentoDB.upsertLancamento(lancamentoList);
+                        lancamentoDB.upsertLancamento(lancamentoList).then(
+                          (retorno) {
+                            Navigator.pop(context, retorno);
+                          }
+                        );
 
                       } else { //não é cartão e não é parcelado e nem dividido
                         Lancamento lancamento = new Lancamento();
@@ -1929,7 +1917,11 @@ class FormularioState extends State<Formulario> {
                         lancamento.pago = lancamentoDB.pago;
                         lancamentoList.add(lancamento);
                         
-                        lancamentoDB.upsertLancamento(lancamentoList);
+                        lancamentoDB.upsertLancamento(lancamentoList).then(
+                          (retorno) {
+                            Navigator.pop(context, retorno);
+                          }
+                        );
                       }
                     } else { //lancamento de cartão
                       lancamentoDB.fatura = this.formSubmit["fatura"]; //ex: Dezembro de 2017
@@ -2082,7 +2074,11 @@ class FormularioState extends State<Formulario> {
                           lancamentoList.add(lancamento);
                         } //for 
 
-                        lancamentoDB.upsertLancamento(lancamentoList);
+                        lancamentoDB.upsertLancamento(lancamentoList).then(
+                          (retorno) {
+                            Navigator.pop(context, retorno);
+                          }
+                        );
 
                       } else if (lancamentoDB.tiporepeticao == 'dividir') { //cartão dividido
 
@@ -2217,7 +2213,11 @@ class FormularioState extends State<Formulario> {
 
                         } //for 
 
-                        lancamentoDB.upsertLancamento(lancamentoList);
+                        lancamentoDB.upsertLancamento(lancamentoList).then(
+                          (retorno) {
+                            Navigator.pop(context, retorno);
+                          }
+                        );
 
                       } else { //lancamento de cartao não parcelado e nem dividido
                       
@@ -2239,7 +2239,11 @@ class FormularioState extends State<Formulario> {
                         lancamento.fatura = lancamentoDB.fatura;
 
                         lancamentoList.add(lancamento);
-                        lancamentoDB.upsertLancamento(lancamentoList);
+                        lancamentoDB.upsertLancamento(lancamentoList).then(
+                          (retorno) {
+                            Navigator.pop(context, retorno);
+                          }
+                        );
                         
                         // Data fatura é data fake só para inserir na fatura correta,
                         // nesse caso ela é null pois nao precisa-se dela no lancamento de cartao não parcelado e nem dividido
@@ -2247,7 +2251,7 @@ class FormularioState extends State<Formulario> {
                       }
                     }
                     lancamentoList = [];
-                    Navigator.pop(context, true);
+                    //Navigator.pop(context, true);
                   }
                 }
               }

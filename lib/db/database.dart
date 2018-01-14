@@ -1451,6 +1451,11 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
+    //if(id != null && id > 0) {
+    //  await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]);
+    //}
+
+    //list[0].id = id;
     for(var lancamento in list) {
       if (lancamento.id == null) {
         lancamento.id = await db.insert("lancamento", lancamento.toMap());
@@ -1461,25 +1466,127 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     }
     await db.close();
 
-    return list;
+    return true;
   }
 
-  Future atualizarLandamento(int id, String hash, bool todos) async {
+  Future atualizarLandamento(Lancamento lancamento, bool todos) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    for(var lancamento in list) {
-      if (lancamento.id == null) {
-        lancamento.id = await db.insert("lancamento", lancamento.toMap());
-      } else {
-        await db.update("lancamento", lancamento.toMap(),
-          where: "id = ?", whereArgs: [lancamento.id]);
-      }
+    //List lista = await db.rawQuery("SELECT * FROM lancamento");
+    //for(var i in lista) {
+    //  print(i['id']);
+    //  print(i['hash']);
+    //  print(i['idcategoria']);
+    //  print(i['idconta']);
+    //  print(i['fatura']);      
+    //  print(i['valor']);
+    //  print(i['data']);
+    //  print(i['idcontadestino']);
+    //  print(i['idtag']);
+    //  print(i['pago']);
+    //  print(i['descricao']);      
+    //  print(i['quantidaderepeticao']);
+    //  print(i['idcartao']);
+    //  print(i['tipo']);
+    //  print(i['datafatura']);
+    //  print(i['periodorepeticao']);
+    //  print(i['tiporepeticao']);
+    //  print('========================');      
+    //}
+    //print('************************');
+    //print(lancamento.id);
+    //print(lancamento.hash);
+    //print(lancamento.idcategoria);
+    //print(lancamento.idconta);
+    //print(lancamento.fatura);      
+    //print(lancamento.valor);
+    //print(lancamento.data);
+    //print(lancamento.idcontadestino);
+    //print(lancamento.idtag);
+    //print(lancamento.pago);
+    //print(lancamento.descricao);      
+    //print(lancamento.quantidaderepeticao);
+    //print(lancamento.idcartao);
+    //print(lancamento.tipo);
+    //print(lancamento.datafatura);
+    //print(lancamento.periodorepeticao);
+    //print(lancamento.tiporepeticao);
+    //print('************************');
+
+    if (!todos) {
+      //await db.delete("lancamento", where: "id = ?", whereArgs: [lancamento.id]);
+      
+      await db.rawUpdate(
+      '''UPDATE lancamento SET
+          data = ?,
+          idcategoria = ?,
+          idtag = ?,
+          idconta = ?,
+          idcontadestino = ?,
+          idcartao = ?,
+          valor = ?,
+          descricao = ?,
+          fatura = ?,
+          hash = null,
+          quantidaderepeticao = null,
+          periodorepeticao = null,
+          tiporepeticao = null
+        WHERE id = ?
+      ''', [
+        lancamento.data, lancamento.idcategoria, lancamento.idtag, lancamento.idconta,
+        lancamento.idcontadestino, lancamento.idcartao, lancamento.valor,
+        lancamento.descricao, lancamento.fatura, lancamento.id
+      ]);
+
+    } else {
+      //id = lancamento.id,
+      await db.rawUpdate(
+      '''UPDATE lancamento SET
+          idcategoria = ?,
+          idtag = ?,
+          idconta = ?,
+          idcontadestino = ?,
+          idcartao = ?,
+          valor = ?,
+          descricao = ?,
+          fatura = ?
+        WHERE hash = ?
+      ''', [
+        lancamento.idcategoria, lancamento.idtag, lancamento.idconta,
+        lancamento.idcontadestino, lancamento.idcartao, lancamento.valor,
+        lancamento.descricao, lancamento.fatura, lancamento.hash
+      ]);
+
+      //await db.update("lancamento", lancamento.toMap(), where: "hash = ?", whereArgs: [lancamento.hash]);
     }
+
+    //List lista2 = await db.rawQuery("SELECT * FROM lancamento");
+    //for(var i in lista2) {
+    //  print(i['id']);
+    //  print(i['hash']);
+    //  print(i['idcategoria']);
+    //  print(i['idconta']);
+    //  print(i['fatura']);      
+    //  print(i['valor']);
+    //  print(i['data']);
+    //  print(i['idcontadestino']);
+    //  print(i['idtag']);
+    //  print(i['pago']);
+    //  print(i['descricao']);      
+    //  print(i['quantidaderepeticao']);
+    //  print(i['idcartao']);
+    //  print(i['tipo']);
+    //  print(i['datafatura']);
+    //  print(i['periodorepeticao']);
+    //  print(i['tiporepeticao']);
+    //  print('========================');
+    //}
+    
     await db.close();
 
-    return list;
+    return true;
   }
 
   Future getLancamentoPeriodo(DateTime from, DateTime to) async {
@@ -1751,8 +1858,8 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    await db.rawUpdate("DELETE FROM lancamento WHERE id = ?", [id]);
-
+    await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]);
+    
     await db.close();
 
     return true;
@@ -1776,7 +1883,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     }
 
     for(var u in listaId) {
-      await db.rawUpdate("DELETE FROM lancamento WHERE id = ?", [u]);
+      await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [u]);
     }
 
     await db.close();

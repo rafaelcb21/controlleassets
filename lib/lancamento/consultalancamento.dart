@@ -51,7 +51,6 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
     .then<Null>((T value) { // The value passed to Navigator.pop() or null.
       if (value != null) {
         setState(() {
-          //print(value);
           //lancamentoDB.getLancamentoMes(this.periodoNext).then(
           //  (list) {
           //    setState(() {
@@ -545,7 +544,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                             );
                           }
                         ));
-
+                        
                         if(resultado) {
                           setState(() {
                             if(this.periodo == 'hoje') {
@@ -576,6 +575,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                             } else if(this.periodo == 'mes') {
                               lancamentoDB.getLancamentoMes(new DateTime.now()).then(
                                 (list) {
+                                  this.periodo = "mes";
                                   setState(() {                                  
                                     if(list.length > 0) {
                                       this.listaDB = list[0];
