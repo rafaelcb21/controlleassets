@@ -1897,8 +1897,9 @@ class FormularioState extends State<Formulario> {
                             } 
                           }
                           lancamentoList.add(lancamento);
-                        } //for                        
+                        } //for
                         
+                        lancamentoDB.deleteLancamento(lancamentoDB.id);
                         lancamentoDB.upsertLancamento(lancamentoList).then(
                           (retorno) {
                             Navigator.pop(context, retorno);
