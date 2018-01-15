@@ -5,6 +5,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 class DatabaseClient {
   Database _db;
@@ -1469,54 +1470,12 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     return true;
   }
 
-  Future atualizarLandamento(Lancamento lancamento, bool todos) async {
+  Future atualizarLancamento(Lancamento lancamento, String dataInicial, bool todos) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    //List lista = await db.rawQuery("SELECT * FROM lancamento");
-    //for(var i in lista) {
-    //  print(i['id']);
-    //  print(i['hash']);
-    //  print(i['idcategoria']);
-    //  print(i['idconta']);
-    //  print(i['fatura']);      
-    //  print(i['valor']);
-    //  print(i['data']);
-    //  print(i['idcontadestino']);
-    //  print(i['idtag']);
-    //  print(i['pago']);
-    //  print(i['descricao']);      
-    //  print(i['quantidaderepeticao']);
-    //  print(i['idcartao']);
-    //  print(i['tipo']);
-    //  print(i['datafatura']);
-    //  print(i['periodorepeticao']);
-    //  print(i['tiporepeticao']);
-    //  print('========================');      
-    //}
-    //print('************************');
-    //print(lancamento.id);
-    //print(lancamento.hash);
-    //print(lancamento.idcategoria);
-    //print(lancamento.idconta);
-    //print(lancamento.fatura);      
-    //print(lancamento.valor);
-    //print(lancamento.data);
-    //print(lancamento.idcontadestino);
-    //print(lancamento.idtag);
-    //print(lancamento.pago);
-    //print(lancamento.descricao);      
-    //print(lancamento.quantidaderepeticao);
-    //print(lancamento.idcartao);
-    //print(lancamento.tipo);
-    //print(lancamento.datafatura);
-    //print(lancamento.periodorepeticao);
-    //print(lancamento.tiporepeticao);
-    //print('************************');
-
     if (!todos) {
-      //await db.delete("lancamento", where: "id = ?", whereArgs: [lancamento.id]);
       
       await db.rawUpdate(
       '''UPDATE lancamento SET
@@ -1541,49 +1500,63 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       ]);
 
     } else {
-      //id = lancamento.id,
-      await db.rawUpdate(
-      '''UPDATE lancamento SET
-          idcategoria = ?,
-          idtag = ?,
-          idconta = ?,
-          idcontadestino = ?,
-          idcartao = ?,
-          valor = ?,
-          descricao = ?,
-          fatura = ?
-        WHERE hash = ?
-      ''', [
-        lancamento.idcategoria, lancamento.idtag, lancamento.idconta,
-        lancamento.idcontadestino, lancamento.idcartao, lancamento.valor,
-        lancamento.descricao, lancamento.fatura, lancamento.hash
-      ]);
+      List datas = [];
+      //[{data: 2018-01-15}, {data: 2018-01-16}, {data: 2018-01-17}
+      List datasParaSelecionar = await db.rawQuery('SELECT data FROM lancamento WHERE hash = ?', [lancamento.hash]);
+      DateTime data = new DateFormat("yyyy-MM-dd").parse(dataInicial); //2018-01-17 00:00:00.000
 
-      //await db.update("lancamento", lancamento.toMap(), where: "hash = ?", whereArgs: [lancamento.hash]);
+      for(var dataString in datasParaSelecionar) {
+        DateTime dataCompare = DateTime.parse(dataString['data']);
+        if(dataCompare.isAfter(data) || dataCompare.compareTo(data) == 0) {
+          String dataFormatada = new DateFormat("yyyy-MM-dd").format(dataCompare).toString();
+          datas.add(dataFormatada); //selecionara as datas que serao atualizadas
+        }
+      }
+
+      int diferencaDias;
+      List novasDatas = [];
+
+      if(lancamento.data != datas[0]) {
+        DateTime lancamentoData = DateTime.parse(lancamento.data);
+        DateTime lancamentoDataInicio = DateTime.parse(datas[0]);
+        diferencaDias = lancamentoData.difference(lancamentoDataInicio).inDays;
+      }
+
+      for(var i in datas) {
+        novasDatas.add(
+            new DateFormat("yyyy-MM-dd").format(
+              DateTime.parse(i).add(new Duration(days: diferencaDias))
+            ).toString()
+          );
+      }
+
+      var uuid = new Uuid();
+      String hashNovo = uuid.v4();
+      
+      for(var i = 0; i < datas.length; i++) {
+        await db.rawUpdate(
+          '''UPDATE lancamento SET
+              idcategoria = ?,
+              data = ?,
+              idtag = ?,
+              idconta = ?,
+              idcontadestino = ?,
+              idcartao = ?,
+              valor = ?,
+              descricao = ?,
+              fatura = ?,
+              hash = ?
+                WHERE hash = ? AND data = ?
+          ''', [
+            lancamento.idcategoria, novasDatas[i], lancamento.idtag, lancamento.idconta,
+            lancamento.idcontadestino, lancamento.idcartao, lancamento.valor,
+            lancamento.descricao, lancamento.fatura, hashNovo, lancamento.hash, datas[i]
+          ]);
+
+          //await db.update("lancamento", lancamento.toMap(), where: "hash = ?", whereArgs: [lancamento.hash]);
+      }
     }
 
-    //List lista2 = await db.rawQuery("SELECT * FROM lancamento");
-    //for(var i in lista2) {
-    //  print(i['id']);
-    //  print(i['hash']);
-    //  print(i['idcategoria']);
-    //  print(i['idconta']);
-    //  print(i['fatura']);      
-    //  print(i['valor']);
-    //  print(i['data']);
-    //  print(i['idcontadestino']);
-    //  print(i['idtag']);
-    //  print(i['pago']);
-    //  print(i['descricao']);      
-    //  print(i['quantidaderepeticao']);
-    //  print(i['idcartao']);
-    //  print(i['tipo']);
-    //  print(i['datafatura']);
-    //  print(i['periodorepeticao']);
-    //  print(i['tiporepeticao']);
-    //  print('========================');
-    //}
-    
     await db.close();
 
     return true;

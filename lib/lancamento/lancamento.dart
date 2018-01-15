@@ -1651,8 +1651,11 @@ class FormularioState extends State<Formulario> {
                             children: <Widget>[
                               new GestureDetector(
                                 onTap: () {
-                                  lancamentoDB.atualizarLandamento(lancamentoDB, false);
-                                  Navigator.pop(context, true);
+                                  lancamentoDB.atualizarLancamento(lancamentoDB, this.lancamentoDBEditar.data, false).then(
+                                    (retorno) {
+                                      Navigator.pop(context, retorno);
+                                    }
+                                  );
                                 },
                                 child: new Container(
                                   margin: new EdgeInsets.only(bottom: 16.0),
@@ -1683,8 +1686,11 @@ class FormularioState extends State<Formulario> {
                               ),
                               new GestureDetector(
                                 onTap: (){
-                                  lancamentoDB.atualizarLandamento(lancamentoDB, true);
-                                  Navigator.pop(context, true);
+                                  lancamentoDB.atualizarLancamento(lancamentoDB, this.lancamentoDBEditar.data, true).then(
+                                    (retorno) {
+                                      Navigator.pop(context, retorno);
+                                    }
+                                  );
                                 },
                                 child: new Container(
                                   margin: new EdgeInsets.only(bottom: 16.0),
