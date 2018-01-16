@@ -18,18 +18,24 @@ class LancamentoPage extends StatefulWidget {
   final bool editar;
   Lancamento lancamentoEditarDB;
   final int idEditar;
-  LancamentoPage(this.editar, this.lancamentoEditarDB, this.color);
-  LancamentoPageStatus createState() => new LancamentoPageStatus(this.editar, this.lancamentoEditarDB, this.color);
+  String periodoFiltro;
+  String periodo;
+
+
+  LancamentoPage(this.editar, this.lancamentoEditarDB, this.color, this.periodo, this.periodoFiltro);
+  LancamentoPageStatus createState() => new LancamentoPageStatus(this.editar, this.lancamentoEditarDB, this.color, this.periodo, this.periodoFiltro);
 }
  
 class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStateMixin{
-  LancamentoPageStatus(this.editar, this.lancamentoEditarDB, this.color);
+  LancamentoPageStatus(this.editar, this.lancamentoEditarDB, this.color, this.periodo, this.periodoFiltro);
   final Color color;
   final bool editar;
   Lancamento lancamentoEditarDB;
   Lancamento lancamentoDB;
   ValueNotifier<List<int>> numeros;
   List numerosEditar = [];
+  String periodoFiltro;
+  String periodo;
  
   AnimationController _controller;
   //AnimationController _controller2;
@@ -168,7 +174,7 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
                     ),
                     new AnimatedBuilder(
                       animation: _frontScale,
-                      child: new Formulario(this.color, this.editar, this.lancamentoEditarDB, this.numeros),
+                      child: new Formulario(this.color, this.editar, this.lancamentoEditarDB, this.numeros, this.periodo, this.periodoFiltro),
                       builder: (BuildContext context, Widget child) {
                         final Matrix4 transform = new Matrix4.identity()
                           ..scale(1.0, _frontScale.value, 1.0);
@@ -529,10 +535,12 @@ class Formulario extends StatefulWidget {
   final bool editar;
   final Lancamento lancamentoDBEditar;
   final ValueNotifier<List<int>> numeros;
+  String periodoFiltro;
+  String periodo;
 
-  Formulario(this.color, this.editar, this.lancamentoDBEditar, this.numeros);
+  Formulario(this.color, this.editar, this.lancamentoDBEditar, this.numeros, this.periodo, this.periodoFiltro);
   @override
-  FormularioState createState() => new FormularioState(this.color, this.editar, this.lancamentoDBEditar, this.numeros);
+  FormularioState createState() => new FormularioState(this.color, this.editar, this.lancamentoDBEditar, this.numeros, this.periodo, this.periodoFiltro);
 }
 
 class FormularioState extends State<Formulario> {
@@ -540,8 +548,10 @@ class FormularioState extends State<Formulario> {
   final bool editar;
   Lancamento lancamentoDBEditar;
   final ValueNotifier<List<int>> numeros;
+  String periodoFiltro;
+  String periodo;
 
-  FormularioState(this.color, this.editar, this.lancamentoDBEditar, this.numeros);
+  FormularioState(this.color, this.editar, this.lancamentoDBEditar, this.numeros, this.periodo, this.periodoFiltro);
   //RadioGroup itemType = RadioGroup.fixo;
   DateTime _toDate = new DateTime.now();
   String _valueText = " ";
@@ -799,36 +809,7 @@ class FormularioState extends State<Formulario> {
     int dia = fechamentoDefinido.day;
     int mes = fechamentoDefinido.month;
     int ano = fechamentoDefinido.year;
-    //DateTime vencimentoDefinido;
-    //DateTime fechamentoDefinido;
-
-    //DateTime diaVencimento = new DateTime(ano, mes, int.parse(vencimento));
-
-    //if(diaVencimento.isBefore(diaLancamento)) {
-    //  if(mes < 12) {
-    //    vencimentoDefinido = new DateTime(ano, mes + 1, int.parse(vencimento));
-    //  } else if (mes == 12) {
-    //    vencimentoDefinido = new DateTime(ano + 1, 1, int.parse(vencimento));
-    //  }      
-    //} else {
-    //  if(mes < 12) {
-    //    vencimentoDefinido = new DateTime(ano, mes + 1, int.parse(vencimento));
-    //  } else if (mes == 12) {
-    //    vencimentoDefinido = new DateTime(ano + 1, 1, int.parse(vencimento));
-    //  } 
-    //}
-
-    //DateTime diaFechamento = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
-    //if(vencimentoDefinido.isBefore(diaFechamento)) {
-    //  if(vencimentoDefinido.month == 1) {
-    //    fechamentoDefinido = new DateTime(vencimentoDefinido.year - 1, 12, int.parse(fechamento));
-    //  } else {
-    //    fechamentoDefinido = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month - 1, int.parse(fechamento));
-    //  }      
-    //} else {
-    //  fechamentoDefinido = new DateTime(vencimentoDefinido.year, vencimentoDefinido.month, int.parse(fechamento));
-    //}
-
+    
     if(!arbitrario) {
       if(diaLancamento.isAfter(fechamentoDefinido)) {
         if(mes < 12) {
@@ -843,9 +824,7 @@ class FormularioState extends State<Formulario> {
       }
     } else {
       return capitalize(mesEscolhido(mes) + ' de ' + ano.toString());
-    }
-
-    
+    }    
   }
 
   void showDialogCartao<T>({ BuildContext context, Widget child }) {
@@ -1688,7 +1667,17 @@ class FormularioState extends State<Formulario> {
                                 onTap: (){
                                   lancamentoDB.atualizarLancamento(lancamentoDB, this.lancamentoDBEditar.data, true).then(
                                     (retorno) {
-                                      Navigator.pop(context, retorno);
+                                       if(this.periodo == 'hoje') {                                         
+                                         Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
+                                       } else if(this.periodo == 'semana') {
+                                         Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
+                                       } else if(this.periodo == 'mes') {
+                                         Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
+                                       } else if(this.periodo == 'periodo') {
+                                         
+                                       }
+
+                                      
                                     }
                                   );
                                 },

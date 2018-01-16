@@ -524,10 +524,10 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                           corLancamento = new Color(0xFF00BFA5);
                         }
 
-                        bool resultado = await Navigator.of(context).push(new PageRouteBuilder(
+                        List resultado = await Navigator.of(context).push(new PageRouteBuilder(
                           opaque: false,
                           pageBuilder: (BuildContext context, _, __) {
-                            return new LancamentoPage(true, lancamentoDB, corLancamento);
+                            return new LancamentoPage(true, lancamentoDB, corLancamento, this.periodo, this.periodoFiltro);
                           },
                           transitionsBuilder: (
                             BuildContext context,
@@ -545,10 +545,10 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                           }
                         ));
                         
-                        if(resultado) {
+                        if(resultado[0]) {
                           setState(() {
                             if(this.periodo == 'hoje') {
-                              lancamentoDB.getLancamentoHoje(new DateTime.now()).then(
+                              lancamentoDB.getLancamentoHoje(resultado[1]).then(
                                 (list) {
                                   setState(() {
                                     this.periodo = "hoje";
@@ -560,7 +560,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 }
                               );
                             } else if (this.periodo == 'semana') {
-                              lancamentoDB.getLancamentoSemana(new DateTime.now()).then(
+                              lancamentoDB.getLancamentoSemana(resultado[1]).then(
                                 (list) {
                                   setState(() {
                                     this.periodo = "semana";
@@ -573,7 +573,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 }
                               );
                             } else if(this.periodo == 'mes') {
-                              lancamentoDB.getLancamentoMes(new DateTime.now()).then(
+                              lancamentoDB.getLancamentoMes(resultado[1]).then(
                                 (list) {
                                   this.periodo = "mes";
                                   setState(() {                                  
