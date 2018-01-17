@@ -110,7 +110,7 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
       } else {        
         y = new List.from(x[0].substring(1).split(""))..addAll(x[1].split(""));
       }
-      List<int> numbersList = y.map((i) => int.parse(i));
+      List numbersList = y.map((i) => int.parse(i)).toList();
 
       for(var i in numbersList) {
         this.numerosEditar.add(i);
@@ -1615,8 +1615,8 @@ class FormularioState extends State<Formulario> {
                         context: context,
                         child: child,
                       )
-                      .then<Null>((T value) { 
-                        Navigator.pop(context, true);
+                      .then<Null>((T value) {
+                        Navigator.pop(context, value);
                       });
                     }
 
@@ -1631,8 +1631,18 @@ class FormularioState extends State<Formulario> {
                               new GestureDetector(
                                 onTap: () {
                                   lancamentoDB.atualizarLancamento(lancamentoDB, this.lancamentoDBEditar.data, false).then(
-                                    (retorno) {
-                                      Navigator.pop(context, retorno);
+                                    (retorno) {                                      
+                                       if(this.periodo == 'hoje') {                                         
+                                         Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
+                                       } else if(this.periodo == 'semana') {
+                                         Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
+                                       } else if(this.periodo == 'mes') {
+                                         Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
+                                       } else if(this.periodo == 'periodo') {
+                                         
+                                       }
+
+                                      
                                     }
                                   );
                                 },
@@ -1675,9 +1685,7 @@ class FormularioState extends State<Formulario> {
                                          Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
                                        } else if(this.periodo == 'periodo') {
                                          
-                                       }
-
-                                      
+                                       }                                      
                                     }
                                   );
                                 },

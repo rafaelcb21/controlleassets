@@ -913,7 +913,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
                                     opaque: false,
                                     pageBuilder: (BuildContext context, _, __) {
-                                      return new LancamentoPage(false, new Lancamento(), new Color(0xFF9E9E9E));
+                                      return new LancamentoPage(false, new Lancamento(), new Color(0xFF9E9E9E), '', '');
                                     },
                                     transitionsBuilder: (
                                       BuildContext context,
@@ -993,7 +993,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
                                   opaque: false,
                                   pageBuilder: (BuildContext context, _, __) {
-                                    return new LancamentoPage(false, new Lancamento(), new Color(0xFF00BFA5));
+                                    return new LancamentoPage(false, new Lancamento(), new Color(0xFF00BFA5), '', '');
                                   },
                                   transitionsBuilder: (
                                     BuildContext context,
@@ -1072,7 +1072,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
                                   opaque: false,
                                   pageBuilder: (BuildContext context, _, __) {
-                                    return new LancamentoPage(false, new Lancamento(), new Color(0xFFE57373));
+                                    return new LancamentoPage(false, new Lancamento(), new Color(0xFFE57373), '', '');
                                   },
                                   transitionsBuilder: (
                                     BuildContext context,

@@ -1519,7 +1519,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       if(lancamento.data != datas[0]) {
         DateTime lancamentoData = DateTime.parse(lancamento.data);
         DateTime lancamentoDataInicio = DateTime.parse(datas[0]);
-        diferencaDias = lancamentoData.difference(lancamentoDataInicio).inDays;
+        diferencaDias = lancamentoData.difference(lancamentoDataInicio).inDays; //descobre a diferenca de dias
       }
 
       for(var i in datas) {

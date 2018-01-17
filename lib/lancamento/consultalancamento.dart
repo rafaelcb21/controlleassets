@@ -317,8 +317,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                             )
                           );
                         },
-                        child: new Text(
-                          this.periodoFiltro.length > 15 ? this.periodoFiltroResumido : this.periodoFiltro,
+                        child: new Text(                          
+                          this.periodoFiltro.length > 17 ? this.periodoFiltroResumido : this.periodoFiltro,
                           style: new TextStyle(
                             fontSize: 16.0,
                           )
@@ -544,7 +544,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                             );
                           }
                         ));
-                        
+
                         if(resultado[0]) {
                           setState(() {
                             if(this.periodo == 'hoje') {
@@ -959,6 +959,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
             }
           }
         }
+
+      
       return this.listaLancamentos;
     }
 
