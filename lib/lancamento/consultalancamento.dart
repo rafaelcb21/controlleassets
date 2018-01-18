@@ -527,7 +527,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                         List resultado = await Navigator.of(context).push(new PageRouteBuilder(
                           opaque: false,
                           pageBuilder: (BuildContext context, _, __) {
-                            return new LancamentoPage(true, lancamentoDB, corLancamento, this.periodo, this.periodoFiltro);
+                            return new LancamentoPage(true, lancamentoDB, corLancamento, this.periodo, this.periodoFiltro, [this.from, this.to]);
                           },
                           transitionsBuilder: (
                             BuildContext context,
@@ -585,7 +585,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 }
                               );
                             } else if(this.periodo == 'periodo') {
-                              lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                              lancamentoDB.getLancamentoPeriodo(resultado[1], resultado[2]).then(
                                 (list) {
                                   setState(() {
                                     if(list.length > 0) {
@@ -1386,10 +1386,22 @@ class FullScreenPeriodoDate extends StatefulWidget {
 
 class FullScreenPeriodoDateState extends State<FullScreenPeriodoDate> {
   Color azulAppbar = new Color(0xFF26C6DA);
-  DateTime _fromDateTime = new DateTime.now();
-  DateTime _toDateTime = new DateTime.now();
+
+  String dateString = new DateTime.now().toString().substring(0,10);
+  DateTime _fromDateTime;
+  DateTime _toDateTime;
+  int ano, mes, dia;
   bool _allDayValue = false;
   bool _saveNeeded = false;
+
+  @override
+  void initState() {    
+    this.ano = int.parse(this.dateString.substring(0, 4));
+    this.mes = int.parse(this.dateString.substring(5, 7));
+    this.dia = int.parse(this.dateString.substring(8, 10));
+    this._fromDateTime = new DateTime(ano, mes, dia);
+    this._toDateTime = new DateTime(ano, mes, dia);
+  }
 
   void showDateErroDialog<T>({ BuildContext context, Widget child }) {
     showDialog<T>(

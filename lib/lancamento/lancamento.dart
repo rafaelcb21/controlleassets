@@ -20,14 +20,15 @@ class LancamentoPage extends StatefulWidget {
   final int idEditar;
   String periodoFiltro;
   String periodo;
+  List fromTo;
 
 
-  LancamentoPage(this.editar, this.lancamentoEditarDB, this.color, this.periodo, this.periodoFiltro);
-  LancamentoPageStatus createState() => new LancamentoPageStatus(this.editar, this.lancamentoEditarDB, this.color, this.periodo, this.periodoFiltro);
+  LancamentoPage(this.editar, this.lancamentoEditarDB, this.color, this.periodo, this.periodoFiltro, this.fromTo);
+  LancamentoPageStatus createState() => new LancamentoPageStatus(this.editar, this.lancamentoEditarDB, this.color, this.periodo, this.periodoFiltro, this.fromTo);
 }
  
 class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStateMixin{
-  LancamentoPageStatus(this.editar, this.lancamentoEditarDB, this.color, this.periodo, this.periodoFiltro);
+  LancamentoPageStatus(this.editar, this.lancamentoEditarDB, this.color, this.periodo, this.periodoFiltro, this.fromTo);
   final Color color;
   final bool editar;
   Lancamento lancamentoEditarDB;
@@ -36,6 +37,7 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
   List numerosEditar = [];
   String periodoFiltro;
   String periodo;
+  List fromTo;
  
   AnimationController _controller;
   //AnimationController _controller2;
@@ -100,7 +102,7 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
     _controller.forward();
     
     if(this.editar) {
-
+      //print(this.periodoFiltro); //22 Jan de 2018 à 21 Fev de 2018
       String doubleToString = this.lancamentoEditarDB.valor.toStringAsFixed(2);
       List<String> x = doubleToString.split(".");
       List<String> y;
@@ -174,7 +176,7 @@ class LancamentoPageStatus extends State<LancamentoPage> with TickerProviderStat
                     ),
                     new AnimatedBuilder(
                       animation: _frontScale,
-                      child: new Formulario(this.color, this.editar, this.lancamentoEditarDB, this.numeros, this.periodo, this.periodoFiltro),
+                      child: new Formulario(this.color, this.editar, this.lancamentoEditarDB, this.numeros, this.periodo, this.periodoFiltro, this.fromTo),
                       builder: (BuildContext context, Widget child) {
                         final Matrix4 transform = new Matrix4.identity()
                           ..scale(1.0, _frontScale.value, 1.0);
@@ -537,10 +539,11 @@ class Formulario extends StatefulWidget {
   final ValueNotifier<List<int>> numeros;
   String periodoFiltro;
   String periodo;
+  List fromTo;
 
-  Formulario(this.color, this.editar, this.lancamentoDBEditar, this.numeros, this.periodo, this.periodoFiltro);
+  Formulario(this.color, this.editar, this.lancamentoDBEditar, this.numeros, this.periodo, this.periodoFiltro, this.fromTo);
   @override
-  FormularioState createState() => new FormularioState(this.color, this.editar, this.lancamentoDBEditar, this.numeros, this.periodo, this.periodoFiltro);
+  FormularioState createState() => new FormularioState(this.color, this.editar, this.lancamentoDBEditar, this.numeros, this.periodo, this.periodoFiltro, this.fromTo);
 }
 
 class FormularioState extends State<Formulario> {
@@ -550,8 +553,9 @@ class FormularioState extends State<Formulario> {
   final ValueNotifier<List<int>> numeros;
   String periodoFiltro;
   String periodo;
+  List fromTo;
 
-  FormularioState(this.color, this.editar, this.lancamentoDBEditar, this.numeros, this.periodo, this.periodoFiltro);
+  FormularioState(this.color, this.editar, this.lancamentoDBEditar, this.numeros, this.periodo, this.periodoFiltro, this.fromTo);
   //RadioGroup itemType = RadioGroup.fixo;
   DateTime _toDate = new DateTime.now();
   String _valueText = " ";
@@ -913,6 +917,27 @@ class FormularioState extends State<Formulario> {
 
   void onSubmitDividir(String result) {
     this.formSubmit['dividir'] = result;
+  }
+
+  String proximoPeriodo(DateTime from, DateTime to) {
+    String diaLabelInicio = "";
+    String diaLabelFim = "";
+    String label = "";
+    var anoMesDiaInicio = new DateFormat.yMMMd("pt_BR").format(from);
+    List yMMMdInicio = anoMesDiaInicio.split(' ');
+    
+    yMMMdInicio[0].length == 1 ? diaLabelInicio = '0' + yMMMdInicio[0] : diaLabelInicio = yMMMdInicio[0];
+    String diaMesInicio = diaLabelInicio + ' ' + yMMMdInicio[2][0].toUpperCase() + yMMMdInicio[2].substring(1); // 23 Dez
+    
+    var anoMesDiaFim = new DateFormat.yMMMd("pt_BR").format(to); // 23 de dezembro de 2017
+    List yMMMdFim = anoMesDiaFim.split(' ');
+
+    yMMMdFim[0].length == 1 ? diaLabelFim = '0' + yMMMdFim[0] : diaLabelFim = yMMMdFim[0];
+
+    String diaMesFim = diaLabelFim + ' ' + yMMMdFim[2][0].toUpperCase() + yMMMdFim[2].substring(1); // 29 Dez
+    label = diaMesInicio + " de " +  yMMMdInicio[4] + " à " + diaMesFim + " de " +  yMMMdFim[4];
+
+    return label;                                        
   }
 
   @override
@@ -1632,17 +1657,54 @@ class FormularioState extends State<Formulario> {
                                 onTap: () {
                                   lancamentoDB.atualizarLancamento(lancamentoDB, this.lancamentoDBEditar.data, false).then(
                                     (retorno) {                                      
-                                       if(this.periodo == 'hoje') {                                         
-                                         Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
-                                       } else if(this.periodo == 'semana') {
-                                         Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
-                                       } else if(this.periodo == 'mes') {
-                                         Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
-                                       } else if(this.periodo == 'periodo') {
-                                         
-                                       }
+                                      if(this.periodo == 'hoje') {                                         
+                                        Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
+                                      } else if(this.periodo == 'semana') {
+                                        Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
+                                      } else if(this.periodo == 'mes') {
+                                        Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
+                                      } else if(this.periodo == 'periodo') {
+                                        DateTime from = this.fromTo[0];
+                                        DateTime to = this.fromTo[1];
+                                        DateTime dataEscolhida = DateTime.parse(lancamentoDB.data);
 
-                                      
+                                        bool dataDepois = dataEscolhida.isBefore(to);
+                                        bool dataAntes = dataEscolhida.isAfter(from);
+                                        bool dataIgualFrom = dataEscolhida.compareTo(from) == 0;
+                                        bool dataIgualTo = dataEscolhida.compareTo(to) == 0;
+                                        bool falseTrue;
+                                        
+                                        if(dataEscolhida.isAfter(to)){
+                                          falseTrue = true;
+                                        } else if(dataEscolhida.isBefore(from)) {
+                                          falseTrue = false;
+                                        }
+
+                                        while(!dataDepois && !dataAntes || !dataIgualFrom || !dataIgualTo) {
+                                          var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, falseTrue, this.periodo);
+                                          from = listaFiltro[0];
+                                          to = listaFiltro[1];
+                                          
+                                          dataDepois = dataEscolhida.isBefore(to);
+                                          dataAntes = dataEscolhida.isAfter(from);
+                                          dataIgualFrom = dataEscolhida.compareTo(from) == 0;
+                                          dataIgualTo = dataEscolhida.compareTo(to) == 0;
+
+                                          if(dataDepois && dataAntes) {
+                                            dataIgualFrom = true;
+                                            dataIgualTo = true;
+                                          } else if(dataIgualFrom || dataIgualTo) {
+                                            dataDepois = true;
+                                            dataAntes = true;
+                                            dataIgualFrom = true;
+                                            dataIgualTo = true;
+                                          }
+
+                                          this.periodoFiltro = proximoPeriodo(from, to);                                         
+                                        }
+
+                                        Navigator.pop(context, [retorno, from, to]);
+                                       }
                                     }
                                   );
                                 },
@@ -1674,18 +1736,57 @@ class FormularioState extends State<Formulario> {
                                 ),
                               ),
                               new GestureDetector(
-                                onTap: (){
+                                onTap: () {
                                   lancamentoDB.atualizarLancamento(lancamentoDB, this.lancamentoDBEditar.data, true).then(
-                                    (retorno) {
-                                       if(this.periodo == 'hoje') {                                         
-                                         Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
-                                       } else if(this.periodo == 'semana') {
-                                         Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
-                                       } else if(this.periodo == 'mes') {
-                                         Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
-                                       } else if(this.periodo == 'periodo') {
-                                         
-                                       }                                      
+                                    (retorno) {                                      
+                                      if(this.periodo == 'hoje') {                                         
+                                        Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
+                                      } else if(this.periodo == 'semana') {
+                                        Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
+                                      } else if(this.periodo == 'mes') {
+                                        Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
+                                      } else if(this.periodo == 'periodo') {
+                                        DateTime from = this.fromTo[0];
+                                        DateTime to = this.fromTo[1];
+                                        DateTime dataEscolhida = DateTime.parse(lancamentoDB.data);
+
+                                        bool dataDepois = dataEscolhida.isBefore(to);
+                                        bool dataAntes = dataEscolhida.isAfter(from);
+                                        bool dataIgualFrom = dataEscolhida.compareTo(from) == 0;
+                                        bool dataIgualTo = dataEscolhida.compareTo(to) == 0;
+                                        bool falseTrue;
+                                        
+                                        if(dataEscolhida.isAfter(to)){
+                                          falseTrue = true;
+                                        } else if(dataEscolhida.isBefore(from)) {
+                                          falseTrue = false;
+                                        }                                        
+
+                                        while(!dataDepois && !dataAntes || !dataIgualFrom || !dataIgualTo) {
+                                          var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, falseTrue, this.periodo);
+                                          from = listaFiltro[0];
+                                          to = listaFiltro[1];;
+                                          
+                                          dataDepois = dataEscolhida.isBefore(to);
+                                          dataAntes = dataEscolhida.isAfter(from);
+                                          dataIgualFrom = dataEscolhida.compareTo(from) == 0;
+                                          dataIgualTo = dataEscolhida.compareTo(to) == 0;
+
+                                          if(dataDepois && dataAntes) {
+                                            dataIgualFrom = true;
+                                            dataIgualTo = true;
+                                          } else if(dataIgualFrom || dataIgualTo) {
+                                            dataDepois = true;
+                                            dataAntes = true;
+                                            dataIgualFrom = true;
+                                            dataIgualTo = true;
+                                          }
+
+                                          this.periodoFiltro = proximoPeriodo(from, to);                                         
+                                        }
+
+                                        Navigator.pop(context, [retorno, from, to]);
+                                       }
                                     }
                                   );
                                 },
@@ -1830,7 +1931,7 @@ class FormularioState extends State<Formulario> {
                         //lancamentoDB.upsertLancamento(lancamentoList, lancamentoDB.id);
                         lancamentoDB.deleteLancamento(lancamentoDB.id);
                         lancamentoDB.upsertLancamento(lancamentoList).then(
-                          (retorno) {
+                          (retorno) {//true
                             Navigator.pop(context, retorno);
                           }
                         );
