@@ -1469,10 +1469,77 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     return true;
   }
 
+  List listaDosMeses(quantidaderepeticao, data, periodorepeticao) {
+    List meses = [];
+
+    for(var i = 0; i < quantidaderepeticao; i++) {
+      if(meses.length == 0) {
+        int monthToList = int.parse(data.substring(5,7));
+        meses.add(monthToList);
+      } else {
+        if(periodorepeticao == 'Meses') {
+          if(meses[i-1] == 12) {
+            meses.add(1);
+          } else {
+            meses.add(meses[i-1] + 1);
+          }
+        } else if(periodorepeticao == 'Bimestres') {
+          if(meses[i-1] == 12) {
+            meses.add(2);
+          } else if(meses[i-1] == 11) {
+            meses.add(1);
+          } else {
+            meses.add(meses[i-1] + 2);
+          }
+        } else if(periodorepeticao == 'Trimestres') {
+          if(meses[i-1] == 12) {
+            meses.add(3);
+          } else if(meses[i-1] == 11) {
+            meses.add(2);
+          } else if(meses[i-1] == 10) {
+            meses.add(1);
+          } else {
+            meses.add(meses[i-1] + 3);
+          }
+        } else if(periodorepeticao == 'Semestres') {
+          if(meses[i-1] == 12) {
+            meses.add(6);
+          } else if(meses[i-1] == 11) {
+            meses.add(5);
+          } else if(meses[i-1] == 10) {
+            meses.add(4);
+          } else if(meses[i-1] == 9) {
+            meses.add(3);
+          } else if(meses[i-1] == 8) {
+            meses.add(2);
+          } else if(meses[i-1] == 7) {
+            meses.add(1);
+          } else {
+            meses.add(meses[i-1] + 6);
+          }
+        }
+      }
+    }
+
+    return meses;
+  }
+
   Future atualizarLancamento(Lancamento lancamento, String dataInicial, bool todos) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
+    List<Lancamento> lancamentoList = [];
+
+    Map periodos = {
+      'Dias': 1,
+      'Semanas': 7,
+      'Quinzenas': 15,
+      'Meses': 30, 
+      'Bimestres': 60,
+      'Trimestres': 90,
+      'Semestres': 180,
+      'Anos': 365
+    };
 
     if (!todos) {
       
@@ -1498,7 +1565,15 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         lancamento.descricao, lancamento.fatura, lancamento.id
       ]);
 
-    } else {
+      await db.close();
+      return true;
+
+    } else if(
+        todos &&
+        lancamento.periodorepeticao == 'Dias' ||
+        lancamento.periodorepeticao == 'Semanas' ||
+        lancamento.periodorepeticao == 'Quinzenas' 
+      ) {
       List datas = [];
       //[{data: 2018-01-15}, {data: 2018-01-16}, {data: 2018-01-17}
       List datasParaSelecionar = await db.rawQuery('SELECT data FROM lancamento WHERE hash = ?', [lancamento.hash]);
@@ -1512,7 +1587,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         }
       }
 
-      int diferencaDias;
+      int diferencaDias = 0;
       List novasDatas = [];
 
       if(lancamento.data != datas[0]) {
@@ -1552,13 +1627,156 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
             lancamento.descricao, lancamento.fatura, hashNovo, lancamento.hash, datas[i]
           ]);
 
-          //await db.update("lancamento", lancamento.toMap(), where: "hash = ?", whereArgs: [lancamento.hash]);
+        await db.close();
+        return true;
       }
-    }
+    } else if(todos && lancamento.periodorepeticao == 'Anos') {
+      var uuid = new Uuid();
+      String hashNovo = uuid.v4();
 
-    await db.close();
+      List datas = [];
+      List datasParaSelecionar = await db.rawQuery('SELECT data FROM lancamento WHERE hash = ?', [lancamento.hash]);
+      DateTime data = new DateFormat("yyyy-MM-dd").parse(dataInicial); //2018-01-17 00:00:00.000
 
-    return true;
+      for(var dataString in datasParaSelecionar) {
+        DateTime dataCompare = DateTime.parse(dataString['data']);
+        if(dataCompare.isAfter(data) || dataCompare.compareTo(data) == 0) {
+          String dataFormatada = new DateFormat("yyyy-MM-dd").format(dataCompare).toString();
+          datas.add(dataFormatada); //selecionara as datas que serao atualizadas
+        }
+      }
+
+      for(var data in datas) {
+        await db.rawDelete("DELETE FROM lancamento WHERE hash = ? AND data = ?", [lancamento.hash, data]);
+      }
+
+      for(var i = 0; i < datas.length; i++) {
+        Lancamento lancamentoEditado = new Lancamento();
+        lancamentoEditado.tipo = lancamento.tipo;
+        lancamentoEditado.fatura = lancamento.fatura;
+        lancamentoEditado.idcategoria = lancamento.idcategoria;
+        lancamentoEditado.idtag = lancamento.idtag;
+        lancamentoEditado.idconta = lancamento.idconta;
+        lancamentoEditado.idcontadestino = lancamento.idcontadestino;
+        lancamentoEditado.idcartao = lancamento.idcartao;
+        lancamentoEditado.valor = lancamento.valor;
+        lancamentoEditado.descricao = lancamento.descricao;
+        lancamentoEditado.tiporepeticao = lancamento.tiporepeticao;
+        lancamentoEditado.quantidaderepeticao = datas.length;
+        lancamentoEditado.periodorepeticao = lancamento.periodorepeticao;
+        lancamentoEditado.datafatura = lancamento.datafatura;
+        lancamentoEditado.pago = lancamento.pago;
+        lancamentoEditado.hash = hashNovo;
+        lancamentoEditado.data = lancamento.data;
+
+        int days = i * periodos[lancamentoEditado.periodorepeticao];
+        int _dia = int.parse(lancamentoEditado.data.substring(8,10));
+        int _mes = int.parse(lancamentoEditado.data.substring(5,7));
+        int _ano = DateTime.parse(lancamentoEditado.data).add(new Duration(days: days)).year;
+        
+        if(_dia == 29 && _mes == 2) {
+          lancamentoEditado.data = new DateTime(_ano, _mes + 1, 0).toString().substring(0,10);
+        } else {
+          lancamentoEditado.data = new DateTime(_ano, _mes, _dia).toString().substring(0,10);
+        }
+        lancamentoList.add(lancamentoEditado);
+      }
+
+      for(var lancamento in lancamentoList) {
+        await db.insert("lancamento", lancamento.toMap());
+      }
+      
+      await db.close();
+
+      return true;
+
+    } else {
+      var uuid = new Uuid();
+      String hashNovo = uuid.v4();
+
+      List datas = [];
+
+      List mesesLista = listaDosMeses(
+        lancamento.quantidaderepeticao,
+        lancamento.data,
+        lancamento.periodorepeticao
+      );
+
+      List datasParaSelecionar = await db.rawQuery('SELECT data FROM lancamento WHERE hash = ?', [lancamento.hash]);
+      DateTime data = new DateFormat("yyyy-MM-dd").parse(dataInicial); //2018-01-17 00:00:00.000
+
+      for(var dataString in datasParaSelecionar) {
+        DateTime dataCompare = DateTime.parse(dataString['data']);
+        if(dataCompare.isAfter(data) || dataCompare.compareTo(data) == 0) {
+          String dataFormatada = new DateFormat("yyyy-MM-dd").format(dataCompare).toString();
+          datas.add(dataFormatada); //selecionara as datas que serao atualizadas
+        }
+      }
+
+      for(var data in datas) {
+        await db.rawDelete("DELETE FROM lancamento WHERE hash = ? AND data = ?", [lancamento.hash, data]);
+      }
+
+      for(var i = 0; i < datas.length; i++) {
+        Lancamento lancamentoEditado = new Lancamento();
+        lancamentoEditado.tipo = lancamento.tipo;
+        lancamentoEditado.fatura = lancamento.fatura;
+        lancamentoEditado.idcategoria = lancamento.idcategoria;
+        lancamentoEditado.idtag = lancamento.idtag;
+        lancamentoEditado.idconta = lancamento.idconta;
+        lancamentoEditado.idcontadestino = lancamento.idcontadestino;
+        lancamentoEditado.idcartao = lancamento.idcartao;
+        lancamentoEditado.valor = lancamento.valor;
+        lancamentoEditado.descricao = lancamento.descricao;
+        lancamentoEditado.tiporepeticao = lancamento.tiporepeticao;
+        lancamentoEditado.quantidaderepeticao = datas.length;
+        lancamentoEditado.periodorepeticao = lancamento.periodorepeticao;
+        lancamentoEditado.datafatura = lancamento.datafatura;
+        lancamentoEditado.pago = lancamento.pago;
+        lancamentoEditado.hash = hashNovo;
+        lancamentoEditado.data = lancamento.data;
+
+        int days = i * periodos[lancamentoEditado.periodorepeticao];
+        int _dia = int.parse(lancamentoEditado.data.substring(8,10));
+        int _ano = DateTime.parse(lancamentoEditado.data).add(new Duration(days: days)).year;
+        
+        if((_dia > 28 && mesesLista[i] == 2) || _dia == 31) {
+          lancamentoEditado.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString().substring(0,10);
+        } else {
+          lancamentoEditado.data = new DateTime(_ano, mesesLista[i], _dia).toString().substring(0,10);                                                           
+        }
+        lancamentoList.add(lancamentoEditado);
+      }
+
+      //for(var lancamento in lancamentoList) {        
+      //  print(lancamento.idcategoria);
+      //  print(lancamento.idconta);
+      //  print(lancamento.fatura); //null
+      //  print(lancamento.hash); //yyyyyyy
+      //  print(lancamento.valor);
+      //  print(lancamento.data); //2018-01-22
+      //  print(lancamento.idcontadestino);
+      //  print(lancamento.idtag);
+      //  print(lancamento.pago);
+      //  print(lancamento.descricao);
+      //  print(lancamento.id);
+      //  print(lancamento.quantidaderepeticao); //2
+      //  print(lancamento.idcartao);
+      //  print(lancamento.tipo);
+      //  print(lancamento.datafatura);
+      //  print(lancamento.periodorepeticao); //Meses
+      //  print(lancamento.tiporepeticao); //Parcelada
+      //  print('============');
+      //}
+
+      for(var lancamento in lancamentoList) {
+        await db.insert("lancamento", lancamento.toMap());
+      }
+
+      await db.close();
+
+      return true;
+    }    
   }
 
   Future getLancamentoPeriodo(DateTime from, DateTime to) async {
