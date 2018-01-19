@@ -21,6 +21,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   List cores = [];
   String periodoFiltro = "";
   String periodoFiltroResumido = "";
+  List periodoFiltroDateTimeList = [];
+  DateTime periodoFiltroDateTime;
   DateTime periodoNext = new DateTime.now();
   DateTime from;
   DateTime to;
@@ -129,6 +131,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 if(list.length > 0) {
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
+                                  this.periodoFiltroDateTime = list[1][0][0];
                                 }
                               });
                             }
@@ -141,6 +144,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
                                   this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                  this.periodoFiltroDateTime = list[1][0][0];
                                 }
                               });
                             }
@@ -153,6 +157,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
                                   this.periodoFiltroResumido = this.periodoFiltro;
+                                  this.periodoFiltroDateTime = list[1][0][0];
                                 }
                               });
                             }
@@ -170,6 +175,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                     list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
                                     + " à " + 
                                     list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                  this.periodoFiltroDateTimeList = list[1][0][0];
                                 }
                               });
                             }
@@ -212,6 +218,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                           if(list.length > 0) {
                                             this.listaDB = list[0];
                                             this.periodoFiltro = list[1][1];
+                                            this.periodoFiltroDateTime = list[1][0][0];
                                           }            
                                         });
                                       }
@@ -232,6 +239,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                             this.listaDB = list[0];
                                             this.periodoFiltro = list[1][1];
                                             this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                            this.periodoFiltroDateTime = list[1][0][0];
                                           }
                                         });
                                       }
@@ -249,6 +257,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                           if(list.length > 0) {
                                             this.listaDB = list[0];
                                             this.periodoFiltro = list[1][1];
+                                            this.periodoFiltroDateTime = list[1][0][0];
                                           }
                                         });
                                       }
@@ -291,6 +300,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                             if(list.length > 0) {                                            
                                               this.listaDB = list[0];
                                               this.periodoFiltro = list[1][1];
+                                              this.periodoFiltroDateTimeList = list[1][0][0];
                                               //this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
                                               
                                               if(this.periodo == "periodo") {
@@ -347,6 +357,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                 if(list.length > 0) {
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
+                                  this.periodoFiltroDateTime = list[1][0][0];
                                 }
                               });
                             }
@@ -359,6 +370,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
                                   this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                  this.periodoFiltroDateTime = list[1][0][0];
                                 }
                               });
                             }
@@ -371,6 +383,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                   this.listaDB = list[0];
                                   this.periodoFiltro = list[1][1];
                                   this.periodoFiltroResumido = this.periodoFiltro;
+                                  this.periodoFiltroDateTime = list[1][0][0];
                                 }
                               });
                             }
@@ -387,6 +400,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                     list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
                                     + " à " + 
                                     list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                  this.periodoFiltroDateTimeList = list[1][0][0];
                                 }
                               });
                             }
@@ -545,63 +559,68 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                           }
                         ));
 
-                        if(resultado[0]) {
-                          setState(() {
-                            if(this.periodo == 'hoje') {
-                              lancamentoDB.getLancamentoHoje(resultado[1]).then(
-                                (list) {
-                                  setState(() {
-                                    this.periodo = "hoje";
-                                    if(list.length > 0) {
-                                      this.listaDB = list[0];
-                                      this.periodoFiltro = list[1][1];
-                                    }            
-                                  });
-                                }
-                              );
-                            } else if (this.periodo == 'semana') {
-                              lancamentoDB.getLancamentoSemana(resultado[1]).then(
-                                (list) {
-                                  setState(() {
-                                    this.periodo = "semana";
-                                    if(list.length > 0) {
-                                      this.listaDB = list[0];
-                                      this.periodoFiltro = list[1][1];
-                                      this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
-                                    }
-                                  });
-                                }
-                              );
-                            } else if(this.periodo == 'mes') {
-                              lancamentoDB.getLancamentoMes(resultado[1]).then(
-                                (list) {
-                                  this.periodo = "mes";
-                                  setState(() {                                  
-                                    if(list.length > 0) {
-                                      this.listaDB = list[0];
-                                      this.periodoFiltro = list[1][1];
-                                    }            
-                                  });
-                                }
-                              );
-                            } else if(this.periodo == 'periodo') {
-                              lancamentoDB.getLancamentoPeriodo(resultado[1], resultado[2]).then(
-                                (list) {
-                                  setState(() {
-                                    if(list.length > 0) {
-                                      this.listaDB = list[0];
-                                      this.periodoFiltro = list[1][1];
-                                      this.periodoFiltroResumido =
-                                        list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
-                                        + " à " + 
-                                        list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
-                                    }
-                                  });
-                                }
-                              );
-                            }
-                            
-                          });
+                        if(resultado != null) {
+                          if(resultado[0]) {
+                            setState(() {
+                              if(this.periodo == 'hoje') {
+                                lancamentoDB.getLancamentoHoje(this.periodoFiltroDateTime).then(
+                                  (list) {
+                                    setState(() {
+                                      this.periodo = "hoje";
+                                      if(list.length > 0) {
+                                        this.listaDB = list[0];
+                                        this.periodoFiltro = list[1][1];
+                                        this.periodoFiltroDateTime = list[1][0][0];
+                                      }            
+                                    });
+                                  }
+                                );
+                              } else if (this.periodo == 'semana') {
+                                lancamentoDB.getLancamentoSemana(this.periodoFiltroDateTime).then(
+                                  (list) {
+                                    setState(() {
+                                      this.periodo = "semana";
+                                      if(list.length > 0) {
+                                        this.listaDB = list[0];
+                                        this.periodoFiltro = list[1][1];
+                                        this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                        this.periodoFiltroDateTime = list[1][0][0];
+                                      }
+                                    });
+                                  }
+                                );
+                              } else if(this.periodo == 'mes') {
+                                lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
+                                  (list) {
+                                    this.periodo = "mes";
+                                    setState(() {                                  
+                                      if(list.length > 0) {
+                                        this.listaDB = list[0];
+                                        this.periodoFiltro = list[1][1];
+                                        this.periodoFiltroDateTime = list[1][0][0];
+                                      }            
+                                    });
+                                  }
+                                );
+                              } else if(this.periodo == 'periodo') {
+                                lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
+                                  (list) {
+                                    setState(() {
+                                      if(list.length > 0) {
+                                        this.listaDB = list[0];
+                                        this.periodoFiltro = list[1][1];
+                                        this.periodoFiltroResumido =
+                                          list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                          + " à " + 
+                                          list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                        this.periodoFiltroDateTimeList = list[1][0][0];
+                                      }
+                                    });
+                                  }
+                                );
+                              }                            
+                            });
+                          }
                         }
                       }
                     );
@@ -651,6 +670,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                         if(list.length > 0) {
                                           this.listaDB = list[0];
                                           this.periodoFiltro = list[1][1];
+                                          this.periodoFiltroDateTime = list[1][0][0];
                                         }
                                       });
                                     }
@@ -662,6 +682,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                         if(list.length > 0) {
                                           this.listaDB = list[0];
                                           this.periodoFiltro = list[1][1];
+                                          this.periodoFiltroDateTime = list[1][0][0];
                                         }
                                       });
                                     }
@@ -673,6 +694,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                         if(list.length > 0) {
                                           this.listaDB = list[0];
                                           this.periodoFiltro = list[1][1];
+                                          this.periodoFiltroDateTime = list[1][0][0];
                                         }
                                       });
                                     }
@@ -703,6 +725,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                             if(list.length > 0) {
                                               this.listaDB = list[0];
                                               this.periodoFiltro = list[1][1];
+                                              this.periodoFiltroDateTime = list[1][0][0];
                                             }
                                           });
                                         }
@@ -714,6 +737,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                             if(list.length > 0) {
                                               this.listaDB = list[0];
                                               this.periodoFiltro = list[1][1];
+                                              this.periodoFiltroDateTime = list[1][0][0];
                                             }
                                           });
                                         }
@@ -725,6 +749,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                             if(list.length > 0) {
                                               this.listaDB = list[0];
                                               this.periodoFiltro = list[1][1];
+                                              this.periodoFiltroDateTime = list[1][0][0];
                                             }
                                           });
                                         }
@@ -769,6 +794,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                             if(list.length > 0) {
                                               this.listaDB = list[0];
                                               this.periodoFiltro = list[1][1];
+                                              this.periodoFiltroDateTime = list[1][0][0];
                                             }
                                           });
                                         }
@@ -780,6 +806,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                             if(list.length > 0) {
                                               this.listaDB = list[0];
                                               this.periodoFiltro = list[1][1];
+                                              this.periodoFiltroDateTime = list[1][0][0];
                                             }
                                           });
                                         }
@@ -791,6 +818,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                             if(list.length > 0) {
                                               this.listaDB = list[0];
                                               this.periodoFiltro = list[1][1];
+                                              this.periodoFiltroDateTime = list[1][0][0];
                                             }
                                           });
                                         }
@@ -841,6 +869,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                             if(list.length > 0) {
                               this.listaDB = list[0];
                               this.periodoFiltro = list[1][1];
+                              this.periodoFiltroDateTime = list[1][0][0];
                             }
                           });
                         }
@@ -852,6 +881,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                             if(list.length > 0) {
                               this.listaDB = list[0];
                               this.periodoFiltro = list[1][1];
+                              this.periodoFiltroDateTime = list[1][0][0];
                             }
                           });
                         }
@@ -863,6 +893,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                             if(list.length > 0) {
                               this.listaDB = list[0];
                               this.periodoFiltro = list[1][1];
+                              this.periodoFiltroDateTime = list[1][0][0];
                             }
                           });
                         }
@@ -926,6 +957,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                             if(list.length > 0) {
                               this.listaDB = list[0];
                               this.periodoFiltro = list[1][1];
+                              this.periodoFiltroDateTime = list[1][0][0];
                             }
                           });
                         }
@@ -937,6 +969,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                             if(list.length > 0) {
                               this.listaDB = list[0];
                               this.periodoFiltro = list[1][1];
+                              this.periodoFiltroDateTime = list[1][0][0];
                             }
                           });
                         }
@@ -948,6 +981,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                             if(list.length > 0) {
                               this.listaDB = list[0];
                               this.periodoFiltro = list[1][1];
+                              this.periodoFiltroDateTime = list[1][0][0];
                             }
                           });
                         }

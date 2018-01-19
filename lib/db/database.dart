@@ -1053,7 +1053,7 @@ class Lancamento {
 
     await db.close();
 
-    return [listaUnica, [hoje, anoMesDiaApresentacao]];
+    return [listaUnica, [[hoje], anoMesDiaApresentacao]];
 
   }
 
@@ -1264,7 +1264,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
     await db.close();
 
-    return [listaUnica, [diaDeReferencia, label]]; //label: 23 Dez de 2017 à 29 Dez de 2018
+    return [listaUnica, [[diaDeReferencia], label]]; //label: 23 Dez de 2017 à 29 Dez de 2018
   }
 
   Future getLancamentoMes(DateTime diaSearch) async {
@@ -1443,7 +1443,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     }
 
     await db.close();
-    return [listaUnica, [diaSearch, hojeMesDescrito]];
+    return [listaUnica, [[diaSearch], hojeMesDescrito]];
   }
 
   Future upsertLancamento(List<Lancamento> list) async {
