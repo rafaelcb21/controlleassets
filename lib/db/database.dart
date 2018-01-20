@@ -1589,45 +1589,55 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         }
       }
 
-      int diferencaDias = 0;
-      List novasDatas = [];
+      List descricaoStringList = lancamento.descricao.split(' ');
+      List ultimoElementoDescricao = descricaoStringList.removeLast().split('/');
+      String primeirosElementosDescricao = descricaoStringList.join(' ');
+      int x = int.parse(ultimoElementoDescricao[0]);
 
-      if(lancamento.data != datas[0]) {
-        DateTime lancamentoData = DateTime.parse(lancamento.data);
-        DateTime lancamentoDataInicio = DateTime.parse(datas[0]);
-        diferencaDias = lancamentoData.difference(lancamentoDataInicio).inDays; //descobre a diferenca de dias
+      List ordemPagos = [];
+      for(var data in datas) {
+        List pagos = await db.rawQuery("SELECT pago FROM lancamento WHERE hash = ? AND data = ?", [lancamento.hash, data]);
+        for(int i = 0; i < pagos.length; i++) {
+          ordemPagos.add(pagos[i]['pago']);
+        }
       }
 
-      for(var i in datas) {
-        novasDatas.add(
-            new DateFormat("yyyy-MM-dd").format(
-              DateTime.parse(i).add(new Duration(days: diferencaDias))
-            ).toString()
-          );
+      for(var data in datas) {
+        await db.rawDelete("DELETE FROM lancamento WHERE hash = ? AND data = ?", [lancamento.hash, data]);
       }
 
+      print(datas);
       for(var i = 0; i < datas.length; i++) {
-        await db.rawUpdate(
-          '''UPDATE lancamento SET
-              idcategoria = ?,
-              data = ?,
-              idtag = ?,
-              idconta = ?,
-              idcontadestino = ?,
-              idcartao = ?,
-              valor = ?,
-              descricao = ?,
-              fatura = ?
-                WHERE hash = ? AND data = ?
-          ''', [
-            lancamento.idcategoria, novasDatas[i], lancamento.idtag, lancamento.idconta,
-            lancamento.idcontadestino, lancamento.idcartao, lancamento.valor,
-            lancamento.descricao, lancamento.fatura, lancamento.hash, datas[i]
-          ]);
+        Lancamento lancamentoEditado = new Lancamento();
+        lancamentoEditado.tipo = lancamento.tipo;
+        lancamentoEditado.fatura = lancamento.fatura;
+        lancamentoEditado.idcategoria = lancamento.idcategoria;
+        lancamentoEditado.idtag = lancamento.idtag;
+        lancamentoEditado.idconta = lancamento.idconta;
+        lancamentoEditado.idcontadestino = lancamento.idcontadestino;
+        lancamentoEditado.idcartao = lancamento.idcartao;
+        lancamentoEditado.valor = lancamento.valor;
+        lancamentoEditado.descricao = primeirosElementosDescricao + ' ' + (x+i).toString() + '/' + lancamento.quantidaderepeticao.toString();
+        lancamentoEditado.tiporepeticao = lancamento.tiporepeticao;
+        lancamentoEditado.quantidaderepeticao = lancamento.quantidaderepeticao;
+        lancamentoEditado.periodorepeticao = lancamento.periodorepeticao;
+        lancamentoEditado.datafatura = lancamento.datafatura;
+        lancamentoEditado.pago = ordemPagos[i];
+        lancamentoEditado.hash = lancamento.hash;
+        lancamentoEditado.data = lancamento.data;
 
-        await db.close();
-        return true;
+        int days = i * periodos[lancamentoEditado.periodorepeticao];
+        lancamentoEditado.data = DateTime.parse(lancamentoEditado.data).add(new Duration(days: days)).toString().substring(0,10);
+        lancamentoList.add(lancamentoEditado);
       }
+
+      for(var lancamento in lancamentoList) {
+        await db.insert("lancamento", lancamento.toMap());
+      }
+
+      await db.close();
+      return true;      
+
     } else if(todos && lancamento.periodorepeticao == 'Anos') {
 
       List datas = [];
@@ -1640,6 +1650,12 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
           String dataFormatada = new DateFormat("yyyy-MM-dd").format(dataCompare).toString();
           datas.add(dataFormatada); //selecionara as datas que serao atualizadas
         }
+      }
+
+      List ordemPagos = [];
+      for(var data in datas) {
+        List pagos = await db.rawQuery("SELECT pago FROM lancamento WHERE hash = ? AND data = ?", [lancamento.hash, data]);
+        ordemPagos.add(pagos[0]['pago']);
       }
 
       for(var data in datas) {
@@ -1666,7 +1682,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         lancamentoEditado.quantidaderepeticao = lancamento.quantidaderepeticao;
         lancamentoEditado.periodorepeticao = lancamento.periodorepeticao;
         lancamentoEditado.datafatura = lancamento.datafatura;
-        lancamentoEditado.pago = lancamento.pago;
+        lancamentoEditado.pago = ordemPagos[i];
         lancamentoEditado.hash = lancamento.hash;
         lancamentoEditado.data = lancamento.data;
 
@@ -1688,7 +1704,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       }
       
       await db.close();
-
       return true;
 
     } else {
@@ -1711,6 +1726,12 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         }
       }
 
+      List ordemPagos = [];
+      for(var data in datas) {
+        List pagos = await db.rawQuery("SELECT pago FROM lancamento WHERE hash = ? AND data = ?", [lancamento.hash, data]);
+        ordemPagos.add(pagos[0]['pago']);
+      }
+
       for(var data in datas) {
         await db.rawDelete("DELETE FROM lancamento WHERE hash = ? AND data = ?", [lancamento.hash, data]);
       }
@@ -1735,7 +1756,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         lancamentoEditado.quantidaderepeticao = lancamento.quantidaderepeticao;
         lancamentoEditado.periodorepeticao = lancamento.periodorepeticao;
         lancamentoEditado.datafatura = lancamento.datafatura;
-        lancamentoEditado.pago = lancamento.pago;
+        lancamentoEditado.pago = ordemPagos[i];
         lancamentoEditado.hash = lancamento.hash;
         lancamentoEditado.data = lancamento.data;
 
@@ -1777,7 +1798,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       }
 
       await db.close();
-
       return true;
     }    
   }

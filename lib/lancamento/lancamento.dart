@@ -583,6 +583,7 @@ class FormularioState extends State<Formulario> {
   String fechamento;
   String vencimento;
   String nomeMes;
+  String ultimoElemento = '';
   List<Lancamento> lancamentoList = [];
   List meses = [];
   var uuid = new Uuid();
@@ -617,6 +618,8 @@ class FormularioState extends State<Formulario> {
     if(!this.editar) {
       lancamentoDB.pago = 1;
     } else {
+
+      lancamentoDB.descricao = this.lancamentoDBEditar.descricao;
       lancamentoDB.idcategoria = this.lancamentoDBEditar.idcategoria;
       lancamentoDB.idconta = this.lancamentoDBEditar.idconta;
       lancamentoDB.fatura = this.lancamentoDBEditar.fatura;
@@ -625,8 +628,7 @@ class FormularioState extends State<Formulario> {
       lancamentoDB.data = this.lancamentoDBEditar.data;
       lancamentoDB.idcontadestino = this.lancamentoDBEditar.idcontadestino;
       lancamentoDB.idtag = this.lancamentoDBEditar.idtag;
-      lancamentoDB.pago = this.lancamentoDBEditar.pago;
-      lancamentoDB.descricao = this.lancamentoDBEditar.descricao;
+      lancamentoDB.pago = this.lancamentoDBEditar.pago;      
       lancamentoDB.id = this.lancamentoDBEditar.id;
       lancamentoDB.quantidaderepeticao = this.lancamentoDBEditar.quantidaderepeticao;
       lancamentoDB.idcartao = this.lancamentoDBEditar.idcartao;
@@ -650,6 +652,11 @@ class FormularioState extends State<Formulario> {
 
       if(this.editar && lancamentoDB.tiporepeticao != null) {
         this.campoRepeticao = false;
+
+        List descricaoList = this.lancamentoDBEditar.descricao.split(' ');
+        this.ultimoElemento = descricaoList.removeLast();
+        this.lancamentoDBEditar.descricao = descricaoList.join(' ');
+        this.formSubmit['descricao'] = this.lancamentoDBEditar.descricao;
       }
 
       categoriaDB.getCategoria(this.lancamentoDBEditar.idcategoria).then((categoria) {
@@ -1633,7 +1640,7 @@ class FormularioState extends State<Formulario> {
                     lancamentoDB.idcontadestino = this.formSubmit['idcontadestino'];
                     lancamentoDB.data = this.formSubmit['data'];
                     lancamentoDB.valor = this.formSubmit['tipo'] == 'Despesa' ? -1*this.formSubmit['valor'] : this.formSubmit['valor'];
-                    lancamentoDB.descricao = this.formSubmit['descricao'];
+                    lancamentoDB.descricao = this.formSubmit['descricao'] + ' ' + this.ultimoElemento;
 
                     void showUpdateDialog<T>({ BuildContext context, Widget child }) {
                       showDialog<T>(
@@ -1740,7 +1747,7 @@ class FormularioState extends State<Formulario> {
                               new GestureDetector(
                                 onTap: () {
                                   lancamentoDB.atualizarLancamento(lancamentoDB, this.lancamentoDBEditar.data, true).then(
-                                    (retorno) {                                      
+                                    (retorno) {
                                       Navigator.pop(context, [retorno]);
                                     }
                                   );

@@ -22,7 +22,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   String periodoFiltro = "";
   String periodoFiltroResumido = "";
   List periodoFiltroDateTimeList = [];
-  DateTime periodoFiltroDateTime;
+  DateTime periodoFiltroDateTime = new DateTime.now();
   DateTime periodoNext = new DateTime.now();
   DateTime from;
   DateTime to;
@@ -313,14 +313,11 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                                               } else if(this.periodo == "semana") {
                                                 this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
                                               }
-                                              
                                             }
                                           });
                                         }
                                       );
                                     }
-                                    
-                                    
                                   }
                                 ),
                               ]
