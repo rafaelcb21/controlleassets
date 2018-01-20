@@ -1524,6 +1524,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     return meses;
   }
 
+  //atualizarLancamento trata de lancamentos repetidos e divididos
   Future atualizarLancamento(Lancamento lancamento, String dataInicial, bool todos) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
@@ -1554,15 +1555,16 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
           valor = ?,
           descricao = ?,
           fatura = ?,
-          hash = null,
-          quantidaderepeticao = null,
-          periodorepeticao = null,
-          tiporepeticao = null
+          hash = ?,
+          quantidaderepeticao = ?,
+          periodorepeticao = ?,
+          tiporepeticao = ?
         WHERE id = ?
       ''', [
         lancamento.data, lancamento.idcategoria, lancamento.idtag, lancamento.idconta,
         lancamento.idcontadestino, lancamento.idcartao, lancamento.valor,
-        lancamento.descricao, lancamento.fatura, lancamento.id
+        lancamento.descricao, lancamento.fatura, lancamento.hash, lancamento.quantidaderepeticao,
+        lancamento.periodorepeticao, lancamento.tiporepeticao, lancamento.id
       ]);
 
       await db.close();
@@ -1604,9 +1606,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
           );
       }
 
-      var uuid = new Uuid();
-      String hashNovo = uuid.v4();
-      
       for(var i = 0; i < datas.length; i++) {
         await db.rawUpdate(
           '''UPDATE lancamento SET
@@ -1618,21 +1617,18 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
               idcartao = ?,
               valor = ?,
               descricao = ?,
-              fatura = ?,
-              hash = ?
+              fatura = ?
                 WHERE hash = ? AND data = ?
           ''', [
             lancamento.idcategoria, novasDatas[i], lancamento.idtag, lancamento.idconta,
             lancamento.idcontadestino, lancamento.idcartao, lancamento.valor,
-            lancamento.descricao, lancamento.fatura, hashNovo, lancamento.hash, datas[i]
+            lancamento.descricao, lancamento.fatura, lancamento.hash, datas[i]
           ]);
 
         await db.close();
         return true;
       }
     } else if(todos && lancamento.periodorepeticao == 'Anos') {
-      var uuid = new Uuid();
-      String hashNovo = uuid.v4();
 
       List datas = [];
       List datasParaSelecionar = await db.rawQuery('SELECT data FROM lancamento WHERE hash = ?', [lancamento.hash]);
@@ -1650,6 +1646,11 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         await db.rawDelete("DELETE FROM lancamento WHERE hash = ? AND data = ?", [lancamento.hash, data]);
       }
 
+      List descricaoStringList = lancamento.descricao.split(' ');
+      List ultimoElementoDescricao = descricaoStringList.removeLast().split('/');
+      String primeirosElementosDescricao = descricaoStringList.join(' ');
+      int x = int.parse(ultimoElementoDescricao[0]);
+
       for(var i = 0; i < datas.length; i++) {
         Lancamento lancamentoEditado = new Lancamento();
         lancamentoEditado.tipo = lancamento.tipo;
@@ -1660,13 +1661,13 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         lancamentoEditado.idcontadestino = lancamento.idcontadestino;
         lancamentoEditado.idcartao = lancamento.idcartao;
         lancamentoEditado.valor = lancamento.valor;
-        lancamentoEditado.descricao = lancamento.descricao;
+        lancamentoEditado.descricao = primeirosElementosDescricao + ' ' + (x+i).toString() + '/' + lancamento.quantidaderepeticao.toString();
         lancamentoEditado.tiporepeticao = lancamento.tiporepeticao;
-        lancamentoEditado.quantidaderepeticao = datas.length;
+        lancamentoEditado.quantidaderepeticao = lancamento.quantidaderepeticao;
         lancamentoEditado.periodorepeticao = lancamento.periodorepeticao;
         lancamentoEditado.datafatura = lancamento.datafatura;
         lancamentoEditado.pago = lancamento.pago;
-        lancamentoEditado.hash = hashNovo;
+        lancamentoEditado.hash = lancamento.hash;
         lancamentoEditado.data = lancamento.data;
 
         int days = i * periodos[lancamentoEditado.periodorepeticao];
@@ -1691,9 +1692,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       return true;
 
     } else {
-      var uuid = new Uuid();
-      String hashNovo = uuid.v4();
-
       List datas = [];
 
       List mesesLista = listaDosMeses(
@@ -1717,6 +1715,11 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         await db.rawDelete("DELETE FROM lancamento WHERE hash = ? AND data = ?", [lancamento.hash, data]);
       }
 
+      List descricaoStringList = lancamento.descricao.split(' ');
+      List ultimoElementoDescricao = descricaoStringList.removeLast().split('/');
+      String primeirosElementosDescricao = descricaoStringList.join(' ');
+      int x = int.parse(ultimoElementoDescricao[0]);
+
       for(var i = 0; i < datas.length; i++) {
         Lancamento lancamentoEditado = new Lancamento();
         lancamentoEditado.tipo = lancamento.tipo;
@@ -1727,13 +1730,13 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         lancamentoEditado.idcontadestino = lancamento.idcontadestino;
         lancamentoEditado.idcartao = lancamento.idcartao;
         lancamentoEditado.valor = lancamento.valor;
-        lancamentoEditado.descricao = lancamento.descricao;
+        lancamentoEditado.descricao = primeirosElementosDescricao + ' ' + (x+i).toString() + '/' + lancamento.quantidaderepeticao.toString();
         lancamentoEditado.tiporepeticao = lancamento.tiporepeticao;
-        lancamentoEditado.quantidaderepeticao = datas.length;
+        lancamentoEditado.quantidaderepeticao = lancamento.quantidaderepeticao;
         lancamentoEditado.periodorepeticao = lancamento.periodorepeticao;
         lancamentoEditado.datafatura = lancamento.datafatura;
         lancamentoEditado.pago = lancamento.pago;
-        lancamentoEditado.hash = hashNovo;
+        lancamentoEditado.hash = lancamento.hash;
         lancamentoEditado.data = lancamento.data;
 
         int days = i * periodos[lancamentoEditado.periodorepeticao];

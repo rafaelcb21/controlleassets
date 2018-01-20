@@ -615,7 +615,7 @@ class FormularioState extends State<Formulario> {
     this.cores = listaCores.cores;
 
     if(!this.editar) {
-      lancamentoDB.pago = 0;
+      lancamentoDB.pago = 1;
     } else {
       lancamentoDB.idcategoria = this.lancamentoDBEditar.idcategoria;
       lancamentoDB.idconta = this.lancamentoDBEditar.idconta;
@@ -1843,11 +1843,11 @@ class FormularioState extends State<Formulario> {
                           lancamento.idcontadestino = lancamentoDB.idcontadestino;
                           lancamento.idcartao = lancamentoDB.idcartao;
                           lancamento.valor = lancamento.tipo == 'Despesa' ? -1*lancamentoDB.valor : lancamentoDB.valor;
-                          lancamento.descricao = lancamentoDB.descricao;
+                          lancamento.descricao = lancamentoDB.descricao + ' ' + (i + 1).toString() + '/' + ((lancamentoDB.quantidaderepeticao).round()).toString();
                           lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                           lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
-                          lancamento.pago = lancamentoDB.pago;
+                          lancamento.pago = i > 0 ? 0 : lancamentoDB.pago;
                           lancamento.hash = lancamentoDB.hash;
 
                           if(
@@ -1912,11 +1912,11 @@ class FormularioState extends State<Formulario> {
                           lancamento.idcontadestino = lancamentoDB.idcontadestino;
                           lancamento.idcartao = lancamentoDB.idcartao;
                           lancamento.valor = lancamento.tipo == 'Despesa' ? -1*valorDivisao : valorDivisao;
-                          lancamento.descricao = lancamentoDB.descricao;
+                          lancamento.descricao = lancamentoDB.descricao + ' ' + (i + 1).toString() + '/' + ((lancamentoDB.quantidaderepeticao).round()).toString();
                           lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                           lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
-                          lancamento.pago = lancamentoDB.pago;
+                          lancamento.pago = i > 0 ? 0 : lancamentoDB.pago;
                           lancamento.hash = lancamentoDB.hash;
 
                           if(
@@ -2005,11 +2005,11 @@ class FormularioState extends State<Formulario> {
                           lancamento.idcontadestino = lancamentoDB.idcontadestino;
                           lancamento.idcartao = lancamentoDB.idcartao;
                           lancamento.valor = lancamento.tipo == 'Despesa' ? -1*lancamentoDB.valor : lancamentoDB.valor;
-                          lancamento.descricao = lancamentoDB.descricao;
+                          lancamento.descricao = lancamentoDB.descricao + ' ' + (i + 1).toString() + '/' + ((lancamentoDB.quantidaderepeticao).round()).toString();
                           lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                           lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
-                          lancamento.pago = lancamentoDB.pago;
+                          lancamento.pago = 0;
                           lancamento.hash = lancamentoDB.hash;
 
                           if(
@@ -2160,11 +2160,11 @@ class FormularioState extends State<Formulario> {
                           lancamento.idcontadestino = lancamentoDB.idcontadestino;
                           lancamento.idcartao = lancamentoDB.idcartao;
                           lancamento.valor = lancamento.tipo == 'Despesa' ? -1*valorDivisao : valorDivisao;
-                          lancamento.descricao = lancamentoDB.descricao;
+                          lancamento.descricao = lancamentoDB.descricao + ' ' + (i + 1).toString() + '/' + ((lancamentoDB.quantidaderepeticao).round()).toString();
                           lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                           lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
-                          lancamento.pago = lancamentoDB.pago;
+                          lancamento.pago = 0;
                           lancamento.hash = lancamentoDB.hash;
                           
                           if(
