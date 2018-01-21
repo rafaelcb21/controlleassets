@@ -1446,6 +1446,24 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     return [listaUnica, [[diaSearch], hojeMesDescrito]];
   }
 
+  Future consultarDatas(Lancamento lancamento, String dataInicial) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    if(dataInicial != lancamento.data) {
+      List dataSelecionada = await db.rawQuery('SELECT data FROM lancamento WHERE hash = ? AND data = ?', [lancamento.hash, lancamento.data]);
+      await db.close();
+
+      if(dataSelecionada.length > 0) {
+        return false;
+      }
+    }
+    
+    await db.close();
+    return true;
+  }
+
   Future upsertLancamento(List<Lancamento> list) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
@@ -1606,7 +1624,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         await db.rawDelete("DELETE FROM lancamento WHERE hash = ? AND data = ?", [lancamento.hash, data]);
       }
 
-      print(datas);
       for(var i = 0; i < datas.length; i++) {
         Lancamento lancamentoEditado = new Lancamento();
         lancamentoEditado.tipo = lancamento.tipo;

@@ -1604,23 +1604,7 @@ class FormularioState extends State<Formulario> {
                       )
                     );
                   } else if(lancamentoDB.hash != null && this.editar) { //lancamento parcelado ou dividido
-                    //print(lancamentoDB.idcategoria); == normal
-                    //print(lancamentoDB.idconta); == normal
-                    //print(lancamentoDB.fatura); ~~ cartao
-                    //print(lancamentoDB.hash);
-                    //print(lancamentoDB.valor); == normal
-                    //print(lancamentoDB.data); == normal
-                    //print(lancamentoDB.idcontadestino); ++ transferencia
-                    //print(lancamentoDB.idtag); == normal
-                    //print(lancamentoDB.pago);
-                    //print(lancamentoDB.descricao); == normal
-                    //print(lancamentoDB.id);
-                    //print(lancamentoDB.quantidaderepeticao);
-                    //print(lancamentoDB.idcartao); ~~ cartao
-                    //print(lancamentoDB.tipo);
-                    //print(lancamentoDB.datafatura);
-                    //print(lancamentoDB.periodorepeticao);
-                    //print(lancamentoDB.tiporepeticao);
+                    
 
                     var valor = this.numeroUSA(this.numeros.value);
                     this.formSubmit['valor'] = valor;
@@ -1648,10 +1632,12 @@ class FormularioState extends State<Formulario> {
                         child: child,
                       )
                       .then<Null>((T value) {
-                        Navigator.pop(context, value);
+                        if(value == true) {
+                          Navigator.pop(context, [value]);
+                        } 
                       });
                     }
-
+                    
                     showUpdateDialog<DialogOptionsAction>(
                       context: context,
                       child: new AlertDialog(
@@ -1662,60 +1648,48 @@ class FormularioState extends State<Formulario> {
                             children: <Widget>[
                               new GestureDetector(
                                 onTap: () {
-                                  lancamentoDB.atualizarLancamento(lancamentoDB, this.lancamentoDBEditar.data, false).then(
-                                    (retorno) {                                      
-                                      //if(this.periodo == 'hoje') {                                         
-                                      //  //Navigator.pop(context, [retorno, DateTime.parse(lancamentoDB.data)]);
-                                      //  Navigator.pop(context, [retorno]);
-                                      //} else if(this.periodo == 'semana') {
-                                      //  Navigator.pop(context, [retorno]);
-                                      //} else if(this.periodo == 'mes') {
-                                      //  Navigator.pop(context, [retorno]);
-                                      //} else if(this.periodo == 'periodo') {
-                                      //  DateTime from = this.fromTo[0];
-                                      //  DateTime to = this.fromTo[1];
-                                      //  DateTime dataEscolhida = DateTime.parse(lancamentoDB.data);
-
-                                      //  bool dataDepois = dataEscolhida.isBefore(to);
-                                      //  bool dataAntes = dataEscolhida.isAfter(from);
-                                      //  bool dataIgualFrom = dataEscolhida.compareTo(from) == 0;
-                                      //  bool dataIgualTo = dataEscolhida.compareTo(to) == 0;
-                                      //  bool falseTrue;
-                                      //  
-                                      //  if(dataEscolhida.isAfter(to)){
-                                      //    falseTrue = true;
-                                      //  } else if(dataEscolhida.isBefore(from)) {
-                                      //    falseTrue = false;
-                                      //  }
-
-                                      //  while(!dataDepois && !dataAntes || !dataIgualFrom || !dataIgualTo) {
-                                      //    var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, falseTrue, this.periodo);
-                                      //    from = listaFiltro[0];
-                                      //    to = listaFiltro[1];
-                                      //    
-                                      //    dataDepois = dataEscolhida.isBefore(to);
-                                      //    dataAntes = dataEscolhida.isAfter(from);
-                                      //    dataIgualFrom = dataEscolhida.compareTo(from) == 0;
-                                      //    dataIgualTo = dataEscolhida.compareTo(to) == 0;
-
-                                      //    if(dataDepois && dataAntes) {
-                                      //      dataIgualFrom = true;
-                                      //      dataIgualTo = true;
-                                      //    } else if(dataIgualFrom || dataIgualTo) {
-                                      //      dataDepois = true;
-                                      //      dataAntes = true;
-                                      //      dataIgualFrom = true;
-                                      //      dataIgualTo = true;
-                                      //    }
-
-                                      //    this.periodoFiltro = proximoPeriodo(from, to);                                         
-                                      //  }
-
-                                        //Navigator.pop(context, [retorno, from, to]);
-                                        Navigator.pop(context, [retorno]);
-                                       //}
+                                  lancamentoDB.consultarDatas(lancamentoDB, this.lancamentoDBEditar.data)
+                                  .then((consulta) {
+                                    if(consulta) {
+                                      lancamentoDB.atualizarLancamento(lancamentoDB, this.lancamentoDBEditar.data, false).then(
+                                        (retorno) {                                      
+                                          Navigator.pop(context, retorno);
+                                        }
+                                      );
+                                    } else {
+                                      showLancamentoErroDialog<String>(
+                                        context: context,
+                                        child: new SimpleDialog(
+                                          title: const Text('Erro'),
+                                          children: <Widget>[
+                                            new Container(
+                                              margin: new EdgeInsets.only(left: 24.0),
+                                              child: new Row(
+                                                children: <Widget>[
+                                                  new Container(
+                                                    margin: new EdgeInsets.only(right: 10.0),
+                                                    child: new Icon(
+                                                      Icons.error,
+                                                      color: const Color(0xFFE57373)),
+                                                  ),
+                                                  new Text(
+                                                    "Essa data já existe\nnesse grupo de\nlancamentos",
+                                                    softWrap: true,
+                                                    style: new TextStyle(
+                                                      color: Colors.black45,
+                                                      fontSize: 16.0,
+                                                      fontFamily: "Roboto",
+                                                      fontWeight: FontWeight.w500,
+                                                    )
+                                                  )
+                                                ],
+                                              ),
+                                            )
+                                          ]
+                                        )
+                                      );
                                     }
-                                  );
+                                  });
                                 },
                                 child: new Container(
                                   margin: new EdgeInsets.only(bottom: 16.0),
@@ -1748,7 +1722,7 @@ class FormularioState extends State<Formulario> {
                                 onTap: () {
                                   lancamentoDB.atualizarLancamento(lancamentoDB, this.lancamentoDBEditar.data, true).then(
                                     (retorno) {
-                                      Navigator.pop(context, [retorno]);
+                                      Navigator.pop(context, retorno);
                                     }
                                   );
                                 },
