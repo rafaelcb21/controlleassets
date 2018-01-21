@@ -2083,12 +2083,31 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
-
-    await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]);
     
-    await db.close();
+    if(id != null) {
+      List lancamentoById = await db.rawQuery('SELECT * FROM lancamento WHERE id = ?', [id]);
+      String hash = lancamentoById[0]['hash'];
 
-    return true;
+      await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]).then(
+        (result) async {
+          List lancamentosByHash = await db.rawQuery('SELECT * FROM lancamento WHERE hash = ?', [hash]);
+
+          for(int i = 0; i < lancamentosByHash.length; i++) {
+            id = lancamentosByHash[i]['id'];
+            List descricaoList = lancamentosByHash[i]['descricao'].split(' ');
+            var ultimoElemento = descricaoList.removeLast();
+            String contador = (i + 1).toString() + '/' + lancamentosByHash.length.toString();
+            String descricao = descricaoList.join(' ');
+            String descricaoCompleta = descricao + ' ' + contador;
+
+            await db.rawUpdate("UPDATE lancamento SET descricao = ? WHERE id = ?", [descricaoCompleta, id]);
+          }
+          await db.close();
+
+          return true;
+        }
+      );
+    }
   }
 
   Future deleteLancamentoRepetidos(String date, String hash) async {
