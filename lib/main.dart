@@ -1069,7 +1069,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               if(_angle == 45.0){
                                 _rotate();
                                 
-                                bool isLoggedIn = await Navigator.of(context).push(new PageRouteBuilder(
+                                await Navigator.of(context).push(new PageRouteBuilder(
                                   opaque: false,
                                   pageBuilder: (BuildContext context, _, __) {
                                     return new LancamentoPage(false, new Lancamento(), new Color(0xFFE57373), '', '', []);
