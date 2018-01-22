@@ -956,6 +956,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                 )
               );
             } else if(listaLaunch[3] == 'comCartao') {
+              print(listaLaunch);
+              print(listaLaunch[7]);
               String valor = '';
               String textoPago = '';
               String tipo = listaLaunch[3];
@@ -1381,12 +1383,33 @@ class ItemLancamentoCartaoState extends State<ItemLancamentoCartao> {
     .then<Null>((T value) {});
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
+    Color corDoItem;
+    Color corBrancaItem = new Color(0xFFFAFAFA);
+    int dia = new DateTime.now().day;
+    int mes = new DateTime.now().month;
+    int ano = new DateTime.now().year;
+    DateTime hoje = new DateTime(ano, mes, dia);
+
+
+    if(
+      DateTime.parse(widget.data).isBefore(hoje) &&
+      widget.pago == 0
+    ) {
+      corDoItem = Colors.amber[50];
+    } else if(DateTime.parse(widget.data).compareTo(hoje) == 0){
+      corDoItem = corBrancaItem;
+    } else {
+      corDoItem = corBrancaItem;
+    }
+
     return new Container(
       padding: new EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0, top: 8.0),
       decoration: new BoxDecoration(
-        color: new Color(0xFFFAFAFA),
+        color: corDoItem,
         border: new Border(
           bottom: new BorderSide(
             style: BorderStyle.solid,

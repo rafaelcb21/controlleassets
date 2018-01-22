@@ -2276,7 +2276,7 @@ class FormularioState extends State<Formulario> {
                         lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                         lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
                         lancamento.data = lancamentoDB.data;
-                        lancamento.pago = lancamentoDB.pago;
+                        lancamento.pago = 0;
                         lancamento.fatura = lancamentoDB.fatura;
 
                         lancamentoList.add(lancamento);
