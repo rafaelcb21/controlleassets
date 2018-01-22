@@ -621,17 +621,31 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                         }
                       }
                     );
-
-                    
-                    
                   },
                   onPressed2: () async {
                     void showDeleteDialog<T>({ BuildContext context, Widget child }) {
-                      showDialog<T>(
+                      showDialog<List>(
                         context: context,
                         child: child,
                       )
-                      .then<Null>((T value) { });
+                      .then<Null>((List value) {
+                        if (value != null) {
+                          setState(() {
+                            this.listaDB = value[0][0];
+                            this.periodoFiltro = value[0][1][1];
+
+                            if(value[1] != 'periodo') {                              
+                              this.periodoFiltroDateTime = value[0][1][0][0];
+                            } else {
+                              this.periodoFiltroResumido =
+                                value[0][1][1].substring(0, 7) + value[0][1][1].substring(12, 14)
+                                  + " à " + 
+                                value[0][1][1].substring(17, 24) + value[0][1][1].substring(29, 31);
+                              this.periodoFiltroDateTimeList = value[0][1][0][0];
+                            }
+                          });
+                        }                      
+                      });
                     }
 
                     if(hash == null) {
@@ -659,45 +673,49 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                             new FlatButton(
                               child: const Text('OK'),
                               onPressed: () {
-                                lancamentoDB.deleteLancamento(id);
-                                if(this.periodo == "hoje") {
-                                  lancamentoDB.getLancamentoHoje(this.periodoNext).then(
-                                    (list) {
-                                      setState(() {
-                                        if(list.length > 0) {
-                                          this.listaDB = list[0];
-                                          this.periodoFiltro = list[1][1];
-                                          this.periodoFiltroDateTime = list[1][0][0];
+                                lancamentoDB.deleteLancamentoNaoRepetidos(id).then((data) {
+                                  if(this.periodo == "hoje") {
+                                    lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                                      (list) {
+                                        setState(() {
+                                          if(list.length > 0) {
+                                            Navigator.pop(context, [list]);
+                                          }
+                                        });
+                                      }
+                                    );
+                                  } else if(this.periodo == "semana") {
+                                    lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                                      (list) {
+                                        setState(() {
+                                          if(list.length > 0) {
+                                            Navigator.pop(context, [list]);
+                                          }
+                                        });
+                                      }
+                                    );
+                                  } else if(this.periodo == "mes") {
+                                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                      (list) {
+                                        setState(() {
+                                          if(list.length > 0) {
+                                            Navigator.pop(context, [list]);
+                                          }
+                                        });
+                                      }
+                                    );
+                                  } else if(this.periodo == "periodo") {
+                                    lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                                      (list) {
+                                        setState(() {
+                                          if(list.length > 0) {
+                                            Navigator.pop(context, [list, 'periodo']);
+                                          }
                                         }
-                                      });
-                                    }
-                                  );
-                                } else if(this.periodo == "semana") {
-                                  lancamentoDB.getLancamentoSemana(this.periodoNext).then(
-                                    (list) {
-                                      setState(() {
-                                        if(list.length > 0) {
-                                          this.listaDB = list[0];
-                                          this.periodoFiltro = list[1][1];
-                                          this.periodoFiltroDateTime = list[1][0][0];
-                                        }
-                                      });
-                                    }
-                                  );
-                                } else if(this.periodo == "mes") {
-                                  lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                                    (list) {
-                                      setState(() {
-                                        if(list.length > 0) {
-                                          this.listaDB = list[0];
-                                          this.periodoFiltro = list[1][1];
-                                          this.periodoFiltroDateTime = list[1][0][0];
-                                        }
-                                      });
-                                    }
-                                  );
-                                }
-                                Navigator.pop(context);
+                                      );
+                                    });
+                                  }
+                                });
                               }
                             )
                           ]
@@ -714,46 +732,50 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                               children: <Widget>[
                                 new GestureDetector(
                                   onTap: (){
-                                    lancamentoDB.deleteLancamento(id);
-                                    if(this.periodo == "hoje") {
-                                      lancamentoDB.getLancamentoHoje(this.periodoNext).then(
-                                        (list) {
-                                          setState(() {
-                                            if(list.length > 0) {
-                                              this.listaDB = list[0];
-                                              this.periodoFiltro = list[1][1];
-                                              this.periodoFiltroDateTime = list[1][0][0];
+                                    lancamentoDB.deleteLancamento(id).then((data) {
+                                      if(this.periodo == "hoje") {
+                                        lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                                          (list) {
+                                            setState(() {
+                                              if(list.length > 0) {
+                                                Navigator.pop(context, [list, 'hoje']);
+                                              }
+                                            });
+                                          }
+                                        );
+                                      } else if(this.periodo == "semana") {
+                                        lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                                          (list) {
+                                            setState(() {
+                                              if(list.length > 0) {
+                                                Navigator.pop(context, [list, 'semana']);
+                                              }
+                                            });
+                                          }
+                                        );
+                                      } else if(this.periodo == "mes") {
+                                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                          (list) {
+                                            setState(() {
+                                              if(list.length > 0) {
+                                                Navigator.pop(context, [list, 'mes']);
+                                              }
+                                            });
+                                          }
+                                        );
+                                      } else if(this.periodo == "periodo") {
+                                        lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                                          (list) {
+                                            setState(() {
+                                              if(list.length > 0) {
+                                                Navigator.pop(context, [list, 'periodo']);
+                                              }
                                             }
-                                          });
-                                        }
-                                      );
-                                    } else if(this.periodo == "semana") {
-                                      lancamentoDB.getLancamentoSemana(this.periodoNext).then(
-                                        (list) {
-                                          setState(() {
-                                            if(list.length > 0) {
-                                              this.listaDB = list[0];
-                                              this.periodoFiltro = list[1][1];
-                                              this.periodoFiltroDateTime = list[1][0][0];
-                                            }
-                                          });
-                                        }
-                                      );
-                                    } else if(this.periodo == "mes") {
-                                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                                        (list) {
-                                          setState(() {
-                                            if(list.length > 0) {
-                                              this.listaDB = list[0];
-                                              this.periodoFiltro = list[1][1];
-                                              this.periodoFiltroDateTime = list[1][0][0];
-                                            }
-                                          });
-                                        }
-                                      );
-                                    }
-                                    Navigator.pop(context);
-                                  },
+                                          );
+                                        });
+                                      }
+                                    });
+                                  },                                    
                                   child: new Container(
                                     margin: new EdgeInsets.only(bottom: 16.0),
                                     padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                

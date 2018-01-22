@@ -2110,6 +2110,15 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     }
   }
 
+  Future deleteLancamentoNaoRepetidos(int id) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+    await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]);
+    await db.close();
+    return true;
+  }
+
   Future deleteLancamentoRepetidos(String date, String hash) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
