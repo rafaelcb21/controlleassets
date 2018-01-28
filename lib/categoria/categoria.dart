@@ -23,7 +23,6 @@ class CategoriaPageState extends State<CategoriaPage>{
       (list) {
         setState(() {
           this.listaDB = list;
-          //print(list);
         });
       }
     );
@@ -54,7 +53,7 @@ class CategoriaPageState extends State<CategoriaPage>{
 
         this.listaCategorias.add(
           new ItemCategoria(
-            key: new ObjectKey(i[0]),
+            key: new ObjectKey(id),
             filho: false,
             temFilhos: temFilhos,
             id: id,
@@ -166,13 +165,10 @@ class CategoriaPageState extends State<CategoriaPage>{
                     new FlatButton(
                       child: const Text('OK'),
                       onPressed: () {
-                        categoriaDB.deleteCategoria(listaDelete).then(
-                          (list) {
-                            setState(() {
-                              this.listaDB = list;
-                            });
-                          }
-                        );
+                        categoriaDB.deleteCategoria(listaDelete);                          
+                        setState(() {
+                          list.removeAt(list.indexOf(i));
+                        });
                         Navigator.pop(context);
                       }
                     )
@@ -196,7 +192,7 @@ class CategoriaPageState extends State<CategoriaPage>{
             this.listaCategorias.add(
               //new ItemCategoria(true, id2, categoria2, cor2, numeroCor2, idcategoriapai2, ativada2)
               new ItemCategoria(
-                key: new ObjectKey(y),
+                key: new ObjectKey(id2),
                 filho: true,
                 temFilhos: false,
                 id: id2,
@@ -1123,7 +1119,7 @@ class ItemCategoriaState extends State<ItemCategoria> with TickerProviderStateMi
                                       fontFamily: "Roboto",
                                       fontWeight: FontWeight.w500,
                                     ),
-                                  ),                                             
+                                  ),
                                 ],
                               )
                             )

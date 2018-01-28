@@ -4,7 +4,7 @@ import '../palette/palette.dart';
 import '../db/database.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
-
+import 'package:flutter/animation.dart';
 import "./lancamento.dart";
 
 class ConsultaLancamentoPage extends StatefulWidget {
@@ -12,7 +12,7 @@ class ConsultaLancamentoPage extends StatefulWidget {
   ConsultaLancamentoPageState createState() => new ConsultaLancamentoPageState();
 }
 
-class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
+class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with TickerProviderStateMixin {
   Color azulAppbar = new Color(0xFF26C6DA);
   Lancamento lancamentoDB = new Lancamento();
   List<Widget> listaLancamentos = [];
@@ -27,9 +27,39 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
   DateTime from;
   DateTime to;
   String periodo = "mes";
+  List total = [];
+
+  AnimationController _controller;
+  Animation<double> _animation;
+  Animation<double> _animation2;
+  Animation<double> _animation3;
+  int _angle = 90;
+  bool _isRotated = true;
+  Color corBrancaItem = new Color(0xFFFAFAFA);
 
   @override
   void initState() {
+    _controller = new AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 180),
+    );
+
+    _animation = new CurvedAnimation(
+      parent: _controller,
+      curve: new Interval(0.0, 1.0, curve: Curves.linear),
+    );
+
+    _animation2 = new CurvedAnimation(
+      parent: _controller,
+      curve: new Interval(0.5, 1.0, curve: Curves.linear),
+    );
+
+    _animation3 = new CurvedAnimation(
+      parent: _controller,
+      curve: new Interval(0.8, 1.0, curve: Curves.linear),
+    );
+    _controller.reverse();
+
     setState(() {
       lancamentoDB.getLancamentoMes(new DateTime.now()).then(
         (list) {
@@ -70,12 +100,22 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
 
   @override
   Widget build(BuildContext context) {
+    final ui.Size logicalSize = MediaQuery.of(context).size;
+    final double _width = logicalSize.width;
+    final double _height = logicalSize.height;
+    
 
     List<Widget> buildLancamentos(lista) {
-      this.listaLancamentos = [
-          ///Filtro
+      this.total = [];
+      this.listaLancamentos = [new Container(
+        padding: new EdgeInsets.only(bottom: 66.0),
+      )];
+
+      for(var i = 0; i < lista.length; i++) {
+        ///Dia
+        this.listaLancamentos.add(
           new Container(
-            padding: new EdgeInsets.only(left: 16.0, right: 16.0, bottom: 12.0),
+            padding: new EdgeInsets.only(left: 8.0, right: 8.0, bottom: 5.0, top: 5.0),
             decoration: new BoxDecoration(
               border: new Border(
                 bottom: new BorderSide(
@@ -87,7 +127,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
             child: new Row(
               children: <Widget>[
                 new Text(
-                  'Filtro:  ',
+                  lista[i][0][2], //dia ex: 1 de fevereiro
                   style: new TextStyle(
                     fontSize: 12.0,
                     fontFamily: 'Roboto',
@@ -96,976 +136,670 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
                 ),
               ],
             ),
-          ),
+          )
+        );
 
-          ///Mes
-          new Container(
-            padding: new EdgeInsets.only(bottom: 9.0, top: 9.0),
-            decoration: new BoxDecoration(
-              border: new Border(
-                bottom: new BorderSide(
-                  style: BorderStyle.solid,
-                  color: Colors.black12,
-                ),
-              )
-            ),
-            child: new Row(
-              children: <Widget>[
-                new Container(
-                  margin: new EdgeInsets.only(left: 8.0),
-                  child: new InkWell(
-                    onTap: (){
-                      setState(() {
-                        var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, false, this.periodo);
-                        this.periodoNext = listaFiltro[1];
+        //for(var u = 0; u < lista[i].length; u++) {
+        for(var listaLaunch in lista[i]) {
+          if(listaLaunch[3] == 'semCartao') {
+            String valor = '';
+            String textoPago = '';
+            int pago = listaLaunch[5];
+            int id = listaLaunch[8];
+            String data = listaLaunch[9];
+            String hash = listaLaunch[6];
+            String tipo = listaLaunch[10];
+            double valorLaunch = listaLaunch[7];
+            String categoria = listaLaunch[4];
+            String descricao = listaLaunch[1];
+            
+            this.total.add(valorLaunch);
 
-                        if(this.periodo == 'periodo') {
-                          this.from = listaFiltro[0];
-                          this.to = listaFiltro[1];
+            if(tipo == "Despesa") {
+              
+              var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
+              valor = f.format(valorLaunch);
+              if(pago == 0){
+                textoPago = "não pago";
+              } else {
+                textoPago = "pago";
+              }
+            } else {
+              var f = new NumberFormat.currency(locale: 'pt_BR', symbol: "", decimalDigits: 2);
+              valor = f.format(valorLaunch);
+
+              if(pago == 0 && tipo == "Receita"){
+                textoPago = "não recebido";
+              } else if(pago == 0 && tipo == "Transferência") {
+                textoPago = "não transferido";
+              } else if(pago == 1 && tipo == "Receita") {
+                textoPago = "recebido";
+              } else if(pago == 1 && tipo == "Transferência") {
+                textoPago = "transferido";
+              }
+            }   
+          
+            this.listaLancamentos.add(
+              new ItemLancamento(
+                key: new ObjectKey(id),
+                id: id,
+                tipo: tipo,
+                categoria: categoria,
+                //idtag: lista[i][1][u]['idtag'],
+                //idconta: lista[i][1][u]['idconta'],
+                //idcontadestino: lista[i][1][u]['idcontadestino'],
+                //idcartao: lista[i][1][u]['idcartao'],
+                valor: valor,
+                data: data,
+                descricao: descricao,
+                //tiporepeticao: lista[i][1][u]['tiporepeticao'],
+                //periodorepeticao: lista[i][1][u]['periodorepeticao'],
+                //quantidaderepeticao: lista[i][1][u]['quantidaderepeticao'],
+                //fatura: lista[i][1][u]['fatura'],
+                pago: pago,
+                textoPago: textoPago,
+                hash: hash,
+                onPressed: () {
+                  
+                  lancamentoDB.getLancamento(id).then(
+                    (list) async {                        
+                      lancamentoDB.idcategoria = list[0]['idcategoria'];
+                      lancamentoDB.idconta = list[0]['idconta'];
+                      lancamentoDB.fatura = list[0]['fatura'];
+                      lancamentoDB.hash = list[0]['hash'];
+                      lancamentoDB.valor = list[0]['valor'];
+                      lancamentoDB.data = list[0]['data'];
+                      lancamentoDB.idcontadestino = list[0]['idcontadestino'];
+                      lancamentoDB.idtag = list[0]['idtag'];
+                      lancamentoDB.pago = list[0]['pago'];
+                      lancamentoDB.descricao = list[0]['descricao'];
+                      lancamentoDB.id = list[0]['id'];
+                      lancamentoDB.quantidaderepeticao = list[0]['quantidaderepeticao'];
+                      lancamentoDB.idcartao = list[0]['idcartao'];
+                      lancamentoDB.tipo = list[0]['tipo'];
+                      lancamentoDB.datafatura = list[0]['datafatura'];
+                      lancamentoDB.periodorepeticao = list[0]['periodorepeticao'];
+                      lancamentoDB.tiporepeticao = list[0]['tiporepeticao'];
+
+                      Color corLancamento;
+
+                      if(list[0]['tipo'] == 'Despesa') {
+                        corLancamento = new Color(0xFFE57373);
+                      } else if(list[0]['tipo'] == 'Transferência') {
+                        corLancamento = new Color(0xFF9E9E9E);
+                      } else {
+                        corLancamento = new Color(0xFF00BFA5);
+                      }
+
+                      List resultado = await Navigator.of(context).push(new PageRouteBuilder(
+                        opaque: false,
+                        pageBuilder: (BuildContext context, _, __) {
+                          return new LancamentoPage(true, lancamentoDB, corLancamento, this.periodo, this.periodoFiltro, [this.from, this.to]);
+                        },
+                        transitionsBuilder: (
+                          BuildContext context,
+                          Animation<double> animation,
+                          Animation<double> secondaryAnimation,
+                          Widget child,
+                        ) {
+                          return new SlideTransition(
+                            position: new Tween<Offset>(
+                              begin:  const Offset(1.0, 0.0),
+                              end: Offset.zero,
+                            ).animate(animation),
+                            child: child,
+                          );
                         }
+                      ));
 
-                        if(this.periodo == "hoje") {
-                          lancamentoDB.getLancamentoHoje(this.periodoNext).then(
-                            (list) {
-                              setState(() {
-                                if(list.length > 0) {
-                                  this.listaDB = list[0];
-                                  this.periodoFiltro = list[1][1];
-                                  this.periodoFiltroDateTime = list[1][0][0];
+                      if(resultado != null) {
+                        if(resultado[0]) {
+                          setState(() {
+                            if(this.periodo == 'hoje') {
+                              lancamentoDB.getLancamentoHoje(this.periodoFiltroDateTime).then(
+                                (list) {
+                                  setState(() {
+                                    this.periodo = "hoje";
+                                    if(list.length > 0) {
+                                      this.listaDB = list[0];
+                                      this.periodoFiltro = list[1][1];
+                                      this.periodoFiltroDateTime = list[1][0][0];
+                                    }            
+                                  });
                                 }
-                              });
-                            }
-                          );
-                        } else if(this.periodo == "semana") {
-                          lancamentoDB.getLancamentoSemana(this.periodoNext).then(
-                            (list) {
-                              setState(() {
-                                if(list.length > 0) {
-                                  this.listaDB = list[0];
-                                  this.periodoFiltro = list[1][1];
-                                  this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
-                                  this.periodoFiltroDateTime = list[1][0][0];
+                              );
+                            } else if (this.periodo == 'semana') {
+                              lancamentoDB.getLancamentoSemana(this.periodoFiltroDateTime).then(
+                                (list) {
+                                  setState(() {
+                                    this.periodo = "semana";
+                                    if(list.length > 0) {
+                                      this.listaDB = list[0];
+                                      this.periodoFiltro = list[1][1];
+                                      this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                      this.periodoFiltroDateTime = list[1][0][0];
+                                    }
+                                  });
                                 }
-                              });
-                            }
-                          );
-                        } else if(this.periodo == "mes") {
-                          lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                            (list) {
-                              setState(() {
-                                if(list.length > 0) {
-                                  this.listaDB = list[0];
-                                  this.periodoFiltro = list[1][1];
-                                  this.periodoFiltroResumido = this.periodoFiltro;
-                                  this.periodoFiltroDateTime = list[1][0][0];
+                              );
+                            } else if(this.periodo == 'mes') {
+                              lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
+                                (list) {
+                                  this.periodo = "mes";
+                                  setState(() {                                  
+                                    if(list.length > 0) {
+                                      this.listaDB = list[0];
+                                      this.periodoFiltro = list[1][1];
+                                      this.periodoFiltroDateTime = list[1][0][0];
+                                    }            
+                                  });
                                 }
-                              });
-                            }
-                          );
-                        } else if(this.periodo == "periodo") {
-                          lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
-                            (list) {
-                              setState(() {
-                                if(list.length > 0) {
-                                  this.listaDB = list[0];
-                                  this.periodoFiltro = list[1][1];
-                                  //23 Dez de 2017 à 29 Dez de 2018
-                                  //this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
-                                  this.periodoFiltroResumido = //23 Dez 17 à 29 Dez 18
-                                    list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
-                                    + " à " + 
-                                    list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
-                                  this.periodoFiltroDateTimeList = list[1][0][0];
+                              );
+                            } else if(this.periodo == 'periodo') {
+                              lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
+                                (list) {
+                                  setState(() {
+                                    if(list.length > 0) {
+                                      this.listaDB = list[0];
+                                      this.periodoFiltro = list[1][1];
+                                      this.periodoFiltroResumido =
+                                        list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                        + " à " + 
+                                        list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                      this.periodoFiltroDateTimeList = list[1][0][0];
+                                    }
+                                  });
                                 }
-                              });
-                            }
-                          );
-                        }                         
-                      });
-                    },
-                    child: new Icon(
-                      Icons.keyboard_arrow_left,
-                      color: new Color(0xFF9E9E9E),
-                      size: 28.0,
-                    ),
-                  ),
-                ),
-                new Expanded(
-                  child: new Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      new InkWell(
-                        onTap: (){
-                          showDialogPeriodos<String>(
-                            context: context,
-                            child: new SimpleDialog(
-                              title: new Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  new Text('Periodos'),
-                                ],
-                              ),
-                              children: <Widget>[
-                                new DialogItem(
-                                  text: "Hoje",
-                                  onPressed: () {
-                                    lancamentoDB.getLancamentoHoje(new DateTime.now()).then(
-                                      (list) {
-                                        setState(() {
-                                          this.periodo = "hoje";
-                                          if(list.length > 0) {
-                                            this.listaDB = list[0];
-                                            this.periodoFiltro = list[1][1];
-                                            this.periodoFiltroDateTime = list[1][0][0];
-                                          }            
-                                        });
-                                      }
-                                    );
-                                    Navigator.pop(context, new DateTime.now());
-                                  }
-                                ),
-                                new DialogItem(
-                                  text: "Esta semana",
-                                  onPressed: () {
-                                    //DateTime agoraDate = new DateTime.now();
-                                    //lancamentoDB.getLancamentoSemana(new DateTime(agoraDate.year, agoraDate.month, agoraDate.day)).then(
-                                    lancamentoDB.getLancamentoSemana(new DateTime.now()).then(
-                                      (list) {
-                                        setState(() {
-                                          this.periodo = "semana";
-                                          if(list.length > 0) {
-                                            this.listaDB = list[0];
-                                            this.periodoFiltro = list[1][1];
-                                            this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
-                                            this.periodoFiltroDateTime = list[1][0][0];
-                                          }
-                                        });
-                                      }
-                                    );
-                                    Navigator.pop(context, new DateTime.now());
-                                  }
-                                ),
-                                new DialogItem(
-                                  text: "Este mes",
-                                  onPressed: () {
-                                    lancamentoDB.getLancamentoMes(new DateTime.now()).then(
-                                      (list) {
-                                        setState(() {
-                                          this.periodo = "mes";
-                                          if(list.length > 0) {
-                                            this.listaDB = list[0];
-                                            this.periodoFiltro = list[1][1];
-                                            this.periodoFiltroDateTime = list[1][0][0];
-                                          }
-                                        });
-                                      }
-                                    );
-                                    Navigator.pop(context, new DateTime.now());
-                                  }
-                                ),
-                                new DialogItem(
-                                  text: "Escolher periodo",
-                                  onPressed: () async {
-                                    Navigator.pop(context);
-                                    List fromAndTo = await Navigator.of(context).push(new PageRouteBuilder(
-                                      opaque: false,
-                                      pageBuilder: (BuildContext context, _, __) {
-                                        return new FullScreenPeriodoDate();
-                                      },
-                                      transitionsBuilder: (
-                                        BuildContext context,
-                                        Animation<double> animation,
-                                        Animation<double> secondaryAnimation,
-                                        Widget child,
-                                      ) {
-                                        return new SlideTransition(
-                                          position: new Tween<Offset>(
-                                            begin:  const Offset(1.0, 0.0),
-                                            end: Offset.zero,
-                                          ).animate(animation),
-                                          child: child,
-                                        );
-                                      }
-                                    ));
+                              );
+                            }                            
+                          });
+                        }
+                      }
+                    }
+                  );
+                },
+                onPressed2: () async {
+                  void showDeleteDialog<T>({ BuildContext context, Widget child }) {
+                    showDialog<List>(
+                      context: context,
+                      child: child,
+                    )
+                    .then<Null>((List value) {
+                      if (value != null) {
+                        setState(() {
+                          this.listaDB = value[0][0];
+                          this.periodoFiltro = value[0][1][1];
 
-                                    if(fromAndTo != null) {
-                                      this.from = fromAndTo[0];
-                                      this.to = fromAndTo[1];
+                          if(value[0][1] != 'periodo') {                              
+                            this.periodoFiltroDateTime = value[0][1][0][0];
+                          } else {
+                            this.periodoFiltroResumido =
+                              value[0][1][1].substring(0, 7) + value[0][1][1].substring(12, 14)
+                                + " à " + 
+                              value[0][1][1].substring(17, 24) + value[0][1][1].substring(29, 31);
+                            this.periodoFiltroDateTimeList = value[0][1][0][0];
+                          }
+                        });
+                      }                      
+                    });
+                  }
+
+                  if(hash == null) {
+                    showDeleteDialog<DialogOptionsAction>(
+                      context: context,
+                      child: new AlertDialog(
+                        title: const Text('Deletar Lançamento'),
+                        content: new Text(
+                            'Deseja deletar esse lançamento?',
+                            softWrap: true,
+                            style: new TextStyle(
+                              color: Colors.black45,
+                              fontSize: 16.0,
+                              fontFamily: "Roboto",
+                              fontWeight: FontWeight.w500,
+                            )
+                        ),
+                        actions: <Widget>[
+                          new FlatButton(
+                            child: const Text('CANCEL'),
+                            onPressed: () {                                
+                              Navigator.pop(context);
+                            }
+                          ),
+                          new FlatButton(
+                            child: const Text('OK'),
+                            onPressed: () {
+                              lancamentoDB.deleteLancamentoNaoRepetidos(id).then((data) {
+                                if(this.periodo == "hoje") {
+                                  lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                                    (list) {
+                                      setState(() {
+                                        if(list.length > 0) {
+                                          Navigator.pop(context, [list]);
+                                        }
+                                      });
+                                    }
+                                  );
+                                } else if(this.periodo == "semana") {
+                                  lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                                    (list) {
+                                      setState(() {
+                                        if(list.length > 0) {
+                                          Navigator.pop(context, [list]);
+                                        }
+                                      });
+                                    }
+                                  );
+                                } else if(this.periodo == "mes") {
+                                  lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                    (list) {
+                                      setState(() {
+                                        if(list.length > 0) {
+                                          Navigator.pop(context, [list]);
+                                        }
+                                      });
+                                    }
+                                  );
+                                } else if(this.periodo == "periodo") {
+                                  lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                                    (list) {
+                                      setState(() {
+                                        if(list.length > 0) {
+                                          Navigator.pop(context, [list, 'periodo']);
+                                        }
+                                      }
+                                    );
+                                  });
+                                }
+                              });
+                            }
+                          )
+                        ]
+                      )
+                    );
+                  } else {
+                    showDeleteDialog<DialogOptionsAction>(
+                      context: context,
+                      child: new AlertDialog(
+                        title: const Text('Deletar Lançamento'),
+                        content: new Container(
+                          height: 120.0,
+                          child: new Column(
+                            children: <Widget>[
+                              new GestureDetector(
+                                onTap: (){
+                                  lancamentoDB.deleteLancamento(id).then((data) {
+                                    if(this.periodo == "hoje") {
+                                      lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
+                                              Navigator.pop(context, [list, 'hoje']);
+                                            }
+                                          });
+                                        }
+                                      );
+                                    } else if(this.periodo == "semana") {
+                                      lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
+                                              Navigator.pop(context, [list, 'semana']);
+                                            }
+                                          });
+                                        }
+                                      );
+                                    } else if(this.periodo == "mes") {
+                                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
+                                              Navigator.pop(context, [list, 'mes']);
+                                            }
+                                          });
+                                        }
+                                      );
+                                    } else if(this.periodo == "periodo") {
                                       lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
                                         (list) {
                                           setState(() {
-                                            this.periodo = list[1][2];
-                                            if(list.length > 0) {                                            
+                                            if(list.length > 0) {
+                                              Navigator.pop(context, [list, 'periodo']);
+                                            }
+                                          }
+                                        );
+                                      });
+                                    }
+                                  });
+                                },                                    
+                                child: new Container(
+                                  margin: new EdgeInsets.only(bottom: 16.0),
+                                  padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                
+                                  width: 250.0,
+                                  height: 40.0,
+                                  decoration: new BoxDecoration(
+                                    color: new Color(0xFF9E9E9E),
+                                    borderRadius: new BorderRadius.circular(3.0)
+                                  ),
+                                  child: new Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      new Text(
+                                        'Apenas esse',
+                                        softWrap: true,
+                                        style: new TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16.0,
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500,
+                                        )
+                                      ),
+                                    ],
+                                  )
+                                ),
+                              ),
+                              new GestureDetector(
+                                onTap: (){
+                                  lancamentoDB.deleteLancamentoRepetidos(data, hash).then((data) {
+                                    if(this.periodo == "hoje") {
+                                      lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
                                               this.listaDB = list[0];
                                               this.periodoFiltro = list[1][1];
-                                              this.periodoFiltroDateTimeList = list[1][0][0];
-                                              //this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
-                                              
-                                              if(this.periodo == "periodo") {
-                                                this.periodoFiltroResumido = //23 Dez 17 à 29 Dez 18
+                                              this.periodoFiltroDateTime = list[1][0][0];
+                                            }
+                                          });
+                                        }
+                                      );
+                                    } else if(this.periodo == "semana") {
+                                      lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
+                                              this.listaDB = list[0];
+                                              this.periodoFiltro = list[1][1];
+                                              this.periodoFiltroDateTime = list[1][0][0];
+                                            }
+                                          });
+                                        }
+                                      );
+                                    } else if(this.periodo == "mes") {
+                                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
+                                              this.listaDB = list[0];
+                                              this.periodoFiltro = list[1][1];
+                                              this.periodoFiltroDateTime = list[1][0][0];
+                                            }
+                                          });
+                                        }
+                                      );
+                                    } else if(this.periodo == "periodo") {
+                                      lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                                        (list) {
+                                          setState(() {
+                                            if(list.length > 0) {
+                                              this.listaDB = list[0];
+                                              this.periodoFiltro = list[1][1];
+                                              this.periodoFiltroResumido =
                                                 list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
-                                                + " à " + 
+                                                  + " à " + 
                                                 list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
-                                              } else if(this.periodo == "mes") {
-                                                this.periodoFiltroResumido = this.periodoFiltro;
-                                              } else if(this.periodo == "semana") {
-                                                this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
-                                              }
+                                              this.periodoFiltroDateTimeList = list[1][0][0];
                                             }
                                           });
                                         }
                                       );
                                     }
-                                  }
+                                    Navigator.pop(context);
+                                  });
+                                },
+                                child: new Container(
+                                  margin: new EdgeInsets.only(bottom: 16.0),
+                                  padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                
+                                  width: 250.0,
+                                  height: 40.0,
+                                  decoration: new BoxDecoration(
+                                    color: new Color(0xFF9E9E9E),
+                                    borderRadius: new BorderRadius.circular(3.0)
+                                  ),
+                                  child: new Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      new Text(
+                                        'Esse e os próximos',
+                                        softWrap: true,
+                                        style: new TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16.0,
+                                          fontFamily: "Roboto",
+                                          fontWeight: FontWeight.w500,
+                                        )
+                                      ),
+                                    ],
+                                  )
                                 ),
-                              ]
-                            )
-                          );
-                        },
-                        child: new Text(                          
-                          this.periodoFiltro.length > 17 ? this.periodoFiltroResumido : this.periodoFiltro,
-                          style: new TextStyle(
-                            fontSize: 16.0,
-                          )
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                new Container(
-                  margin: new EdgeInsets.only(right: 8.0),
-                  child: new InkWell(
-                    onTap: () {
-                      setState(() {
-                        var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true, this.periodo);
-                        this.periodoNext = listaFiltro[1];
-
-                        if(this.periodo == 'periodo') {
-                          this.from = listaFiltro[0];
-                          this.to = listaFiltro[1];
-                        }                        
-
-                        if(this.periodo == "hoje") {
-                          lancamentoDB.getLancamentoHoje(this.periodoNext).then(
-                            (list) {
-                              setState(() {
-                                if(list.length > 0) {
-                                  this.listaDB = list[0];
-                                  this.periodoFiltro = list[1][1];
-                                  this.periodoFiltroDateTime = list[1][0][0];
-                                }
-                              });
-                            }
-                          );
-                        } else if(this.periodo == "semana") {
-                          lancamentoDB.getLancamentoSemana(this.periodoNext).then(
-                            (list) {
-                              setState(() {
-                                if(list.length > 0) {
-                                  this.listaDB = list[0];
-                                  this.periodoFiltro = list[1][1];
-                                  this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
-                                  this.periodoFiltroDateTime = list[1][0][0];
-                                }
-                              });
-                            }
-                          );
-                        } else if(this.periodo == "mes") {
-                          lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                            (list) {
-                              setState(() {
-                                if(list.length > 0) {
-                                  this.listaDB = list[0];
-                                  this.periodoFiltro = list[1][1];
-                                  this.periodoFiltroResumido = this.periodoFiltro;
-                                  this.periodoFiltroDateTime = list[1][0][0];
-                                }
-                              });
-                            }
-                          );
-                        } else if(this.periodo == "periodo") {
-                          lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
-                            (list) {
-                              setState(() {
-                                if(list.length > 0) {
-                                  this.listaDB = list[0];
-                                  this.periodoFiltro = list[1][1];
-                                  //this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
-                                  this.periodoFiltroResumido = //23 Dez 17 à 29 Dez 18
-                                    list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
-                                    + " à " + 
-                                    list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
-                                  this.periodoFiltroDateTimeList = list[1][0][0];
-                                }
-                              });
-                            }
-                          );
-                        } 
-                      });
-                    },
-                    child: new Icon(
-                      Icons.keyboard_arrow_right,
-                      color: new Color(0xFF9E9E9E),
-                      size: 28.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
-        ];
-
-        for(var i = 0; i < lista.length; i++) {
-          ///Dia
-          this.listaLancamentos.add(
-            new Container(
-              padding: new EdgeInsets.only(left: 8.0, right: 8.0, bottom: 5.0, top: 5.0),
-              decoration: new BoxDecoration(
-                border: new Border(
-                  bottom: new BorderSide(
-                    style: BorderStyle.solid,
-                    color: Colors.black12,
-                  ),
-                )
-              ),
-              child: new Row(
-                children: <Widget>[
-                  new Text(
-                    lista[i][0][2], //dia ex: 1 de fevereiro
-                    style: new TextStyle(
-                      fontSize: 12.0,
-                      fontFamily: 'Roboto',
-                      color: new Color(0xFF9E9E9E)
-                    ),
-                  ),
-                ],
-              ),
-            )
-          );
-
-          //for(var u = 0; u < lista[i].length; u++) {
-          for(var listaLaunch in lista[i]) {
-            if(listaLaunch[3] == 'semCartao') {
-              String valor = '';
-              String textoPago = '';
-              int pago = listaLaunch[5];
-              int id = listaLaunch[8];
-              String data = listaLaunch[9];
-              String hash = listaLaunch[6];
-              String tipo = listaLaunch[10];
-              double valorLaunch = listaLaunch[7];
-              String categoria = listaLaunch[4];
-              String descricao = listaLaunch[1];
-              
-              if(tipo == "Despesa") {
-                
-                var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
-                valor = f.format(valorLaunch);
-                if(pago == 0){
-                  textoPago = "não pago";
-                } else {
-                  textoPago = "pago";
-                }
-              } else {
-                var f = new NumberFormat.currency(locale: 'pt_BR', symbol: "", decimalDigits: 2);
-                valor = f.format(valorLaunch);
-
-                if(pago == 0 && tipo == "Receita"){
-                  textoPago = "não recebido";
-                } else if(pago == 0 && tipo == "Transferência") {
-                  textoPago = "não transferido";
-                } else if(pago == 1 && tipo == "Receita") {
-                  textoPago = "recebido";
-                } else if(pago == 1 && tipo == "Transferência") {
-                  textoPago = "transferido";
-                }
-              }   
-            
-              this.listaLancamentos.add(
-                new ItemLancamento(
-                  key: new ObjectKey(listaLaunch),
-                  id: id,
-                  tipo: tipo,
-                  categoria: categoria,
-                  //idtag: lista[i][1][u]['idtag'],
-                  //idconta: lista[i][1][u]['idconta'],
-                  //idcontadestino: lista[i][1][u]['idcontadestino'],
-                  //idcartao: lista[i][1][u]['idcartao'],
-                  valor: valor,
-                  data: data,
-                  descricao: descricao,
-                  //tiporepeticao: lista[i][1][u]['tiporepeticao'],
-                  //periodorepeticao: lista[i][1][u]['periodorepeticao'],
-                  //quantidaderepeticao: lista[i][1][u]['quantidaderepeticao'],
-                  //fatura: lista[i][1][u]['fatura'],
-                  pago: pago,
-                  textoPago: textoPago,
-                  hash: hash,
-                  onPressed: () {
-                    
-                    lancamentoDB.getLancamento(id).then(
-                      (list) async {                        
-                        lancamentoDB.idcategoria = list[0]['idcategoria'];
-                        lancamentoDB.idconta = list[0]['idconta'];
-                        lancamentoDB.fatura = list[0]['fatura'];
-                        lancamentoDB.hash = list[0]['hash'];
-                        lancamentoDB.valor = list[0]['valor'];
-                        lancamentoDB.data = list[0]['data'];
-                        lancamentoDB.idcontadestino = list[0]['idcontadestino'];
-                        lancamentoDB.idtag = list[0]['idtag'];
-                        lancamentoDB.pago = list[0]['pago'];
-                        lancamentoDB.descricao = list[0]['descricao'];
-                        lancamentoDB.id = list[0]['id'];
-                        lancamentoDB.quantidaderepeticao = list[0]['quantidaderepeticao'];
-                        lancamentoDB.idcartao = list[0]['idcartao'];
-                        lancamentoDB.tipo = list[0]['tipo'];
-                        lancamentoDB.datafatura = list[0]['datafatura'];
-                        lancamentoDB.periodorepeticao = list[0]['periodorepeticao'];
-                        lancamentoDB.tiporepeticao = list[0]['tiporepeticao'];
-
-                        Color corLancamento;
-
-                        if(list[0]['tipo'] == 'Despesa') {
-                          corLancamento = new Color(0xFFE57373);
-                        } else if(list[0]['tipo'] == 'Transferência') {
-                          corLancamento = new Color(0xFF9E9E9E);
-                        } else {
-                          corLancamento = new Color(0xFF00BFA5);
-                        }
-
-                        List resultado = await Navigator.of(context).push(new PageRouteBuilder(
-                          opaque: false,
-                          pageBuilder: (BuildContext context, _, __) {
-                            return new LancamentoPage(true, lancamentoDB, corLancamento, this.periodo, this.periodoFiltro, [this.from, this.to]);
-                          },
-                          transitionsBuilder: (
-                            BuildContext context,
-                            Animation<double> animation,
-                            Animation<double> secondaryAnimation,
-                            Widget child,
-                          ) {
-                            return new SlideTransition(
-                              position: new Tween<Offset>(
-                                begin:  const Offset(1.0, 0.0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            );
-                          }
-                        ));
-
-                        if(resultado != null) {
-                          if(resultado[0]) {
-                            setState(() {
-                              if(this.periodo == 'hoje') {
-                                lancamentoDB.getLancamentoHoje(this.periodoFiltroDateTime).then(
-                                  (list) {
-                                    setState(() {
-                                      this.periodo = "hoje";
-                                      if(list.length > 0) {
-                                        this.listaDB = list[0];
-                                        this.periodoFiltro = list[1][1];
-                                        this.periodoFiltroDateTime = list[1][0][0];
-                                      }            
-                                    });
-                                  }
-                                );
-                              } else if (this.periodo == 'semana') {
-                                lancamentoDB.getLancamentoSemana(this.periodoFiltroDateTime).then(
-                                  (list) {
-                                    setState(() {
-                                      this.periodo = "semana";
-                                      if(list.length > 0) {
-                                        this.listaDB = list[0];
-                                        this.periodoFiltro = list[1][1];
-                                        this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
-                                        this.periodoFiltroDateTime = list[1][0][0];
-                                      }
-                                    });
-                                  }
-                                );
-                              } else if(this.periodo == 'mes') {
-                                lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
-                                  (list) {
-                                    this.periodo = "mes";
-                                    setState(() {                                  
-                                      if(list.length > 0) {
-                                        this.listaDB = list[0];
-                                        this.periodoFiltro = list[1][1];
-                                        this.periodoFiltroDateTime = list[1][0][0];
-                                      }            
-                                    });
-                                  }
-                                );
-                              } else if(this.periodo == 'periodo') {
-                                lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
-                                  (list) {
-                                    setState(() {
-                                      if(list.length > 0) {
-                                        this.listaDB = list[0];
-                                        this.periodoFiltro = list[1][1];
-                                        this.periodoFiltroResumido =
-                                          list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
-                                          + " à " + 
-                                          list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
-                                        this.periodoFiltroDateTimeList = list[1][0][0];
-                                      }
-                                    });
-                                  }
-                                );
-                              }                            
-                            });
-                          }
-                        }
-                      }
-                    );
-                  },
-                  onPressed2: () async {
-                    void showDeleteDialog<T>({ BuildContext context, Widget child }) {
-                      showDialog<List>(
-                        context: context,
-                        child: child,
                       )
-                      .then<Null>((List value) {
-                        if (value != null) {
+                    );
+                  }
+                },
+                onPressed3: () {
+                  lancamentoDB.updateLancamentoPago(id, pago).then((data) {
+                    if(this.periodo == "hoje") {
+                      lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                        (list) {
                           setState(() {
-                            this.listaDB = value[0][0];
-                            this.periodoFiltro = value[0][1][1];
-
-                            if(value[0][1] != 'periodo') {                              
-                              this.periodoFiltroDateTime = value[0][1][0][0];
-                            } else {
-                              this.periodoFiltroResumido =
-                                value[0][1][1].substring(0, 7) + value[0][1][1].substring(12, 14)
-                                  + " à " + 
-                                value[0][1][1].substring(17, 24) + value[0][1][1].substring(29, 31);
-                              this.periodoFiltroDateTimeList = value[0][1][0][0];
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                              this.periodoFiltroDateTime = list[1][0][0];
                             }
                           });
-                        }                      
-                      });
-                    }
-
-                    if(hash == null) {
-                      showDeleteDialog<DialogOptionsAction>(
-                        context: context,
-                        child: new AlertDialog(
-                          title: const Text('Deletar Lançamento'),
-                          content: new Text(
-                              'Deseja deletar esse lançamento?',
-                              softWrap: true,
-                              style: new TextStyle(
-                                color: Colors.black45,
-                                fontSize: 16.0,
-                                fontFamily: "Roboto",
-                                fontWeight: FontWeight.w500,
-                              )
-                          ),
-                          actions: <Widget>[
-                            new FlatButton(
-                              child: const Text('CANCEL'),
-                              onPressed: () {                                
-                                Navigator.pop(context);
-                              }
-                            ),
-                            new FlatButton(
-                              child: const Text('OK'),
-                              onPressed: () {
-                                lancamentoDB.deleteLancamentoNaoRepetidos(id).then((data) {
-                                  if(this.periodo == "hoje") {
-                                    lancamentoDB.getLancamentoHoje(this.periodoNext).then(
-                                      (list) {
-                                        setState(() {
-                                          if(list.length > 0) {
-                                            Navigator.pop(context, [list]);
-                                          }
-                                        });
-                                      }
-                                    );
-                                  } else if(this.periodo == "semana") {
-                                    lancamentoDB.getLancamentoSemana(this.periodoNext).then(
-                                      (list) {
-                                        setState(() {
-                                          if(list.length > 0) {
-                                            Navigator.pop(context, [list]);
-                                          }
-                                        });
-                                      }
-                                    );
-                                  } else if(this.periodo == "mes") {
-                                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                                      (list) {
-                                        setState(() {
-                                          if(list.length > 0) {
-                                            Navigator.pop(context, [list]);
-                                          }
-                                        });
-                                      }
-                                    );
-                                  } else if(this.periodo == "periodo") {
-                                    lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
-                                      (list) {
-                                        setState(() {
-                                          if(list.length > 0) {
-                                            Navigator.pop(context, [list, 'periodo']);
-                                          }
-                                        }
-                                      );
-                                    });
-                                  }
-                                });
-                              }
-                            )
-                          ]
-                        )
+                        }
                       );
-                    } else {
-                      showDeleteDialog<DialogOptionsAction>(
-                        context: context,
-                        child: new AlertDialog(
-                          title: const Text('Deletar Lançamento'),
-                          content: new Container(
-                            height: 120.0,
-                            child: new Column(
-                              children: <Widget>[
-                                new GestureDetector(
-                                  onTap: (){
-                                    lancamentoDB.deleteLancamento(id).then((data) {
-                                      if(this.periodo == "hoje") {
-                                        lancamentoDB.getLancamentoHoje(this.periodoNext).then(
-                                          (list) {
-                                            setState(() {
-                                              if(list.length > 0) {
-                                                Navigator.pop(context, [list, 'hoje']);
-                                              }
-                                            });
-                                          }
-                                        );
-                                      } else if(this.periodo == "semana") {
-                                        lancamentoDB.getLancamentoSemana(this.periodoNext).then(
-                                          (list) {
-                                            setState(() {
-                                              if(list.length > 0) {
-                                                Navigator.pop(context, [list, 'semana']);
-                                              }
-                                            });
-                                          }
-                                        );
-                                      } else if(this.periodo == "mes") {
-                                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                                          (list) {
-                                            setState(() {
-                                              if(list.length > 0) {
-                                                Navigator.pop(context, [list, 'mes']);
-                                              }
-                                            });
-                                          }
-                                        );
-                                      } else if(this.periodo == "periodo") {
-                                        lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
-                                          (list) {
-                                            setState(() {
-                                              if(list.length > 0) {
-                                                Navigator.pop(context, [list, 'periodo']);
-                                              }
-                                            }
-                                          );
-                                        });
-                                      }
-                                    });
-                                  },                                    
-                                  child: new Container(
-                                    margin: new EdgeInsets.only(bottom: 16.0),
-                                    padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                
-                                    width: 250.0,
-                                    height: 40.0,
-                                    decoration: new BoxDecoration(
-                                      color: new Color(0xFF9E9E9E),
-                                      borderRadius: new BorderRadius.circular(3.0)
-                                    ),
-                                    child: new Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        new Text(
-                                          'Apenas esse',
-                                          softWrap: true,
-                                          style: new TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16.0,
-                                            fontFamily: "Roboto",
-                                            fontWeight: FontWeight.w500,
-                                          )
-                                        ),
-                                      ],
-                                    )
-                                  ),
-                                ),
-                                new GestureDetector(
-                                  onTap: (){
-                                    lancamentoDB.deleteLancamentoRepetidos(data, hash).then((data) {
-                                      if(this.periodo == "hoje") {
-                                        lancamentoDB.getLancamentoHoje(this.periodoNext).then(
-                                          (list) {
-                                            setState(() {
-                                              if(list.length > 0) {
-                                                this.listaDB = list[0];
-                                                this.periodoFiltro = list[1][1];
-                                                this.periodoFiltroDateTime = list[1][0][0];
-                                              }
-                                            });
-                                          }
-                                        );
-                                      } else if(this.periodo == "semana") {
-                                        lancamentoDB.getLancamentoSemana(this.periodoNext).then(
-                                          (list) {
-                                            setState(() {
-                                              if(list.length > 0) {
-                                                this.listaDB = list[0];
-                                                this.periodoFiltro = list[1][1];
-                                                this.periodoFiltroDateTime = list[1][0][0];
-                                              }
-                                            });
-                                          }
-                                        );
-                                      } else if(this.periodo == "mes") {
-                                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                                          (list) {
-                                            setState(() {
-                                              if(list.length > 0) {
-                                                this.listaDB = list[0];
-                                                this.periodoFiltro = list[1][1];
-                                                this.periodoFiltroDateTime = list[1][0][0];
-                                              }
-                                            });
-                                          }
-                                        );
-                                      } else if(this.periodo == "periodo") {
-                                        lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
-                                          (list) {
-                                            setState(() {
-                                              if(list.length > 0) {
-                                                this.listaDB = list[0];
-                                                this.periodoFiltro = list[1][1];
-                                                this.periodoFiltroResumido =
-                                                  list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
-                                                    + " à " + 
-                                                  list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
-                                                this.periodoFiltroDateTimeList = list[1][0][0];
-                                              }
-                                            });
-                                          }
-                                        );
-                                      }
-                                      Navigator.pop(context);
-                                    });
-                                  },
-                                  child: new Container(
-                                    margin: new EdgeInsets.only(bottom: 16.0),
-                                    padding: new EdgeInsets.only(left: 16.0, right: 16.0),                                
-                                    width: 250.0,
-                                    height: 40.0,
-                                    decoration: new BoxDecoration(
-                                      color: new Color(0xFF9E9E9E),
-                                      borderRadius: new BorderRadius.circular(3.0)
-                                    ),
-                                    child: new Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        new Text(
-                                          'Esse e os próximos',
-                                          softWrap: true,
-                                          style: new TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16.0,
-                                            fontFamily: "Roboto",
-                                            fontWeight: FontWeight.w500,
-                                          )
-                                        ),
-                                      ],
-                                    )
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
+                    } else if(this.periodo == "semana") {
+                      lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                              this.periodoFiltroDateTime = list[1][0][0];
+                            }
+                          });
+                        }
+                      );
+                    } else if(this.periodo == "mes") {
+                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                              this.periodoFiltroDateTime = list[1][0][0];
+                            }
+                          });
+                        }
+                      );
+                    } else if(this.periodo == "periodo") {
+                      lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                              this.periodoFiltroResumido =
+                                list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                  + " à " + 
+                                list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                              this.periodoFiltroDateTimeList = list[1][0][0];
+                            }
+                          });
+                        }
                       );
                     }
-                  },
-                  onPressed3: () {
-                    lancamentoDB.updateLancamentoPago(id, pago).then((data) {
-                      if(this.periodo == "hoje") {
-                        lancamentoDB.getLancamentoHoje(this.periodoNext).then(
-                          (list) {
-                            setState(() {
-                              if(list.length > 0) {
-                                this.listaDB = list[0];
-                                this.periodoFiltro = list[1][1];
-                                this.periodoFiltroDateTime = list[1][0][0];
-                              }
-                            });
-                          }
-                        );
-                      } else if(this.periodo == "semana") {
-                        lancamentoDB.getLancamentoSemana(this.periodoNext).then(
-                          (list) {
-                            setState(() {
-                              if(list.length > 0) {
-                                this.listaDB = list[0];
-                                this.periodoFiltro = list[1][1];
-                                this.periodoFiltroDateTime = list[1][0][0];
-                              }
-                            });
-                          }
-                        );
-                      } else if(this.periodo == "mes") {
-                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                          (list) {
-                            setState(() {
-                              if(list.length > 0) {
-                                this.listaDB = list[0];
-                                this.periodoFiltro = list[1][1];
-                                this.periodoFiltroDateTime = list[1][0][0];
-                              }
-                            });
-                          }
-                        );
-                      } else if(this.periodo == "periodo") {
-                        lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
-                          (list) {
-                            setState(() {
-                              if(list.length > 0) {
-                                this.listaDB = list[0];
-                                this.periodoFiltro = list[1][1];
-                                this.periodoFiltroResumido =
-                                  list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
-                                    + " à " + 
-                                  list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
-                                this.periodoFiltroDateTimeList = list[1][0][0];
-                              }
-                            });
-                          }
-                        );
-                      }
-                    });
-                  },
-                )
-              );
-            } else if(listaLaunch[3] == 'comCartao') {
-              print(listaLaunch);
-              print(listaLaunch[7]);
-              String valor = '';
-              String textoPago = '';
-              String tipo = listaLaunch[3];
-              double valorLaunch = listaLaunch[5];
-              int pago = listaLaunch[7];
-              String categoria = listaLaunch[4];
-              String descricao = listaLaunch[1];
-              List ids = listaLaunch[8];
+                  });
+                },
+              )
+            );
+          } else if(listaLaunch[3] == 'comCartao') {
+            String valor = '';
+            String textoPago = '';
+            String tipo = listaLaunch[3];
+            double valorLaunch = listaLaunch[5];
+            int pago = listaLaunch[7];
+            String categoria = listaLaunch[4];
+            String descricao = listaLaunch[1];
+            List ids = listaLaunch[8];
 
-              //var data = new DateFormat("yyyy-MM-dd").parse(STRING);
-              //var dataFormatada = new DateFormat.yMMMM("pt_BR").format(DATETIME).toString();
+            this.total.add(valorLaunch);
 
-              String data = new DateFormat("yyyy-MM-dd").format(listaLaunch[0]);
-              
-              if(valorLaunch < 0) {
-                var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
-                valor = f.format(valorLaunch);
-                if(pago == 0){
-                  textoPago = "não pago";
-                } else {
-                  textoPago = "pago";
-                }
-              } else if(valorLaunch > 0) {
-                var f = new NumberFormat.currency(locale: 'pt_BR', symbol: "", decimalDigits: 2);
-                valor = f.format(valorLaunch);
-                if(pago == 0){
-                  textoPago = "não recebido";
-                } else {
-                  textoPago = "recebido";
-                }
+            //var data = new DateFormat("yyyy-MM-dd").parse(STRING);
+            //var dataFormatada = new DateFormat.yMMMM("pt_BR").format(DATETIME).toString();
+
+            String data = new DateFormat("yyyy-MM-dd").format(listaLaunch[0]);
+            
+            if(valorLaunch < 0) {
+              var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
+              valor = f.format(valorLaunch);
+              if(pago == 0){
+                textoPago = "não pago";
+              } else {
+                textoPago = "pago";
               }
-
-              this.listaLancamentos.add(
-                new ItemLancamentoCartao(
-                  key: new ObjectKey(listaLaunch),
-                  ids: ids,
-                  tipo: tipo,
-                  categoria: "cartão " + categoria,
-                  valor: valor,
-                  valorOriginal: valorLaunch,
-                  data: data.toString(),
-                  descricao: descricao,
-                  pago: pago,
-                  textoPago: textoPago,
-                  
-                  onPressed2: () {
-                    lancamentoDB.updateLancamentoPagoFatura(ids, pago).then((data) {
-                      if(this.periodo == "hoje") {
-                        lancamentoDB.getLancamentoHoje(this.periodoNext).then(
-                          (list) {
-                            setState(() {
-                              if(list.length > 0) {
-                                this.listaDB = list[0];
-                                this.periodoFiltro = list[1][1];
-                                this.periodoFiltroDateTime = list[1][0][0];
-                              }
-                            });
-                          }
-                        );
-                      } else if(this.periodo == "semana") {
-                        lancamentoDB.getLancamentoSemana(this.periodoNext).then(
-                          (list) {
-                            setState(() {
-                              if(list.length > 0) {
-                                this.listaDB = list[0];
-                                this.periodoFiltro = list[1][1];
-                                this.periodoFiltroDateTime = list[1][0][0];
-                              }
-                            });
-                          }
-                        );
-                      } else if(this.periodo == "mes") {
-                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                          (list) {
-                            setState(() {
-                              if(list.length > 0) {
-                                this.listaDB = list[0];
-                                this.periodoFiltro = list[1][1];
-                                this.periodoFiltroDateTime = list[1][0][0];
-                              }
-                            });
-                          }
-                        );
-                      } else if(this.periodo == "periodo") {
-                        lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
-                          (list) {
-                            setState(() {
-                              if(list.length > 0) {
-                                this.listaDB = list[0];
-                                this.periodoFiltro = list[1][1];
-                                this.periodoFiltroResumido =
-                                  list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
-                                    + " à " + 
-                                  list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
-                                this.periodoFiltroDateTimeList = list[1][0][0];
-                              }
-                            });
-                          }
-                        );
-                      }
-                    });
-                  },
-                )
-              );
+            } else if(valorLaunch > 0) {
+              var f = new NumberFormat.currency(locale: 'pt_BR', symbol: "", decimalDigits: 2);
+              valor = f.format(valorLaunch);
+              if(pago == 0){
+                textoPago = "não recebido";
+              } else {
+                textoPago = "recebido";
+              }
             }
+
+            this.listaLancamentos.add(
+              new ItemLancamentoCartao(
+                key: new ObjectKey(ids[0]),
+                ids: ids,
+                tipo: tipo,
+                categoria: "cartão " + categoria,
+                valor: valor,
+                valorOriginal: valorLaunch,
+                data: data.toString(),
+                descricao: descricao,
+                pago: pago,
+                textoPago: textoPago,
+                
+                onPressed2: () {
+                  lancamentoDB.updateLancamentoPagoFatura(ids, pago).then((data) {
+                    if(this.periodo == "hoje") {
+                      lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                              this.periodoFiltroDateTime = list[1][0][0];
+                            }
+                          });
+                        }
+                      );
+                    } else if(this.periodo == "semana") {
+                      lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                              this.periodoFiltroDateTime = list[1][0][0];
+                            }
+                          });
+                        }
+                      );
+                    } else if(this.periodo == "mes") {
+                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                              this.periodoFiltroDateTime = list[1][0][0];
+                            }
+                          });
+                        }
+                      );
+                    } else if(this.periodo == "periodo") {
+                      lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                              this.periodoFiltroResumido =
+                                list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                  + " à " + 
+                                list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                              this.periodoFiltroDateTimeList = list[1][0][0];
+                            }
+                          });
+                        }
+                      );
+                    }
+                  });
+                },
+              )
+            );
           }
-        }      
+        }
+      }
+
+      this.listaLancamentos.add(
+        new Container(
+          padding: new EdgeInsets.only(top: 130.0),
+        )
+      );
+
       return this.listaLancamentos;
+    }
+
+    void _rotate(){
+      setState((){
+        if(_isRotated) {
+          _angle = 45;
+          _isRotated = false;
+          _controller.forward(from: 0.0);
+        } else {
+          _angle = 90;
+          _isRotated = true;
+          _controller.reverse(from: 1.0);
+        }
+      });
+    }
+
+    List totalLista(List listaValores) {
+      if(listaValores.length != 0) {
+        int total = listaValores.reduce((a, b) => a + b);
+        var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
+        var valor = 'R\$ ' + f.format(total);
+
+        if(total < 0) {
+          return [valor, new Color(0xFFE57373)];
+        } else {
+          return [valor, new Color(0xFF00BFA5)];
+        }
+      }
+
+      return ['R\$ 0,00', new Color(0xFF00BFA5)];
+      
     }
 
     return new Scaffold( 
@@ -1080,11 +814,888 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>{
           )
         ],
       ),
-      body: this.listaDB == [] ? new Container() : 
-        new ListView(
-          padding: new EdgeInsets.only(top: 16.0),
-          children: buildLancamentos(this.listaDB)
-        )
+      body: new Stack(
+        children: <Widget>[
+          this.listaDB == [] ? new Container() : 
+          new ListView(
+            padding: new EdgeInsets.only(top: 16.0),
+            children: buildLancamentos(this.listaDB)
+          ),
+//////////////////////////////////
+          new Positioned(
+            top: 0.0,
+            right: 0.0,
+            left: 0.0,
+            child: new Column(
+              children: <Widget>[
+                ///FIltro
+                new Container(
+                  padding: new EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8.0, top: 12.0),
+                  decoration: new BoxDecoration(
+                    color: this.corBrancaItem,
+                    border: new Border(
+                      bottom: new BorderSide(
+                        style: BorderStyle.solid,
+                        color: Colors.black12,
+                      ),
+                    )
+                  ),
+                  child: new Row(
+                    children: <Widget>[
+                      new Text(
+                        'Filtro:  ',
+                        style: new TextStyle(
+                          fontSize: 12.0,
+                          fontFamily: 'Roboto',
+                          color: new Color(0xFF9E9E9E)
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                ///Mes
+                new Container(
+                  padding: new EdgeInsets.only(bottom: 9.0, top: 9.0),
+                  decoration: new BoxDecoration(
+                    color: this.corBrancaItem,
+                    border: new Border(
+                      bottom: new BorderSide(
+                        style: BorderStyle.solid,
+                        color: Colors.black12,
+                      ),
+                    )
+                  ),
+                  child: new Row(
+                    children: <Widget>[
+                      new Container(
+                        margin: new EdgeInsets.only(left: 8.0),
+                        child: new InkWell(
+                          onTap: (){
+                            setState(() {
+                              var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, false, this.periodo);
+                              this.periodoNext = listaFiltro[1];
+
+                              if(this.periodo == 'periodo') {
+                                this.from = listaFiltro[0];
+                                this.to = listaFiltro[1];
+                              }
+
+                              if(this.periodo == "hoje") {
+                                lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                                  (list) {
+                                    setState(() {
+                                      if(list.length > 0) {
+                                        this.listaDB = list[0];
+                                        this.periodoFiltro = list[1][1];
+                                        this.periodoFiltroDateTime = list[1][0][0];
+                                      }
+                                    });
+                                  }
+                                );
+                              } else if(this.periodo == "semana") {
+                                lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                                  (list) {
+                                    setState(() {
+                                      if(list.length > 0) {
+                                        this.listaDB = list[0];
+                                        this.periodoFiltro = list[1][1];
+                                        this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                        this.periodoFiltroDateTime = list[1][0][0];
+                                      }
+                                    });
+                                  }
+                                );
+                              } else if(this.periodo == "mes") {
+                                lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                  (list) {
+                                    setState(() {
+                                      if(list.length > 0) {
+                                        this.listaDB = list[0];
+                                        this.periodoFiltro = list[1][1];
+                                        this.periodoFiltroResumido = this.periodoFiltro;
+                                        this.periodoFiltroDateTime = list[1][0][0];
+                                      }
+                                    });
+                                  }
+                                );
+                              } else if(this.periodo == "periodo") {
+                                lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                                  (list) {
+                                    setState(() {
+                                      if(list.length > 0) {
+                                        this.listaDB = list[0];
+                                        this.periodoFiltro = list[1][1];
+                                        //23 Dez de 2017 à 29 Dez de 2018
+                                        //this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                        this.periodoFiltroResumido = //23 Dez 17 à 29 Dez 18
+                                          list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                          + " à " + 
+                                          list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                        this.periodoFiltroDateTimeList = list[1][0][0];
+                                      }
+                                    });
+                                  }
+                                );
+                              }                         
+                            });
+                          },
+                          child: new Icon(
+                            Icons.keyboard_arrow_left,
+                            color: new Color(0xFF9E9E9E),
+                            size: 28.0,
+                          ),
+                        ),
+                      ),
+                      new Expanded(
+                        child: new Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            new InkWell(
+                              onTap: (){
+                                showDialogPeriodos<String>(
+                                  context: context,
+                                  child: new SimpleDialog(
+                                    title: new Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        new Text('Periodos'),
+                                      ],
+                                    ),
+                                    children: <Widget>[
+                                      new DialogItem(
+                                        text: "Hoje",
+                                        onPressed: () {
+                                          lancamentoDB.getLancamentoHoje(new DateTime.now()).then(
+                                            (list) {
+                                              setState(() {
+                                                this.periodo = "hoje";
+                                                if(list.length > 0) {
+                                                  this.listaDB = list[0];
+                                                  this.periodoFiltro = list[1][1];
+                                                  this.periodoFiltroDateTime = list[1][0][0];
+                                                }            
+                                              });
+                                            }
+                                          );
+                                          Navigator.pop(context, new DateTime.now());
+                                        }
+                                      ),
+                                      new DialogItem(
+                                        text: "Esta semana",
+                                        onPressed: () {
+                                          //DateTime agoraDate = new DateTime.now();
+                                          //lancamentoDB.getLancamentoSemana(new DateTime(agoraDate.year, agoraDate.month, agoraDate.day)).then(
+                                          lancamentoDB.getLancamentoSemana(new DateTime.now()).then(
+                                            (list) {
+                                              setState(() {
+                                                this.periodo = "semana";
+                                                if(list.length > 0) {
+                                                  this.listaDB = list[0];
+                                                  this.periodoFiltro = list[1][1];
+                                                  this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                                  this.periodoFiltroDateTime = list[1][0][0];
+                                                }
+                                              });
+                                            }
+                                          );
+                                          Navigator.pop(context, new DateTime.now());
+                                        }
+                                      ),
+                                      new DialogItem(
+                                        text: "Este mes",
+                                        onPressed: () {
+                                          lancamentoDB.getLancamentoMes(new DateTime.now()).then(
+                                            (list) {
+                                              setState(() {
+                                                this.periodo = "mes";
+                                                if(list.length > 0) {
+                                                  this.listaDB = list[0];
+                                                  this.periodoFiltro = list[1][1];
+                                                  this.periodoFiltroDateTime = list[1][0][0];
+                                                }
+                                              });
+                                            }
+                                          );
+                                          Navigator.pop(context, new DateTime.now());
+                                        }
+                                      ),
+                                      new DialogItem(
+                                        text: "Escolher periodo",
+                                        onPressed: () async {
+                                          Navigator.pop(context);
+                                          List fromAndTo = await Navigator.of(context).push(new PageRouteBuilder(
+                                            opaque: false,
+                                            pageBuilder: (BuildContext context, _, __) {
+                                              return new FullScreenPeriodoDate();
+                                            },
+                                            transitionsBuilder: (
+                                              BuildContext context,
+                                              Animation<double> animation,
+                                              Animation<double> secondaryAnimation,
+                                              Widget child,
+                                            ) {
+                                              return new SlideTransition(
+                                                position: new Tween<Offset>(
+                                                  begin:  const Offset(1.0, 0.0),
+                                                  end: Offset.zero,
+                                                ).animate(animation),
+                                                child: child,
+                                              );
+                                            }
+                                          ));
+
+                                          if(fromAndTo != null) {
+                                            this.from = fromAndTo[0];
+                                            this.to = fromAndTo[1];
+                                            lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                                              (list) {
+                                                setState(() {
+                                                  this.periodo = list[1][2];
+                                                  if(list.length > 0) {                                            
+                                                    this.listaDB = list[0];
+                                                    this.periodoFiltro = list[1][1];
+                                                    this.periodoFiltroDateTimeList = list[1][0][0];
+                                                    //this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                                    
+                                                    if(this.periodo == "periodo") {
+                                                      this.periodoFiltroResumido = //23 Dez 17 à 29 Dez 18
+                                                      list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                                      + " à " + 
+                                                      list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                                    } else if(this.periodo == "mes") {
+                                                      this.periodoFiltroResumido = this.periodoFiltro;
+                                                    } else if(this.periodo == "semana") {
+                                                      this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                                    }
+                                                  }
+                                                });
+                                              }
+                                            );
+                                          }
+                                        }
+                                      ),
+                                    ]
+                                  )
+                                );
+                              },
+                              child: new Text(                          
+                                this.periodoFiltro.length > 17 ? this.periodoFiltroResumido : this.periodoFiltro,
+                                style: new TextStyle(
+                                  fontSize: 16.0,
+                                )
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      new Container(
+                        margin: new EdgeInsets.only(right: 8.0),
+                        child: new InkWell(
+                          onTap: () {
+                            setState(() {
+                              var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true, this.periodo);
+                              this.periodoNext = listaFiltro[1];
+
+                              if(this.periodo == 'periodo') {
+                                this.from = listaFiltro[0];
+                                this.to = listaFiltro[1];
+                              }                        
+
+                              if(this.periodo == "hoje") {
+                                lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                                  (list) {
+                                    setState(() {
+                                      if(list.length > 0) {
+                                        this.listaDB = list[0];
+                                        this.periodoFiltro = list[1][1];
+                                        this.periodoFiltroDateTime = list[1][0][0];
+                                      }
+                                    });
+                                  }
+                                );
+                              } else if(this.periodo == "semana") {
+                                lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                                  (list) {
+                                    setState(() {
+                                      if(list.length > 0) {
+                                        this.listaDB = list[0];
+                                        this.periodoFiltro = list[1][1];
+                                        this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                        this.periodoFiltroDateTime = list[1][0][0];
+                                      }
+                                    });
+                                  }
+                                );
+                              } else if(this.periodo == "mes") {
+                                lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                  (list) {
+                                    setState(() {
+                                      if(list.length > 0) {
+                                        this.listaDB = list[0];
+                                        this.periodoFiltro = list[1][1];
+                                        this.periodoFiltroResumido = this.periodoFiltro;
+                                        this.periodoFiltroDateTime = list[1][0][0];
+                                      }
+                                    });
+                                  }
+                                );
+                              } else if(this.periodo == "periodo") {
+                                lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                                  (list) {
+                                    setState(() {
+                                      if(list.length > 0) {
+                                        this.listaDB = list[0];
+                                        this.periodoFiltro = list[1][1];
+                                        //this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                        this.periodoFiltroResumido = //23 Dez 17 à 29 Dez 18
+                                          list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                          + " à " + 
+                                          list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                        this.periodoFiltroDateTimeList = list[1][0][0];
+                                      }
+                                    });
+                                  }
+                                );
+                              } 
+                            });
+                          },
+                          child: new Icon(
+                            Icons.keyboard_arrow_right,
+                            color: new Color(0xFF9E9E9E),
+                            size: 28.0,
+                          ),
+                        ),
+                      )
+                    ]
+                  ),
+                )
+              ]
+            )
+          ),
+
+          new Positioned(
+            bottom: 0.0,
+            right: 0.0,
+            left: 0.0,
+            child: new Container(
+              padding: new EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0, top: 16.0),
+              decoration: new BoxDecoration(
+                color: new Color(0xFFFAFAFA),
+                boxShadow: [
+                  new BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 4.0,
+                  )
+                ],
+                border: new Border(
+                  top: new BorderSide(
+                    style: BorderStyle.solid,
+                    color: Colors.black12,
+                  ),
+                )
+              ),
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  new Text(
+                    'Total: ',
+                    style: new TextStyle(
+                      fontSize: 16.0,
+                      fontFamily: 'Roboto',
+                      color: new Color(0xFF9E9E9E)
+                    ),
+                  ),
+                  new Text(
+                    totalLista(this.total)[0],
+                    style: new TextStyle(
+                      fontSize: 16.0,
+                      fontFamily: 'Roboto',
+                      color: totalLista(this.total)[1],
+                    ),
+                  )
+                ],
+              )
+            )
+          ),
+
+          // float button
+          new Positioned(
+            bottom: 0.0,
+            child: new GestureDetector(
+              onTap: _rotate,
+              child: new AnimatedBuilder(
+                animation: _animation,
+                builder: (BuildContext context, Widget child) {
+                  return new Container(
+                    height: _height,
+                    child: new CustomPaint(
+                      painter: new Sky(_width, _height * _animation.value),
+                      child: new Container(
+                        height: _isRotated ? 0.0 : _height * _animation.value,
+                        width: _isRotated ? 0.0 : _width,
+                      ),
+                    ),
+                  );
+                }
+              ),
+            )
+          ),
+          new Positioned(
+            bottom: 200.0 + 46.0,
+            right: 24.0,
+            child: new Container(
+              child: new Row(
+                children: <Widget>[
+                  new ScaleTransition(
+                    scale: _animation3,
+                    alignment: FractionalOffset.center,
+                    child: new Container(
+                      margin: new EdgeInsets.only(right: 16.0),
+                      child: new Text(
+                        'transferência',
+                        style: new TextStyle(
+                          fontSize: 13.0,
+                          fontFamily: 'Roboto',
+                          color: new Color(0xFF9E9E9E),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ), 
+                    ),
+                  ),
+                  
+                  new ScaleTransition(
+                    scale: _animation3,
+                    alignment: FractionalOffset.center,
+                    child: new Material(
+                      color: new Color(0xFF9E9E9E),
+                      type: MaterialType.circle,
+                      elevation: 6.0,
+                      child: new GestureDetector(
+                        child: new Container(
+                          width: 40.0,
+                          height: 40.0,
+                          child: new InkWell(
+                            onTap: ()  async {
+                              if(_angle == 45.0){
+                                _rotate();
+                                
+                                List resultado = await Navigator.of(context).push(new PageRouteBuilder(
+                                  opaque: false,
+                                  pageBuilder: (BuildContext context, _, __) {
+                                    return new LancamentoPage(false, new Lancamento(), new Color(0xFF9E9E9E), '', '', []);
+                                  },
+                                  transitionsBuilder: (
+                                    BuildContext context,
+                                    Animation<double> animation,
+                                    Animation<double> secondaryAnimation,
+                                    Widget child,
+                                  ) {
+                                    return new SlideTransition(
+                                      position: new Tween<Offset>(
+                                        begin:  const Offset(1.0, 0.0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    );
+                                  }
+                                ));
+
+                                if(resultado != null) {
+                                  if(resultado[0]) {
+                                    setState(() {
+                                      if(this.periodo == 'hoje') {
+                                        lancamentoDB.getLancamentoHoje(this.periodoFiltroDateTime).then(
+                                          (list) {
+                                            setState(() {
+                                              this.periodo = "hoje";
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroDateTime = list[1][0][0];
+                                              }            
+                                            });
+                                          }
+                                        );
+                                      } else if (this.periodo == 'semana') {
+                                        lancamentoDB.getLancamentoSemana(this.periodoFiltroDateTime).then(
+                                          (list) {
+                                            setState(() {
+                                              this.periodo = "semana";
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                                this.periodoFiltroDateTime = list[1][0][0];
+                                              }
+                                            });
+                                          }
+                                        );
+                                      } else if(this.periodo == 'mes') {
+                                        lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
+                                          (list) {
+                                            this.periodo = "mes";
+                                            setState(() {                                  
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroDateTime = list[1][0][0];
+                                              }            
+                                            });
+                                          }
+                                        );
+                                      } else if(this.periodo == 'periodo') {
+                                        lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
+                                          (list) {
+                                            setState(() {
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroResumido =
+                                                  list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                                  + " à " + 
+                                                  list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                                this.periodoFiltroDateTimeList = list[1][0][0];
+                                              }
+                                            });
+                                          }
+                                        );
+                                      }
+                                    });
+                                  }
+                                }
+                              }
+                            },
+                            child: new Center(
+                              child: new Icon(
+                                Icons.add,
+                                color: new Color(0xFFFFFFFF),
+                              ),                      
+                            ),
+                          )
+                        ),
+                      )
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ),
+          
+          new Positioned(
+            bottom: 144.0 + 46.0,
+            right: 24.0,
+            child: new Container(
+              child: new Row(
+                children: <Widget>[
+                  new ScaleTransition(
+                    scale: _animation2,
+                    alignment: FractionalOffset.center,
+                    child: new Container(
+                      margin: new EdgeInsets.only(right: 16.0),
+                      child: new Text(
+                        'receita',
+                        style: new TextStyle(
+                          fontSize: 13.0,
+                          fontFamily: 'Roboto',
+                          color: new Color(0xFF9E9E9E),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ), 
+                    ),
+                  ),
+
+                  new ScaleTransition(
+                    scale: _animation2,
+                    alignment: FractionalOffset.center,
+                    child: new Material(
+                      color: new Color(0xFF00BFA5),
+                      type: MaterialType.circle,
+                      elevation: 6.0,
+                      child: new GestureDetector(
+                        child: new Container(
+                          width: 40.0,
+                          height: 40.0,
+                          child: new InkWell(
+                            onTap: () async {
+                              if(_angle == 45.0) {
+                                _rotate();
+                                
+                                List resultado = await Navigator.of(context).push(new PageRouteBuilder(
+                                  opaque: false,
+                                  pageBuilder: (BuildContext context, _, __) {
+                                    return new LancamentoPage(false, new Lancamento(), new Color(0xFF00BFA5), '', '', []);
+                                  },
+                                  transitionsBuilder: (
+                                    BuildContext context,
+                                    Animation<double> animation,
+                                    Animation<double> secondaryAnimation,
+                                    Widget child,
+                                  ) {
+                                    return new SlideTransition(
+                                      position: new Tween<Offset>(
+                                        begin:  const Offset(1.0, 0.0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    );
+                                  }
+                                ));
+
+                                if(resultado != null) {
+                                  if(resultado[0]) {
+                                    setState(() {
+                                      if(this.periodo == 'hoje') {
+                                        lancamentoDB.getLancamentoHoje(this.periodoFiltroDateTime).then(
+                                          (list) {
+                                            setState(() {
+                                              this.periodo = "hoje";
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroDateTime = list[1][0][0];
+                                              }            
+                                            });
+                                          }
+                                        );
+                                      } else if (this.periodo == 'semana') {
+                                        lancamentoDB.getLancamentoSemana(this.periodoFiltroDateTime).then(
+                                          (list) {
+                                            setState(() {
+                                              this.periodo = "semana";
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                                this.periodoFiltroDateTime = list[1][0][0];
+                                              }
+                                            });
+                                          }
+                                        );
+                                      } else if(this.periodo == 'mes') {
+                                        lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
+                                          (list) {
+                                            this.periodo = "mes";
+                                            setState(() {                                  
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroDateTime = list[1][0][0];
+                                              }            
+                                            });
+                                          }
+                                        );
+                                      } else if(this.periodo == 'periodo') {
+                                        lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
+                                          (list) {
+                                            setState(() {
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroResumido =
+                                                  list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                                  + " à " + 
+                                                  list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                                this.periodoFiltroDateTimeList = list[1][0][0];
+                                              }
+                                            });
+                                          }
+                                        );
+                                      }
+                                    });
+                                  }
+                                }
+                              }
+                            },
+                            child: new Center(
+                              child: new Icon(
+                                Icons.add,
+                                color: new Color(0xFFFFFFFF),
+                              ),
+                            ),
+                          )
+                        ),
+                      )
+                    ),
+                  ), 
+                ],
+              ),
+            )
+          ),
+          new Positioned(
+            bottom: 88.0 + 46.0,
+            right: 24.0,
+            child: new Container(
+              child: new Row(
+                children: <Widget>[
+                  new ScaleTransition(
+                    scale: _animation,
+                    alignment: FractionalOffset.center,
+                    child: new Container(
+                      margin: new EdgeInsets.only(right: 16.0),
+                      child: new Text(
+                        'despesa',
+                        style: new TextStyle(
+                          fontSize: 13.0,
+                          fontFamily: 'Roboto',
+                          color: new Color(0xFF9E9E9E),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ), 
+                    ),
+                  ),
+                  
+                  new ScaleTransition(
+                    scale: _animation,
+                    alignment: FractionalOffset.center,
+                    child: new Material(
+                      color: new Color(0xFFE57373),
+                      type: MaterialType.circle,
+                      elevation: 6.0,
+                      child: new GestureDetector(
+                        child: new Container(
+                          width: 40.0,
+                          height: 40.0,
+                          child: new InkWell(
+                            onTap: () async {
+                              if(_angle == 45.0){
+                                _rotate();
+                                
+                                List resultado = await Navigator.of(context).push(new PageRouteBuilder(
+                                  opaque: false,
+                                  pageBuilder: (BuildContext context, _, __) {
+                                    return new LancamentoPage(false, new Lancamento(), new Color(0xFFE57373), '', '', []);
+                                  },
+                                  transitionsBuilder: (
+                                    BuildContext context,
+                                    Animation<double> animation,
+                                    Animation<double> secondaryAnimation,
+                                    Widget child,
+                                  ) {
+                                    return new SlideTransition(
+                                      position: new Tween<Offset>(
+                                        begin:  const Offset(1.0, 0.0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    );
+                                  }
+                                ));
+
+                                if(resultado != null) {
+                                  if(resultado[0]) {
+                                    setState(() {
+                                      if(this.periodo == 'hoje') {
+                                        lancamentoDB.getLancamentoHoje(this.periodoFiltroDateTime).then(
+                                          (list) {
+                                            setState(() {
+                                              this.periodo = "hoje";
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroDateTime = list[1][0][0];
+                                              }            
+                                            });
+                                          }
+                                        );
+                                      } else if (this.periodo == 'semana') {
+                                        lancamentoDB.getLancamentoSemana(this.periodoFiltroDateTime).then(
+                                          (list) {
+                                            setState(() {
+                                              this.periodo = "semana";
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                                                this.periodoFiltroDateTime = list[1][0][0];
+                                              }
+                                            });
+                                          }
+                                        );
+                                      } else if(this.periodo == 'mes') {
+                                        lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
+                                          (list) {
+                                            this.periodo = "mes";
+                                            setState(() {                                  
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroDateTime = list[1][0][0];
+                                              }            
+                                            });
+                                          }
+                                        );
+                                      } else if(this.periodo == 'periodo') {
+                                        lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
+                                          (list) {
+                                            setState(() {
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroResumido =
+                                                  list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                                                  + " à " + 
+                                                  list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                                                this.periodoFiltroDateTimeList = list[1][0][0];
+                                              }
+                                            });
+                                          }
+                                        );
+                                      }
+                                    });
+                                  }
+                                }
+                              }
+                            },
+                            child: new Center(
+                              child: new Icon(
+                                Icons.add,
+                                color: new Color(0xFFFFFFFF),
+                              ),                      
+                            ),
+                          )
+                        ),
+                      )
+                    ),
+                  ), 
+                ],
+              ),
+            )
+          ),
+          
+          new Positioned(
+            bottom: 16.0 + 46.0,
+            right: 16.0,
+            child: new Material(
+              color: new Color(0xFFE57373),
+              type: MaterialType.circle,
+              elevation: 6.0,
+              child: new GestureDetector(
+                child: new Container(
+                  width: 56.0,
+                  height: 56.00,
+                  child: new InkWell(
+                    onTap: _rotate,
+                    child: new Center(
+                      child: new RotationTransition(
+                        turns: new AlwaysStoppedAnimation(_angle / 360),
+                        child: new Icon(
+                          Icons.add,
+                          color: new Color(0xFFFFFFFF),
+                        ),
+                      )
+                    ),
+                  )
+                ),
+              )
+            ),
+          ),
+          /////////////////////////////
+        ],
+      )
     );
   }
 }
@@ -1757,6 +2368,28 @@ enum DismissDialogAction {
   cancel,
   discard,
   save,
+}
+
+class Sky extends CustomPainter {
+  final double _width;
+  double _rectHeight;
+
+  Sky(this._width, this._rectHeight);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(
+      new Rect.fromLTRB(
+        0.0, size.height - _rectHeight, this._width, size.height
+      ),
+      new Paint()..color = new Color.fromRGBO(255, 255, 255, 0.9)
+    );
+  }
+
+  @override
+  bool shouldRepaint(Sky oldDelegate) {
+    return _width != oldDelegate._width || _rectHeight != oldDelegate._rectHeight;
+  }
 }
 
 

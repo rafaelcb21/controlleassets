@@ -44,7 +44,7 @@ class TagPageState extends State<TagPage>{
 
         this.listaTags.add(
           new ItemTag(
-            key: new ObjectKey(i),
+            key: new ObjectKey(id),
             id: id,
             tag: tag,
             relacionada: relacionada,

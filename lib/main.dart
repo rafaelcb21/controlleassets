@@ -534,7 +534,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           new ListView  (
             children: <Widget>[  
               
-              //Carda Saldo
+              //Card Saldo
               new Container(
                 padding: new EdgeInsets.only(bottom: 3.0, right: 6.0, left: 6.0, top: 12.0),
                 child: new Card(

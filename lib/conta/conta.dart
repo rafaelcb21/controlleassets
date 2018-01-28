@@ -246,7 +246,7 @@ class ItemContaState extends State<ItemConta> {
                 contaDB.cor = widget.numeroCor;
                 contaDB.ativada = value ? 1 : 0;
                 this.switchValue = value;
-                contaDB.upsertConta(contaDB);                
+                contaDB.upsertConta(contaDB);
               });
             },
           )                 
