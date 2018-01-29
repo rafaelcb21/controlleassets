@@ -2057,6 +2057,85 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     return lista;
   }
 
+  Future lancamentoDeFixo(String periodo, String periodoFiltro) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+    String mesString = '';
+    List listaProximasDatas = [];
+
+    print([periodo, periodoFiltro]);
+    List dias = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',
+    '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
+    '25', '26', '27', '28', '29', '30', '31'];
+
+    
+    if(periodo == 'mes') {
+      var listaPeriodoFiltro = periodoFiltro.split(' ');
+      int mes = mesEscolhido(listaPeriodoFiltro[0]);
+      if(mes < 10) {
+        mesString = '0' + mes.toString();
+      } else {
+        mesString =  mes.toString();
+      }
+            
+      int ano = int.parse(listaPeriodoFiltro[2]);
+      int ultimoDiaMes = new DateTime(ano, mes + 1, 0).day;
+      //DateTime primeiroDiaMes = new DateTime(ano, mes, 1);
+
+      //List datas = [];
+      List lancamentosFixos = [];
+
+      for(String dia in dias) {
+        if(dia != ultimoDiaMes.toString()) {
+          String data = ano.toString()+'-'+mesString+'-'+dia;
+          List buscaLancamento = await db.rawQuery("SELECT * FROM lancamento WHERE tiporepeticao = 'Fixa' AND data = ?", [data]);
+          if(buscaLancamento.length > 0){
+            lancamentosFixos.add(buscaLancamento);
+          }
+          
+        } else {
+          String data = ano.toString()+'-'+mesString+'-'+dia;
+          List buscaLancamento = await db.rawQuery("SELECT * FROM lancamento WHERE tiporepeticao = 'Fixa' AND data = ?", [data]);
+          if(buscaLancamento.length > 0){
+            lancamentosFixos.add(buscaLancamento);
+          }
+          break;
+        }
+      }
+
+      for(var i in lancamentosFixos) {
+        int _dia = int.parse(i[0]['data'].toString().substring(8, 10));
+        int _mes = int.parse(i[0]['data'].toString().substring(5, 7));
+        int _ano = int.parse(i[0]['data'].toString().substring(0, 4));
+
+        print([_dia, _mes]);
+
+        if(_dia > 28 && _mes == 1) {
+          print('rafa1');
+          String proximaData = new DateTime(_ano, _mes + 1, 0).toString().substring(0,10);
+          listaProximasDatas.add(proximaData);
+        } else {
+          String proximaData = new DateTime(_ano, _mes, _dia).toString().substring(0,10);                                                           
+          listaProximasDatas.add(proximaData);
+        }
+      }
+
+      print(lancamentosFixos);
+      print(listaProximasDatas);
+
+      
+      
+      
+
+    }
+
+
+    await db.close();
+
+    return true;
+  }
+
   
 
   Future updateLancamentoPagoFatura(List ids, int pago) async {

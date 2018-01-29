@@ -1958,6 +1958,10 @@ class FormularioState extends State<Formulario> {
                         lancamento.data = lancamentoDB.data;
                         lancamento.pago = lancamentoDB.pago;
                         lancamentoList.add(lancamento);
+
+                         if(lancamentoDB.tiporepeticao == 'Fixa') {
+                          lancamento.hash = uuid.v4();
+                        }
                         
                         lancamentoDB.upsertLancamento(lancamentoList).then(
                           (retorno) {
@@ -2279,6 +2283,10 @@ class FormularioState extends State<Formulario> {
                         lancamento.data = lancamentoDB.data;
                         lancamento.pago = 0;
                         lancamento.fatura = lancamentoDB.fatura;
+
+                        if(lancamentoDB.tiporepeticao == 'Fixa') {
+                          lancamento.hash = uuid.v4();
+                        }
 
                         lancamentoList.add(lancamento);
                         lancamentoDB.upsertLancamento(lancamentoList).then(
