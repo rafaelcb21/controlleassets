@@ -2113,10 +2113,10 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
         if(_dia > 28 && _mes == 1) {
           print('rafa1');
-          String proximaData = new DateTime(_ano, _mes + 1, 0).toString().substring(0,10);
+          String proximaData = new DateTime(_ano, _mes + 2, 0).toString().substring(0,10);
           listaProximasDatas.add(proximaData);
         } else {
-          String proximaData = new DateTime(_ano, _mes, _dia).toString().substring(0,10);                                                           
+          String proximaData = new DateTime(_ano, _mes + 1, _dia).toString().substring(0,10);                                                           
           listaProximasDatas.add(proximaData);
         }
       }
