@@ -1135,19 +1135,19 @@ class FormularioState extends State<Formulario> {
         var year = this._toDate.add(new Duration(days: 31)).year;
 
         var lista = [
-          [mesMiddle.subtract(new Duration(days: 62)).month, 
-          mesMiddle.subtract(new Duration(days: 62)).year, true],
+          [mesMiddle.subtract(new Duration(days: 60)).month, 
+          mesMiddle.subtract(new Duration(days: 60)).year, true],
 
-          [mesMiddle.subtract(new Duration(days: 31)).month,
-          mesMiddle.subtract(new Duration(days: 31)).year, true],
+          [mesMiddle.subtract(new Duration(days: 30)).month,
+          mesMiddle.subtract(new Duration(days: 30)).year, true],
 
           [month, year, false],
 
-          [mesMiddle.add(new Duration(days: 31)).month,
-          mesMiddle.add(new Duration(days: 31)).year, true],
+          [mesMiddle.add(new Duration(days: 30)).month,
+          mesMiddle.add(new Duration(days: 30)).year, true],
 
-          [mesMiddle.add(new Duration(days: 62)).month,
-          mesMiddle.add(new Duration(days: 62)).year, true]
+          [mesMiddle.add(new Duration(days: 60)).month,
+          mesMiddle.add(new Duration(days: 60)).year, true]
         ];
 
         for(var i in lista) {
@@ -1165,6 +1165,7 @@ class FormularioState extends State<Formulario> {
           );
         }
         return this.faturasLista;
+
       } else {
         var mesMiddle = this._toDate;
         var month = this._toDate.month;
