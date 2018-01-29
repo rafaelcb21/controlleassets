@@ -2062,13 +2062,12 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
     String mesString = '';
-    List listaProximasDatas = [];
+    //List listaProximasDatas = [];
 
     print([periodo, periodoFiltro]);
     List dias = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',
     '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
     '25', '26', '27', '28', '29', '30', '31'];
-
     
     if(periodo == 'mes') {
       var listaPeriodoFiltro = periodoFiltro.split(' ');
@@ -2085,15 +2084,16 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
       //List datas = [];
       List lancamentosFixos = [];
+      List listaDeDatas = [];
 
+      //Pega todos os lancamentos fixos do mes de origem
       for(String dia in dias) {
         if(dia != ultimoDiaMes.toString()) {
           String data = ano.toString()+'-'+mesString+'-'+dia;
           List buscaLancamento = await db.rawQuery("SELECT * FROM lancamento WHERE tiporepeticao = 'Fixa' AND data = ?", [data]);
           if(buscaLancamento.length > 0){
             lancamentosFixos.add(buscaLancamento);
-          }
-          
+          }          
         } else {
           String data = ano.toString()+'-'+mesString+'-'+dia;
           List buscaLancamento = await db.rawQuery("SELECT * FROM lancamento WHERE tiporepeticao = 'Fixa' AND data = ?", [data]);
@@ -2104,32 +2104,87 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         }
       }
 
+
+
       for(var i in lancamentosFixos) {
         int _dia = int.parse(i[0]['data'].toString().substring(8, 10));
         int _mes = int.parse(i[0]['data'].toString().substring(5, 7));
         int _ano = int.parse(i[0]['data'].toString().substring(0, 4));
+        listaDeDatas = [];
+        List diaDoPrimeiroLancamento = await db.rawQuery('SELECT data FROM lancamento WHERE hash = ?', [i[0]['hash']]);
 
-        print([_dia, _mes]);
+        for(var date in diaDoPrimeiroLancamento) {
+          listaDeDatas.add(date['data']);
+        }
 
-        if(_dia > 28 && _mes == 1) {
-          print('rafa1');
-          String proximaData = new DateTime(_ano, _mes + 2, 0).toString().substring(0,10);
-          listaProximasDatas.add(proximaData);
+        listaDeDatas.sort();
+        int primeiroDia = listaDeDatas[0].day; //29
+
+        //if(_dia > 28 && _mes == 1) {
+        if(_dia > 28) {
+          int proximoMes =  _mes + 1;
+          String proximaData = new DateTime(_ano, proximoMes, primeiroDia).toString().substring(0,10);
+          int compararMes = int.parse(proximaData.substring(5, 7));
+
+          //2017-04-31 (4) != (5) 2018-05-01
+          if(proximoMes != compararMes) {
+            proximaData = new DateTime(_ano, compararMes, 0).toString().substring(0,10);
+          }
+
+          //String proximaData = new DateTime(_ano, _mes + 2, 0).toString().substring(0,10);
+
+          //busca os lancamentos fixo do proximo mes que ja foram inseridos, sem o valor for 0 insere o lancamento
+          var confirmar = await db.rawQuery('SELECT * FROM lancamento WHERE hash = ? AND data = ?', [i[0]['hash'], proximaData]);
+
+          if(confirmar.length == 0) {
+            Lancamento lancamento = new Lancamento();
+            lancamento.descricao = i[0]['descricao'];
+            lancamento.idcategoria = i[0]['idcategoria'];
+            lancamento.idconta = i[0]['idconta'];
+            lancamento.fatura = i[0]['fatura'];
+            lancamento.hash = i[0]['hash'];
+            lancamento.valor = i[0]['valor'];
+            lancamento.data = proximaData;
+            lancamento.idcontadestino = i[0]['idcontadestino'];
+            lancamento.idtag = i[0]['idtag'];
+            lancamento.pago = 0;     
+            lancamento.quantidaderepeticao = i[0]['quantidaderepeticao'];
+            lancamento.idcartao = i[0]['idcartao'];
+            lancamento.tipo = i[0]['tipo'];
+            lancamento.datafatura = i[0]['datafatura'];
+            lancamento.periodorepeticao = i[0]['periodorepeticao'];
+            lancamento.tiporepeticao = i[0]['tiporepeticao'];
+            await db.insert("lancamento", lancamento.toMap());
+          }
+
         } else {
-          String proximaData = new DateTime(_ano, _mes + 1, _dia).toString().substring(0,10);                                                           
-          listaProximasDatas.add(proximaData);
+          String proximaData = new DateTime(_ano, _mes + 1, _dia).toString().substring(0,10);
+          //busca os lancamentos fixo do proximo mes que ja foram inseridos, sem o valor for 0 insere o lancamento
+          var confirmar = await db.rawQuery('SELECT * FROM lancamento WHERE hash = ? AND data = ?', [i[0]['hash'], proximaData]);
+
+          if(confirmar.length == 0) {
+            Lancamento lancamento = new Lancamento();
+            lancamento.descricao = i[0]['descricao'];
+            lancamento.idcategoria = i[0]['idcategoria'];
+            lancamento.idconta = i[0]['idconta'];
+            lancamento.fatura = i[0]['fatura'];
+            lancamento.hash = i[0]['hash'];
+            lancamento.valor = i[0]['valor'];
+            lancamento.data = proximaData;
+            lancamento.idcontadestino = i[0]['idcontadestino'];
+            lancamento.idtag = i[0]['idtag'];
+            lancamento.pago = 0;     
+            lancamento.quantidaderepeticao = i[0]['quantidaderepeticao'];
+            lancamento.idcartao = i[0]['idcartao'];
+            lancamento.tipo = i[0]['tipo'];
+            lancamento.datafatura = i[0]['datafatura'];
+            lancamento.periodorepeticao = i[0]['periodorepeticao'];
+            lancamento.tiporepeticao = i[0]['tiporepeticao'];
+            await db.insert("lancamento", lancamento.toMap());
+          }
         }
       }
-
-      print(lancamentosFixos);
-      print(listaProximasDatas);
-
-      
-      
-      
-
     }
-
 
     await db.close();
 
