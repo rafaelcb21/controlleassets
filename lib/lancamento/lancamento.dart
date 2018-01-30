@@ -1961,6 +1961,12 @@ class FormularioState extends State<Formulario> {
 
                          if(lancamentoDB.tiporepeticao == 'Fixa') {
                           lancamento.hash = uuid.v4();
+                          LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
+                          lancamentoFixoTable.idlancamento = lancamento.id;
+                          lancamentoFixoTable.hashlancamento = lancamento.hash;
+                          lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
+                          lancamentoFixoTable.data = lancamento.data;
+                          lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
                         }
                         
                         lancamentoDB.upsertLancamento(lancamentoList).then(
@@ -2284,8 +2290,15 @@ class FormularioState extends State<Formulario> {
                         lancamento.pago = 0;
                         lancamento.fatura = lancamentoDB.fatura;
 
+
                         if(lancamentoDB.tiporepeticao == 'Fixa') {
                           lancamento.hash = uuid.v4();
+                          LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
+                          lancamentoFixoTable.idlancamento = lancamento.id;
+                          lancamentoFixoTable.hashlancamento = lancamento.hash;
+                          lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
+                          lancamentoFixoTable.data = lancamento.data;
+                          lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
                         }
 
                         lancamentoList.add(lancamento);

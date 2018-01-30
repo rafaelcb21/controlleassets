@@ -7,6 +7,7 @@ dependencies:
 #  typeof: "^0.0.2"
 #  crypto: "^2.0.2+1"
   uuid: "^0.5.3"
+  queries: "^0.0.15"
   flutter:
     sdk: flutter
  # google_sign_in: "^1.0.1"
