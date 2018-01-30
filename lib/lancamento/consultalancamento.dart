@@ -787,7 +787,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
 
     List totalLista(List listaValores) {
       if(listaValores.length != 0) {
-        int total = listaValores.reduce((a, b) => a + b);
+        double total = listaValores.reduce((a, b) => a + b);
         var f = new NumberFormat.currency(locale: "pt_BR", symbol: "", decimalDigits: 2);
         var valor = 'R\$ ' + f.format(total);
 

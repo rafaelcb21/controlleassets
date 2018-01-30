@@ -2064,7 +2064,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     String mesString = '';
     //List listaProximasDatas = [];
 
-    print([periodo, periodoFiltro]);
     List dias = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',
     '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
     '25', '26', '27', '28', '29', '30', '31'];
@@ -2087,6 +2086,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       List listaDeDatas = [];
 
       //Pega todos os lancamentos fixos do mes de origem
+      
       for(String dia in dias) {
         if(dia != ultimoDiaMes.toString()) {
           String data = ano.toString()+'-'+mesString+'-'+dia;
@@ -2101,27 +2101,26 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
             lancamentosFixos.add(buscaLancamento);
           }
           break;
-        }
+        }        
       }
-
-
 
       for(var i in lancamentosFixos) {
         int _dia = int.parse(i[0]['data'].toString().substring(8, 10));
         int _mes = int.parse(i[0]['data'].toString().substring(5, 7));
         int _ano = int.parse(i[0]['data'].toString().substring(0, 4));
         listaDeDatas = [];
+
         List diaDoPrimeiroLancamento = await db.rawQuery('SELECT data FROM lancamento WHERE hash = ?', [i[0]['hash']]);
 
-        for(var date in diaDoPrimeiroLancamento) {
-          listaDeDatas.add(date['data']);
+        for(var date in diaDoPrimeiroLancamento) {          
+          listaDeDatas.add(DateTime.parse(date['data']));
         }
 
         listaDeDatas.sort();
         int primeiroDia = listaDeDatas[0].day; //29
 
         //if(_dia > 28 && _mes == 1) {
-        if(_dia > 28) {
+        if(primeiroDia > 28) {
           int proximoMes =  _mes + 1;
           String proximaData = new DateTime(_ano, proximoMes, primeiroDia).toString().substring(0,10);
           int compararMes = int.parse(proximaData.substring(5, 7));
