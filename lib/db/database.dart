@@ -660,6 +660,8 @@ class Lancamento {
                           "valor", "data", "datafatura", "descricao", "tiporepeticao", "periodorepeticao", "quantidaderepeticao",
                           "fatura", "pago", "hash"];
 
+  List fixoList = ['Mensal', 'Bimestral', 'Trimestral', 'Semestral', 'Anual'];
+
   Map toMap() {
     Map map = {
       "tipo" : tipo,
@@ -1542,6 +1544,53 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     return meses;
   }
 
+  List proximoMesFunction(periodo, mes, ano) {
+    if(periodo == 'Mensal') {
+      if(mes == 12) {
+        return [1, ano+1];
+      } else {
+        return [mes + 1, ano];
+      } 
+    } else if(periodo == 'Bimestral') {
+      if(mes == 11) {
+        return [1, ano+1];
+      } if(mes == 12) {
+        return [2, ano+1];
+      } else {
+        return [mes + 2, ano];
+      } 
+    } else if(periodo == 'Trimestral') {
+      if(mes == 10) {
+        return [1, ano+1];
+      } if(mes == 11) {
+        return [2, ano+1];
+      } if(mes == 12) {
+        return [3, ano+1];
+      } else {
+        return [mes + 3, ano];
+      } 
+    } else if(periodo == 'Semestral') {
+      if(mes == 7) {
+        return [1, ano+1];
+      } if(mes == 8) {
+        return [2, ano+1];
+      } if(mes == 9) {
+        return [3, ano+1];
+      } if(mes == 10) {
+        return [4, ano+1];
+      } if(mes == 11) {
+        return [5, ano+1];
+      } if(mes == 12) {
+        return [6, ano+1];
+      } else {
+        return [mes + 6, ano];
+      } 
+    } else if(periodo == 'Anual') {
+      return [mes, ano+1];
+    }
+    return [];
+  }
+
   //atualizarLancamento trata de lancamentos repetidos e divididos
   Future atualizarLancamento(Lancamento lancamento, String dataInicial, bool todos) async {
     Directory path = await getApplicationDocumentsDirectory();
@@ -2064,9 +2113,63 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     String mesString = '';
     //List listaProximasDatas = [];
 
+    //[hoje, 30 Jan 2018]
+    //[semana, 29 Jan de 2018 à 04 Fev de 2018]
+    //[mes, janeiro de 2018]
+    //[periodo, 30 Jan de 2018 à 27 Fev de 2018]
+
+
     List dias = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',
     '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
     '25', '26', '27', '28', '29', '30', '31'];
+
+    List lancamentosFixos = [];
+    List listaDeDatas = [];
+
+    if(periodo == 'semana') {
+      var listaPeriodoFiltro = periodoFiltro.split(' ');
+      int ano = int.parse(listaPeriodoFiltro[8]);
+      int mes = mesEscolhidoAbreviado(listaPeriodoFiltro[6]);
+      int dia = int.parse(listaPeriodoFiltro[5]);
+      DateTime ultimoDia = new DateTime(ano, mes, dia);
+      
+      // Pega todos os lancamentos fixos do mes de origem   
+      for(int i in [6 ,5 ,4 ,3 ,2 ,1, 0]) {
+        String data = new DateFormat("yyyy-MM-dd").format(
+          ultimoDia.subtract(new Duration(hours: i*24))
+        ).toString();
+        List buscaLancamento = await db.rawQuery("SELECT * FROM lancamento WHERE tiporepeticao = 'Fixa' AND data = ?", [data]);
+        if(buscaLancamento.length > 0){
+          lancamentosFixos.add(buscaLancamento);
+        }
+      }
+
+      print(lancamentosFixos);
+
+      for(var i in lancamentosFixos) {
+        int _dia = int.parse(i[0]['data'].toString().substring(8, 10));
+        int _mes = int.parse(i[0]['data'].toString().substring(5, 7));
+        int _ano = int.parse(i[0]['data'].toString().substring(0, 4));
+        listaDeDatas = [];
+
+        // Pega todos as datas dos lancamentos fixos ja criados de um item especifico
+        List diaDoPrimeiroLancamento = await db.rawQuery('SELECT data FROM lancamento WHERE hash = ?', [i[0]['hash']]);
+
+        for(var date in diaDoPrimeiroLancamento) {          
+          listaDeDatas.add(DateTime.parse(date['data']));
+        }
+
+        listaDeDatas.sort();
+
+        //Pega o primeiro dia do lancamento
+        int primeiroDia = listaDeDatas[0].day; //29
+        List proximoMesAno = [];
+        int proximoMes;
+      }
+         
+
+    }
+    
     
     if(periodo == 'mes') {
       var listaPeriodoFiltro = periodoFiltro.split(' ');
@@ -2078,30 +2181,22 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       }
             
       int ano = int.parse(listaPeriodoFiltro[2]);
-      int ultimoDiaMes = new DateTime(ano, mes + 1, 0).day;
+      int ultimoDia = new DateTime(ano, mes + 1, 0).day;
       //DateTime primeiroDiaMes = new DateTime(ano, mes, 1);
 
       //List datas = [];
-      List lancamentosFixos = [];
-      List listaDeDatas = [];
-
-      //Pega todos os lancamentos fixos do mes de origem
       
-      for(String dia in dias) {
-        if(dia != ultimoDiaMes.toString()) {
-          String data = ano.toString()+'-'+mesString+'-'+dia;
-          List buscaLancamento = await db.rawQuery("SELECT * FROM lancamento WHERE tiporepeticao = 'Fixa' AND data = ?", [data]);
-          if(buscaLancamento.length > 0){
-            lancamentosFixos.add(buscaLancamento);
-          }          
-        } else {
-          String data = ano.toString()+'-'+mesString+'-'+dia;
-          List buscaLancamento = await db.rawQuery("SELECT * FROM lancamento WHERE tiporepeticao = 'Fixa' AND data = ?", [data]);
-          if(buscaLancamento.length > 0){
-            lancamentosFixos.add(buscaLancamento);
-          }
+
+      //Pega todos os lancamentos fixos do mes de origem      
+      for(String dia in dias) {        
+        String data = ano.toString()+'-'+mesString+'-'+dia;
+        List buscaLancamento = await db.rawQuery("SELECT * FROM lancamento WHERE tiporepeticao = 'Fixa' AND data = ?", [data]);
+        if(buscaLancamento.length > 0){
+          lancamentosFixos.add(buscaLancamento);
+        }
+        if(dia == ultimoDia.toString()) {
           break;
-        }        
+        }
       }
 
       for(var i in lancamentosFixos) {
@@ -2110,6 +2205,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         int _ano = int.parse(i[0]['data'].toString().substring(0, 4));
         listaDeDatas = [];
 
+        // Pega todos as datas dos lancamentos fixos ja criados de um item especifico
         List diaDoPrimeiroLancamento = await db.rawQuery('SELECT data FROM lancamento WHERE hash = ?', [i[0]['hash']]);
 
         for(var date in diaDoPrimeiroLancamento) {          
@@ -2117,15 +2213,23 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         }
 
         listaDeDatas.sort();
-        int primeiroDia = listaDeDatas[0].day; //29
 
-        //if(_dia > 28 && _mes == 1) {
+        //Pega o primeiro dia do lancamento
+        int primeiroDia = listaDeDatas[0].day; //29
+        List proximoMesAno = [];
+        int proximoMes;
+
+        if(fixoList.indexOf(i[0]['periodorepeticao']) != -1) {
+          proximoMesAno =  proximoMesFunction(i[0]['periodorepeticao'], _mes, _ano);
+          proximoMes = proximoMesAno[0];
+          _ano = proximoMesAno[1];
+        }
+
         if(primeiroDia > 28) {
-          int proximoMes =  _mes + 1;
           String proximaData = new DateTime(_ano, proximoMes, primeiroDia).toString().substring(0,10);
           int compararMes = int.parse(proximaData.substring(5, 7));
 
-          //2017-04-31 (4) != (5) 2018-05-01
+          //2018-04-31 (4) != (5) 2018-05-01
           if(proximoMes != compararMes) {
             proximaData = new DateTime(_ano, compararMes, 0).toString().substring(0,10);
           }
