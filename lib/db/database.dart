@@ -127,7 +127,6 @@ class DatabaseClient {
     await db.execute("""
             CREATE TABLE lancamentofixo (
               id INTEGER PRIMARY KEY, 
-              idlancamento INTEGER NOT NULL,
               hashlancamento TEXT NOT NULL,
               periodorepeticao TEXT NOT NULL,
               data TEXT NOT NULL
@@ -143,18 +142,16 @@ class LancamentoFixo {
   Database db;
 
   int id;
-  int idlancamento;
   String hashlancamento;
   String periodorepeticao;
   String data;
 
   String lancamentoFixoTable = "lancamentofixo";
 
-  static final columns = ["id", "idlancamento", "hashlancamento", "periodorepeticao", "data"];
+  static final columns = ["id", "hashlancamento", "periodorepeticao", "data"];
 
   Map toMap() {
     Map map = {
-      "idlancamento": idlancamento,
       "hashlancamento": hashlancamento,
       "periodorepeticao": periodorepeticao,
       "data": data
@@ -168,7 +165,6 @@ class LancamentoFixo {
   static fromMap(Map map) {
     LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
     lancamentoFixoTable.id = map["id"];
-    lancamentoFixoTable.idlancamento = map["idlancamento"];
     lancamentoFixoTable.hashlancamento = map["hashlancamento"];
     lancamentoFixoTable.periodorepeticao = map["periodorepeticao"];
     lancamentoFixoTable.data = map["data"];
@@ -2174,6 +2170,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
     String mesString = '';
+    List listaDatas = [];
 
     //[hoje, 30 Jan 2018]
     //[semana, 29 Jan de 2018 à 04 Fev de 2018]
@@ -2266,11 +2263,41 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     List allHashDistinct = new Collection(allHash).distinct().toList();
 
     for(var i in allHashDistinct) {
-      String hash = i[0]['hashlancamento'];
+      String hash = i['hashlancamento'];
       List datas = await db.rawQuery('SELECT data, periodorepeticao FROM lancamentofixo WHERE hashlancamento = ?', [hash]);
 
       //pegar a primeira e a ultima data
-      //se a ultima data for maior que a data final => não evolui
+      for(var j in datas) {
+        listaDatas.add(DateTime.parse(j['data']));
+      }
+      listaDatas.sort();
+      DateTime primeiroItem = listaDatas[0];
+      DateTime ultimoItem = listaDatas.last;
+
+      //se a ultima data for maior que a data final referencia => não evolui
+      DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
+      DateTime ultimaDataReferencia = DateTime.parse(datasDeRederencia.last);
+
+      if(!ultimoItem.isAfter(ultimaDataReferencia)) {
+        if(datas[0]['periodorepeticao'] == 'Mensal') {
+
+          //int days = i * this.periodos[lancamentoDB.periodorepeticao];
+          //int _dia = int.parse(lancamentoDB.data.substring(8,10));
+          //int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
+          //
+          //if((_dia > 28 && mesesLista[i] == 2) || _dia == 31) {
+          //  lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString().substring(0,10);
+          //} else {
+          //  lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString().substring(0,10);                                                           
+          //} 
+        }
+      }
+
+
+      
+
+
+      
       //se a utima for menor que a data inicial => evolui ate chegar na ultima data final antes de ultrapassar
       //se a ultima data estiver no meio => evolui ate chegar na ultima data final antes de ultrapassar
       // oque evoluir vai para a tabela lancamento
