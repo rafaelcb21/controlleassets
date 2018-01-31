@@ -2256,42 +2256,77 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       print(datasDeRederencia);
     }
 
-    //seleciona todos os hash da tabela lancamentofixo
+    // Seleciona todos os hash da tabela lancamentofixo
     List allHash = await db.rawQuery('SELECT hashlancamento FROM lancamentofixo');
     
-    //remove os hash duplicados
+    // Remove os hash duplicados
     List allHashDistinct = new Collection(allHash).distinct().toList();
 
     for(var i in allHashDistinct) {
       String hash = i['hashlancamento'];
       List datas = await db.rawQuery('SELECT data, periodorepeticao FROM lancamentofixo WHERE hashlancamento = ?', [hash]);
 
-      //pegar a primeira e a ultima data
+      // Pegar a primeira e a ultima data
       for(var j in datas) {
         listaDatas.add(DateTime.parse(j['data']));
       }
       listaDatas.sort();
-      DateTime primeiroItem = listaDatas[0];
-      DateTime ultimoItem = listaDatas.last;
+      DateTime primeiroItemData = listaDatas[0];
+      String primeiroItemDataString = new DateFormat("yyyy-MM-dd").format(primeiroItemData).toString().substring(0,10);
+      DateTime ultimoItemData = listaDatas.last;
 
-      //se a ultima data for maior que a data final referencia => não evolui
+      List item = await db.rawQuery('SELECT * FROM lancamento WHERE hash = ? AND data = ?', [hash, primeiroItemDataString]);
+
+      // Se a ultima data for maior que a data final referencia => não evolui
       DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
       DateTime ultimaDataReferencia = DateTime.parse(datasDeRederencia.last);
 
-      if(!ultimoItem.isAfter(ultimaDataReferencia)) {
-        if(datas[0]['periodorepeticao'] == 'Mensal') {
+      if(datas[0]['periodorepeticao'] == 'Mensal') {
 
+        while(!ultimoItemData.isAfter(ultimaDataReferencia)) {
+          String dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
           //int days = i * this.periodos[lancamentoDB.periodorepeticao];
-          //int _dia = int.parse(lancamentoDB.data.substring(8,10));
-          //int _ano = DateTime.parse(lancamentoDB.data).add(new Duration(days: days)).year;
-          //
-          //if((_dia > 28 && mesesLista[i] == 2) || _dia == 31) {
-          //  lancamento.data = new DateTime(_ano, mesesLista[i] + 1, 0).toString().substring(0,10);
-          //} else {
-          //  lancamento.data = new DateTime(_ano, mesesLista[i], _dia).toString().substring(0,10);                                                           
-          //} 
+          int _dia = int.parse(dataStringUltimoItem.substring(8,10));
+          int _mes = int.parse(dataStringUltimoItem.substring(5,7));
+          int _ano = DateTime.parse(dataStringUltimoItem).add(new Duration(days: 30)).year;
+          
+          if((_dia > 28 && _mes == 1) || _dia == 31) {
+            dataStringUltimoItem = new DateTime(_ano, 3, 0).toString().substring(0,10);
+          } else {
+            dataStringUltimoItem = new DateTime(_ano, _mes + 1, _dia).toString().substring(0,10);                                                           
+          }
+          ultimoItemData = DateTime.parse(dataStringUltimoItem);
+
+          if(ultimoItemData.isAfter(ultimaDataReferencia)) {break;}
+
+          // Salvar no banco nas tabelas lancamento e lancamentofixo
+          Lancamento lancamento = new Lancamento();
+          lancamento.tipo = item[0]['tipo'];
+          lancamento.fatura = item[0]['fatura'];
+          lancamento.idcategoria = item[0]['idcategoria'];
+          lancamento.idtag = item[0]['idtag'];
+          lancamento.idconta = item[0]['idconta'];
+          lancamento.idcontadestino = item[0]['idcontadestino'];
+          lancamento.idcartao = item[0]['idcartao'];
+          lancamento.valor = item[0]['valor'];
+          lancamento.descricao = item[0]['quantidaderepeticao'];
+          lancamento.tiporepeticao = item[0]['tiporepeticao'];
+          lancamento.quantidaderepeticao = item[0]['quantidaderepeticao'];
+          lancamento.periodorepeticao = item[0]['periodorepeticao'];
+          lancamento.datafatura = item[0]['datafatura'];
+          lancamento.pago = item[0]['pago'];
+          lancamento.hash = item[0]['hash'];
+          lancamento.data = dataStringUltimoItem;
+
+          LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
+          lancamentoFixoTable.hashlancamento = lancamento.hash;
+          lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
+          lancamentoFixoTable.data = lancamento.data;
+          lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
+          
         }
       }
+      
 
 
       
