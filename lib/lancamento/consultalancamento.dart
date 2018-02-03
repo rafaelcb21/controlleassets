@@ -61,18 +61,39 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
     _controller.reverse();
 
     setState(() {
-      lancamentoDB.getLancamentoMes(new DateTime.now()).then(
-        (list) {
-          setState(() {
-            if(list.length > 0) {
-              this.listaDB = list[0];
-              this.periodoFiltro = list[1][1];
+      String periodoInicial = criarPeriodoFiltro(this.periodo);
+      lancamentoDB.lancamentoDeFixo(this.periodo, periodoInicial).then((data) {
+        if(this.periodo == 'mes') {
+          lancamentoDB.getLancamentoMes(new DateTime.now()).then(
+            (list) {
+              setState(() {
+                if(list.length > 0) {
+                  this.listaDB = list[0];
+                  this.periodoFiltro = list[1][1];
 
-            }            
-          });
-        } //[[11 de dezembro, [{idcategoria: 8, idconta: 1, fatura: null, hash
-      );
+                }            
+              });
+            } //[[11 de dezembro, [{idcategoria: 8, idconta: 1, fatura: null, hash
+          );
+        }
+      });
+           
     });
+  }
+
+  String criarPeriodoFiltro(periodo) {
+    String diaLabelInicio = "";
+    if(periodo == 'mes') {
+      DateTime hoje = new DateTime.now();
+      int mes = hoje.month;
+      int ano = hoje.year;
+      //pega o ultimo dia do mes anterior para conseguir o ultimo dia do mes atual
+      DateTime periodoAtual = new DateTime(ano, mes, 0);
+      var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(periodoAtual).toString();
+      return hojeMesDescrito;
+    }
+
+    return '';    
   }
 
   void showDialogPeriodos<T>({ BuildContext context, Widget child }) {
@@ -1337,18 +1358,21 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                           }
                                         );
                                       } else if(this.periodo == 'mes') {
-                                        lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
-                                          (list) {
-                                            this.periodo = "mes";
-                                            setState(() {                                  
-                                              if(list.length > 0) {
-                                                this.listaDB = list[0];
-                                                this.periodoFiltro = list[1][1];
-                                                this.periodoFiltroDateTime = list[1][0][0];
-                                              }            
-                                            });
-                                          }
-                                        );
+                                        lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
+                                          lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
+                                            (list) {
+                                              this.periodo = "mes";
+                                              setState(() {                                  
+                                                if(list.length > 0) {
+                                                  this.listaDB = list[0];
+                                                  this.periodoFiltro = list[1][1];
+                                                  this.periodoFiltroDateTime = list[1][0][0];
+                                                }            
+                                              });
+                                            }
+                                          );
+                                        });
+                                        
                                       } else if(this.periodo == 'periodo') {
                                         lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
                                           (list) {
@@ -1478,18 +1502,20 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                           }
                                         );
                                       } else if(this.periodo == 'mes') {
-                                        lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
-                                          (list) {
-                                            this.periodo = "mes";
-                                            setState(() {                                  
-                                              if(list.length > 0) {
-                                                this.listaDB = list[0];
-                                                this.periodoFiltro = list[1][1];
-                                                this.periodoFiltroDateTime = list[1][0][0];
-                                              }            
-                                            });
-                                          }
-                                        );
+                                        lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
+                                          lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
+                                            (list) {
+                                              this.periodo = "mes";
+                                              setState(() {                                  
+                                                if(list.length > 0) {
+                                                  this.listaDB = list[0];
+                                                  this.periodoFiltro = list[1][1];
+                                                  this.periodoFiltroDateTime = list[1][0][0];
+                                                }            
+                                              });
+                                            }
+                                          );
+                                        });
                                       } else if(this.periodo == 'periodo') {
                                         lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
                                           (list) {
@@ -1618,18 +1644,20 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                           }
                                         );
                                       } else if(this.periodo == 'mes') {
-                                        lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
-                                          (list) {
-                                            this.periodo = "mes";
-                                            setState(() {                                  
-                                              if(list.length > 0) {
-                                                this.listaDB = list[0];
-                                                this.periodoFiltro = list[1][1];
-                                                this.periodoFiltroDateTime = list[1][0][0];
-                                              }            
-                                            });
-                                          }
-                                        );
+                                        lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
+                                          lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
+                                            (list) {
+                                              this.periodo = "mes";
+                                              setState(() {                                  
+                                                if(list.length > 0) {
+                                                  this.listaDB = list[0];
+                                                  this.periodoFiltro = list[1][1];
+                                                  this.periodoFiltroDateTime = list[1][0][0];
+                                                }            
+                                              });
+                                            }
+                                          );
+                                        });
                                       } else if(this.periodo == 'periodo') {
                                         lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
                                           (list) {

@@ -2270,12 +2270,12 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         allHashDistinct.add(hash['hashlancamento']);
       }      
     }
-    //List allHashDistinct = new Collection(allHash).distinct().toList();
 
     for(var hash in allHashDistinct) {
+      listaDatas = [];
       //String hash = i['hashlancamento'];
       List datas = await db.rawQuery('SELECT data, periodorepeticao FROM lancamentofixo WHERE hashlancamento = ?', [hash]);
-
+      
       // Pegar a primeira e a ultima data
       for(var j in datas) {
         listaDatas.add(DateTime.parse(j['data']));
@@ -2293,12 +2293,11 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
       if(datas[0]['periodorepeticao'] == 'Mensal') {
         while(!ultimoItemData.isAfter(ultimaDataReferencia)) {
-          
           String dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
           //int days = i * this.periodos[lancamentoDB.periodorepeticao];
           int _dia = int.parse(dataStringUltimoItem.substring(8,10));
           int _mes = int.parse(dataStringUltimoItem.substring(5,7));
-          int _ano = DateTime.parse(dataStringUltimoItem).add(new Duration(days: 30)).year;
+          int _ano = int.parse(dataStringUltimoItem.substring(0,4));
           
           if((_dia > 28 && _mes == 1) || _dia == 31) {
             dataStringUltimoItem = new DateTime(_ano, 3, 0).toString().substring(0,10);
@@ -2353,17 +2352,14 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       // oque evoluir vai para a tabela lancamento
     }
 
-    List items = await db.rawQuery('SELECT * FROM lancamento');
-
-    for(var x in items) {
-      print(x);
-    }
-
-    List items2 = await db.rawQuery('SELECT * FROM lancamentofixo');
-
-    for(var y in items2) {
-      print(y);
-    }
+    //List items = await db.rawQuery('SELECT * FROM lancamento');
+    //for(var x in items) {
+    //  print(x);
+    //}
+    //List items2 = await db.rawQuery('SELECT * FROM lancamentofixo');
+    //for(var y in items2) {
+    //  print(y);
+    //}
     
 
 
