@@ -1650,6 +1650,122 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     return [];
   }
 
+  DateTime proximaData(periodo, dia, mes, ano) {
+    String dataStringUltimoItem;
+
+    if(periodo == 'Diária') {
+      return new DateTime(ano, mes, dia).add(new Duration(hours: 24));
+
+    } else if(periodo == 'Semanal') {
+      return new DateTime(ano, mes, dia).add(new Duration(hours: 7*24));
+
+    } else if(periodo == 'Quinzenal') {
+      return new DateTime(ano, mes, dia).add(new Duration(hours: 15*24));
+
+    } else if(periodo == 'Mensal') {
+      if((dia > 28 && mes == 1) || dia == 31) {
+        dataStringUltimoItem = new DateTime(ano, 3, 0).toString().substring(0,10);
+
+      } else if(mes == 12) {
+        dataStringUltimoItem = new DateTime(ano+1, 1, dia).toString().substring(0,10);
+
+      } else {
+        dataStringUltimoItem = new DateTime(ano, mes+1, dia).toString().substring(0,10);                                                           
+      }
+      DateTime ultimoItemData = DateTime.parse(dataStringUltimoItem);
+      return ultimoItemData;
+
+    } else if(periodo == 'Bimestral') {
+      if(dia > 28 && mes == 12) {
+        dataStringUltimoItem = new DateTime(ano+1, 3, 0).toString().substring(0,10);
+
+      } else if(dia < 29 && mes == 12) {
+        dataStringUltimoItem = new DateTime(ano+1, 2, dia).toString().substring(0,10);
+
+      } else if(mes == 11) {
+        dataStringUltimoItem = new DateTime(ano+1, 1, dia).toString().substring(0,10);
+
+      } else if(mes < 11 && dia == 31) {
+        dataStringUltimoItem = new DateTime(ano, mes+3, 0).toString().substring(0,10);                                                           
+      
+      } else if(mes < 11 && dia != 31) {
+        dataStringUltimoItem = new DateTime(ano, mes+2, dia).toString().substring(0,10);                                                           
+      }
+
+      DateTime ultimoItemData = DateTime.parse(dataStringUltimoItem);
+      return ultimoItemData;
+
+    } else if(periodo == 'Trimestral') {
+      if(mes == 12) {
+        dataStringUltimoItem = new DateTime(ano+1, 3, dia).toString().substring(0,10);
+
+      } else if(dia > 28 && mes == 11) {
+        dataStringUltimoItem = new DateTime(ano+1, 3, 0).toString().substring(0,10);
+
+      } else if(dia < 29 && mes == 11) {
+        dataStringUltimoItem = new DateTime(ano+1, 2, dia).toString().substring(0,10);
+
+      } else if(mes == 10) {
+        dataStringUltimoItem = new DateTime(ano+1, 1, dia).toString().substring(0,10);
+      
+      } else if(dia == 31 && mes < 10) {
+        dataStringUltimoItem = new DateTime(ano, mes+4, 0).toString().substring(0,10);
+
+      } else if(dia != 31 && mes < 10) {
+        dataStringUltimoItem = new DateTime(ano, mes+3, dia).toString().substring(0,10);
+      }
+
+      DateTime ultimoItemData = DateTime.parse(dataStringUltimoItem);
+      return ultimoItemData;
+
+    } else if(periodo == 'Semestral') {
+      if(dia == 31 && mes == 12) {
+        dataStringUltimoItem = new DateTime(ano+1, 7, 0).toString().substring(0,10);
+
+      } else if(dia != 31 && mes == 12) {
+        dataStringUltimoItem = new DateTime(ano+1, 6, dia).toString().substring(0,10);
+
+      } else if(mes == 11) {
+        dataStringUltimoItem = new DateTime(ano+1, 5, dia).toString().substring(0,10);
+
+      } else if(dia == 31 && mes == 10) {
+        dataStringUltimoItem = new DateTime(ano+1, 5, 0).toString().substring(0,10);
+
+      } else if(dia != 31 && mes == 10) {
+        dataStringUltimoItem = new DateTime(ano+1, 4, dia).toString().substring(0,10);
+
+      } else if(mes == 9) {
+        dataStringUltimoItem = new DateTime(ano+1, 3, dia).toString().substring(0,10);
+
+      } else if(dia > 28 && mes == 8) {
+        dataStringUltimoItem = new DateTime(ano+1, 3, 0).toString().substring(0,10);
+
+      } else if(dia < 29 && mes == 8) {
+        dataStringUltimoItem = new DateTime(ano+1, 2, dia).toString().substring(0,10);
+
+      } else if(mes == 7) {
+        dataStringUltimoItem = new DateTime(ano+1, 1, dia).toString().substring(0,10);
+
+      } else if(dia == 31 && mes < 7) {
+        dataStringUltimoItem = new DateTime(ano, mes+7, 0).toString().substring(0,10);
+
+      } else if(dia != 31 && mes < 7) {
+        dataStringUltimoItem = new DateTime(ano, mes+6, dia).toString().substring(0,10);
+
+      } 
+      DateTime ultimoItemData = DateTime.parse(dataStringUltimoItem);
+      return ultimoItemData;
+
+    } else if(periodo == 'Anual') {
+      dataStringUltimoItem = new DateTime(ano+1, mes, dia).toString().substring(0,10);
+
+      DateTime ultimoItemData = DateTime.parse(dataStringUltimoItem);
+      return ultimoItemData;
+    }
+
+    return new DateTime.now();
+  }
+
   //atualizarLancamento trata de lancamentos repetidos e divididos
   Future atualizarLancamento(Lancamento lancamento, String dataInicial, bool todos) async {
     Directory path = await getApplicationDocumentsDirectory();
@@ -1927,6 +2043,55 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     }    
   }
 
+  List proximoPeriodoParaLancamentoFixo(DateTime from, DateTime to) {
+    List listaDatasPeriodo = [];
+    String diaLabelInicio = "";
+    String diaLabelFim = "";
+   
+    int diferencaDias = to.difference(from).inDays;
+
+    listaDatasPeriodo.add(
+      new DateFormat("yyyy-MM-dd").format(from)
+    );
+
+    for(int i = 1; i <= diferencaDias; i++) {
+      
+      if(from.add(new Duration(days: i)).hour == 23) {        
+        DateTime provisorio = from.add(new Duration(days: i));
+        listaDatasPeriodo.add(
+          new DateFormat("yyyy-MM-dd").format(
+            provisorio.add(new Duration(hours: 1))
+          )
+        );      
+      } else {
+        listaDatasPeriodo.add(
+          new DateFormat("yyyy-MM-dd").format(
+            from.add(new Duration(days: i))
+          )
+        );
+      }
+    }
+
+    var anoMesDiaInicio = new DateFormat.yMMMd("pt_BR").format(from); // 23 de dezembro de 2017
+    List yMMMdInicio = anoMesDiaInicio.split(' ');
+
+
+    yMMMdInicio[0].length == 1 ? diaLabelInicio = '0' + yMMMdInicio[0] : diaLabelInicio = yMMMdInicio[0];
+    String diaMesInicio = diaLabelInicio + ' ' + yMMMdInicio[2][0].toUpperCase() + yMMMdInicio[2].substring(1); // 23 Dez
+
+    var anoMesDiaFim = new DateFormat.yMMMd("pt_BR").format(to); // 23 de dezembro de 2017
+    List yMMMdFim = anoMesDiaFim.split(' ');
+
+    yMMMdFim[0].length == 1 ? diaLabelFim = '0' + yMMMdFim[0] : diaLabelFim = yMMMdFim[0];
+    
+    String diaMesFim = diaLabelFim + ' ' + yMMMdFim[2][0].toUpperCase() + yMMMdFim[2].substring(1); // 29 Dez
+
+    String label = diaMesInicio + " de " +  yMMMdInicio[4] + " à " + diaMesFim + " de " +  yMMMdFim[4]; // 23 Dez de 2017 à 29 Dez de 2018
+  
+    List listaPeriodoFiltro = label.split(' ');
+    return listaPeriodoFiltro;
+  }
+
   Future getLancamentoPeriodo(DateTime from, DateTime to) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
@@ -2183,7 +2348,8 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       int ano = int.parse(listaPeriodoFiltro[2]);
       int mes = mesEscolhidoAbreviado(listaPeriodoFiltro[1]);
       int dia = int.parse(listaPeriodoFiltro[0]);
-      String data = new DateFormat("yyyy-MM-dd").format(new DateTime(ano, mes, dia)).toString();
+      DateTime dataReferencia = new DateTime(ano, mes, dia).add(new Duration(hours: 24));
+      String data = new DateFormat("yyyy-MM-dd").format(dataReferencia);
       datasDeRederencia.add(data);
     }
 
@@ -2191,15 +2357,9 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       int anoFim = int.parse(listaPeriodoFiltro[8]);
       int mesFim = mesEscolhidoAbreviado(listaPeriodoFiltro[6]);
       int diaFim = int.parse(listaPeriodoFiltro[5]);
-      DateTime ultimoDia = new DateTime(anoFim, mesFim, diaFim);
-      
-      // Seleciona as datas da semana   
-      for(int i in [6 ,5 ,4 ,3 ,2 ,1, 0]) {
-        String data = new DateFormat("yyyy-MM-dd").format(
-          ultimoDia.subtract(new Duration(hours: i*24))
-        ).toString();
-        datasDeRederencia.add(data);
-      }
+      DateTime ultimoDia = new DateTime(anoFim, mesFim, diaFim).add(new Duration(hours: 7*24));
+      String data = new DateFormat("yyyy-MM-dd").format(ultimoDia);
+      datasDeRederencia.add(data);
     }
     
     if(periodo == 'mes') {
@@ -2220,7 +2380,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
       if(mes == 12) {
         ano = int.parse(listaPeriodoFiltro[2]);
-        DateTime date = new DateTime(ano + 1, 1, 0);
+        DateTime date = new DateTime(ano + 1, 2, 0);
         ultimoDia = date.day;
         datasDeRederencia.add(
           new DateFormat('yyyy-MM-dd').format(date)
@@ -2247,17 +2407,14 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       int diaFim = int.parse(listaPeriodoFiltro[5]);
       DateTime ultimoDia = new DateTime(anoFim, mesFim, diaFim);
 
-      int diferencaDeDias = ultimoDia.difference(primeiroDia).inDays;
-      
-      var listNumeros = new List<int>.generate(diferencaDeDias, (i) => i);
+      List ultimoDiaPeriodo = proximoPeriodoParaLancamentoFixo(primeiroDia, ultimoDia);
 
-      // Seleciona as datas entre o periodo  
-      for(int i in listNumeros.reversed.toList()) {
-        String data = new DateFormat("yyyy-MM-dd").format(
-          ultimoDia.subtract(new Duration(hours: i*24))
-        ).toString();
-        datasDeRederencia.add(data);
-      }
+      int anoFimProximo = int.parse(ultimoDiaPeriodo[8]);
+      int mesFimProximo = mesEscolhidoAbreviado(ultimoDiaPeriodo[6]);
+      int diaFimProximo = int.parse(ultimoDiaPeriodo[5]);
+      DateTime ultimoDiaProximo = new DateTime(anoFimProximo, mesFimProximo, diaFimProximo);
+
+      datasDeRederencia.add(ultimoDiaProximo);
     }
 
     // Seleciona todos os hash da tabela lancamentofixo
@@ -2291,53 +2448,47 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       //DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
       DateTime ultimaDataReferencia = DateTime.parse(datasDeRederencia.last);
 
-      if(datas[0]['periodorepeticao'] == 'Mensal') {
-        while(!ultimoItemData.isAfter(ultimaDataReferencia)) {
-          String dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
-          //int days = i * this.periodos[lancamentoDB.periodorepeticao];
-          int _dia = int.parse(dataStringUltimoItem.substring(8,10));
-          int _mes = int.parse(dataStringUltimoItem.substring(5,7));
-          int _ano = int.parse(dataStringUltimoItem.substring(0,4));
-          
-          if((_dia > 28 && _mes == 1) || _dia == 31) {
-            dataStringUltimoItem = new DateTime(_ano, 3, 0).toString().substring(0,10);
-          } else {
-            dataStringUltimoItem = new DateTime(_ano, _mes + 1, _dia).toString().substring(0,10);                                                           
-          }
-          ultimoItemData = DateTime.parse(dataStringUltimoItem);
+      while(!ultimoItemData.isAfter(ultimaDataReferencia)) {
+        String dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
+        //int days = i * this.periodos[lancamentoDB.periodorepeticao];
+        int _dia = int.parse(dataStringUltimoItem.substring(8,10));
+        int _mes = int.parse(dataStringUltimoItem.substring(5,7));
+        int _ano = int.parse(dataStringUltimoItem.substring(0,4));
+        
+        ultimoItemData = proximaData(datas[0]['periodorepeticao'], _dia, _mes, _ano);
+        
+        if(ultimoItemData.isAfter(ultimaDataReferencia)) {break;}
 
-          if(ultimoItemData.isAfter(ultimaDataReferencia)) {break;}
+        // Salvar no banco nas tabelas lancamento e lancamentofixo
+        Lancamento lancamento = new Lancamento();
+        lancamento.tipo = item[0]['tipo'];
+        lancamento.fatura = item[0]['fatura'];
+        lancamento.idcategoria = item[0]['idcategoria'];
+        lancamento.idtag = item[0]['idtag'];
+        lancamento.idconta = item[0]['idconta'];
+        lancamento.idcontadestino = item[0]['idcontadestino'];
+        lancamento.idcartao = item[0]['idcartao'];
+        lancamento.valor = item[0]['valor'];
+        lancamento.descricao = item[0]['descricao'];
+        lancamento.tiporepeticao = item[0]['tiporepeticao'];
+        lancamento.quantidaderepeticao = item[0]['quantidaderepeticao'];
+        lancamento.periodorepeticao = item[0]['periodorepeticao'];
+        lancamento.datafatura = item[0]['datafatura'];
+        lancamento.pago = 0;
+        lancamento.hash = item[0]['hash'];
+        lancamento.data = dataStringUltimoItem;
 
-          // Salvar no banco nas tabelas lancamento e lancamentofixo
-          Lancamento lancamento = new Lancamento();
-          lancamento.tipo = item[0]['tipo'];
-          lancamento.fatura = item[0]['fatura'];
-          lancamento.idcategoria = item[0]['idcategoria'];
-          lancamento.idtag = item[0]['idtag'];
-          lancamento.idconta = item[0]['idconta'];
-          lancamento.idcontadestino = item[0]['idcontadestino'];
-          lancamento.idcartao = item[0]['idcartao'];
-          lancamento.valor = item[0]['valor'];
-          lancamento.descricao = item[0]['descricao'];
-          lancamento.tiporepeticao = item[0]['tiporepeticao'];
-          lancamento.quantidaderepeticao = item[0]['quantidaderepeticao'];
-          lancamento.periodorepeticao = item[0]['periodorepeticao'];
-          lancamento.datafatura = item[0]['datafatura'];
-          lancamento.pago = 0;
-          lancamento.hash = item[0]['hash'];
-          lancamento.data = dataStringUltimoItem;
+        upsertLancamento([lancamento]);
+        //await db.insert("lancamento", lancamento.toMap());
 
-          upsertLancamento([lancamento]);
-          //await db.insert("lancamento", lancamento.toMap());
-
-          LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
-          lancamentoFixoTable.hashlancamento = lancamento.hash;
-          lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
-          lancamentoFixoTable.data = lancamento.data;
-          lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
-          
-        }
+        LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
+        lancamentoFixoTable.hashlancamento = lancamento.hash;
+        lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
+        lancamentoFixoTable.data = lancamento.data;
+        lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
+        
       }
+      
 
 
       
