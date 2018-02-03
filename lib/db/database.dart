@@ -2452,6 +2452,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     for(var u in listaId) {
       await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [u]);
     }
+    await db.rawDelete("DELETE FROM lancamentofixo WHERE hashlancamento = ?", [hash]);
 
     await db.close();
 
