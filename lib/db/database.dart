@@ -5,8 +5,8 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
-import 'package:queries/collections.dart';
+//import 'package:uuid/uuid.dart';
+//import 'package:queries/collections.dart';
 
 class DatabaseClient {
   Database _db;
@@ -2185,7 +2185,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       int dia = int.parse(listaPeriodoFiltro[0]);
       String data = new DateFormat("yyyy-MM-dd").format(new DateTime(ano, mes, dia)).toString();
       datasDeRederencia.add(data);
-      print(datasDeRederencia);
     }
 
     if(periodo == 'semana') {
@@ -2201,7 +2200,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         ).toString();
         datasDeRederencia.add(data);
       }
-      print(datasDeRederencia);
     }
     
     if(periodo == 'mes') {
@@ -2216,19 +2214,26 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       } else {
         mesString =  mes.toString();
       }
-            
-      int ano = int.parse(listaPeriodoFiltro[2]);
-      int ultimoDia = new DateTime(ano, mes + 1, 0).day;
 
-      // Seleciona as datas do mes     
-      for(String dia in dias) {
-        String data = ano.toString()+'-'+mesString+'-'+dia;
-        datasDeRederencia.add(data);
-        if(dia == ultimoDia.toString()) {
-          break;
-        }
+      int ano;
+      int ultimoDia;      
+
+      if(mes == 12) {
+        ano = int.parse(listaPeriodoFiltro[2]);
+        DateTime date = new DateTime(ano + 1, 1, 0);
+        ultimoDia = date.day;
+        datasDeRederencia.add(
+          new DateFormat('yyyy-MM-dd').format(date)
+        );
+      } else {
+        ano = int.parse(listaPeriodoFiltro[2]);
+        DateTime date = new DateTime(ano, mes + 2, 0);
+        ultimoDia = date.day;
+        datasDeRederencia.add(
+          new DateFormat('yyyy-MM-dd').format(date)
+        );
+        
       }
-      print(datasDeRederencia);
     }
 
     if(periodo == 'periodo') {
@@ -2253,17 +2258,22 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         ).toString();
         datasDeRederencia.add(data);
       }
-      print(datasDeRederencia);
     }
 
     // Seleciona todos os hash da tabela lancamentofixo
     List allHash = await db.rawQuery('SELECT hashlancamento FROM lancamentofixo');
     
     // Remove os hash duplicados
-    List allHashDistinct = new Collection(allHash).distinct().toList();
+    List allHashDistinct = [];
+    for(var hash in allHash) {
+      if(!allHashDistinct.contains(hash['hashlancamento'])) {
+        allHashDistinct.add(hash['hashlancamento']);
+      }      
+    }
+    //List allHashDistinct = new Collection(allHash).distinct().toList();
 
-    for(var i in allHashDistinct) {
-      String hash = i['hashlancamento'];
+    for(var hash in allHashDistinct) {
+      //String hash = i['hashlancamento'];
       List datas = await db.rawQuery('SELECT data, periodorepeticao FROM lancamentofixo WHERE hashlancamento = ?', [hash]);
 
       // Pegar a primeira e a ultima data
@@ -2278,12 +2288,12 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       List item = await db.rawQuery('SELECT * FROM lancamento WHERE hash = ? AND data = ?', [hash, primeiroItemDataString]);
 
       // Se a ultima data for maior que a data final referencia => não evolui
-      DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
+      //DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
       DateTime ultimaDataReferencia = DateTime.parse(datasDeRederencia.last);
 
       if(datas[0]['periodorepeticao'] == 'Mensal') {
-
         while(!ultimoItemData.isAfter(ultimaDataReferencia)) {
+          
           String dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
           //int days = i * this.periodos[lancamentoDB.periodorepeticao];
           int _dia = int.parse(dataStringUltimoItem.substring(8,10));
@@ -2309,14 +2319,17 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
           lancamento.idcontadestino = item[0]['idcontadestino'];
           lancamento.idcartao = item[0]['idcartao'];
           lancamento.valor = item[0]['valor'];
-          lancamento.descricao = item[0]['quantidaderepeticao'];
+          lancamento.descricao = item[0]['descricao'];
           lancamento.tiporepeticao = item[0]['tiporepeticao'];
           lancamento.quantidaderepeticao = item[0]['quantidaderepeticao'];
           lancamento.periodorepeticao = item[0]['periodorepeticao'];
           lancamento.datafatura = item[0]['datafatura'];
-          lancamento.pago = item[0]['pago'];
+          lancamento.pago = 0;
           lancamento.hash = item[0]['hash'];
           lancamento.data = dataStringUltimoItem;
+
+          upsertLancamento([lancamento]);
+          //await db.insert("lancamento", lancamento.toMap());
 
           LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
           lancamentoFixoTable.hashlancamento = lancamento.hash;
@@ -2326,6 +2339,8 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
           
         }
       }
+
+
       
 
 
@@ -2336,6 +2351,18 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       //se a utima for menor que a data inicial => evolui ate chegar na ultima data final antes de ultrapassar
       //se a ultima data estiver no meio => evolui ate chegar na ultima data final antes de ultrapassar
       // oque evoluir vai para a tabela lancamento
+    }
+
+    List items = await db.rawQuery('SELECT * FROM lancamento');
+
+    for(var x in items) {
+      print(x);
+    }
+
+    List items2 = await db.rawQuery('SELECT * FROM lancamentofixo');
+
+    for(var y in items2) {
+      print(y);
     }
     
 
