@@ -202,7 +202,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
           
             this.listaLancamentos.add(
               new ItemLancamento(
-                key: new ObjectKey(id),
+                //key: new ObjectKey(id),
+                key: new Key(id.toString()),
                 id: id,
                 tipo: tipo,
                 categoria: categoria,
@@ -709,7 +710,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
 
             this.listaLancamentos.add(
               new ItemLancamentoCartao(
-                key: new ObjectKey(ids[0]),
+                //key: new ObjectKey(ids[0]),
+                key: new Key(ids[0].toString()),
                 ids: ids,
                 tipo: tipo,
                 categoria: "cartão " + categoria,
