@@ -1676,13 +1676,19 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     String dataStringUltimoItem;
 
     if(periodo == 'Diária') {
-      return new DateTime(ano, mes, dia).add(new Duration(hours: 24));
+      DateTime diaTempo = new DateTime(ano, mes, dia);
+      DateTime diaAcrecentado = diaTempo.add(new Duration(hours: 25));
+      return diaAcrecentado;
 
     } else if(periodo == 'Semanal') {
-      return new DateTime(ano, mes, dia).add(new Duration(hours: 7*24));
+      DateTime diaTempo = new DateTime(ano, mes, dia);
+      DateTime diaAcrecentado = diaTempo.add(new Duration(hours: 7*25));
+      return diaAcrecentado;
 
     } else if(periodo == 'Quinzenal') {
-      return new DateTime(ano, mes, dia).add(new Duration(hours: 15*24));
+      DateTime diaTempo = new DateTime(ano, mes, dia);
+      DateTime diaAcrecentado = diaTempo.add(new Duration(hours: 15*25));
+      return diaAcrecentado;
 
     } else if(periodo == 'Mensal') {
       if((dia > 28 && mes == 1) || dia == 31) {
@@ -2469,7 +2475,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       //DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
       DateTime ultimaDataReferencia = DateTime.parse(datasDeRederencia.last);
 
-      print([ultimoItemData, ultimaDataReferencia]);
       while(!ultimoItemData.isAfter(ultimaDataReferencia)) {
         String dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
         //int days = i * this.periodos[lancamentoDB.periodorepeticao];
@@ -2477,11 +2482,9 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         int _mes = int.parse(dataStringUltimoItem.substring(5,7));
         int _ano = int.parse(dataStringUltimoItem.substring(0,4));
 
-        
         ultimoItemData = proximaData(datas[0]['periodorepeticao'], _dia, _mes, _ano);
         dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
-        print([ultimoItemData, ultimaDataReferencia]);
-        
+
         if(ultimoItemData.isAfter(ultimaDataReferencia)) {break;}
 
         // Salvar no banco nas tabelas lancamento e lancamentofixo
