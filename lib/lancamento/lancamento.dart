@@ -618,7 +618,6 @@ class FormularioState extends State<Formulario> {
     if(!this.editar) {
       lancamentoDB.pago = 1;
     } else {
-
       lancamentoDB.descricao = this.lancamentoDBEditar.descricao;
       lancamentoDB.idcategoria = this.lancamentoDBEditar.idcategoria;
       lancamentoDB.idconta = this.lancamentoDBEditar.idconta;
@@ -650,7 +649,7 @@ class FormularioState extends State<Formulario> {
 
       this._toDate = DateTime.parse(this.lancamentoDBEditar.data);
 
-      if(this.editar && lancamentoDB.tiporepeticao != null) {
+      if(this.editar && lancamentoDB.tiporepeticao != null && lancamentoDB.tiporepeticao != 'Fixa') {
         this.campoRepeticao = false;
 
         List descricaoList = this.lancamentoDBEditar.descricao.split(' ');
