@@ -87,8 +87,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
       DateTime hoje = new DateTime.now();
       int mes = hoje.month;
       int ano = hoje.year;
-      //pega o ultimo dia do mes anterior para conseguir o ultimo dia do mes atual
-      DateTime periodoAtual = new DateTime(ano, mes, 0);
+      //pega o ultimo dia do mes atual para conseguir o ultimo dia do mes atual
+      DateTime periodoAtual = new DateTime(ano, mes + 1, 0);
       var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(periodoAtual).toString();
       return hojeMesDescrito;
     }
@@ -1123,9 +1123,9 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                               if(this.periodo == 'periodo') {
                                 this.from = listaFiltro[0];
                                 this.to = listaFiltro[1];
-                              } 
+                              }
 
-                              lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
+                              lancamentoDB.lancamentoDeFixo(this.periodo, listaFiltro[2]).then((data) {
                                 if(this.periodo == "hoje") {
                                   lancamentoDB.getLancamentoHoje(this.periodoNext).then(
                                     (list) {

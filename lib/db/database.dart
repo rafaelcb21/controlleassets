@@ -820,6 +820,23 @@ class Lancamento {
     }
   }
 
+  String mesAbreviadoParaCompleto(month) {
+    switch(month) {
+      case "Jan": return "Janeiro"; break;
+      case "Fev": return "Fevereiro"; break;
+      case "Mar": return "Março"; break;
+      case "Abr": return "Abril"; break;
+      case "Mai": return "Maio"; break;
+      case "Jun": return "Junho"; break;
+      case "Jul": return "Julho"; break;
+      case "Ago": return "Agosto"; break;
+      case "Set": return "Setembro"; break;
+      case "Out": return "Outubro"; break;
+      case "Nov": return "Novembro"; break;
+      case "Dez": return "Dezembro"; break;
+    }
+  }
+
   String stringDateInDateTimeString(String date, String vencimento) {
     List listaMesAno = date.split(" ");
     String nomeMes = listaMesAno[0];
@@ -896,7 +913,12 @@ class Lancamento {
       List yMMMd = anoMesDia.split(' ');
       String anoMesDiaApresentacao = yMMMd[0] + ' ' + yMMMd[2][0].toUpperCase() + yMMMd[2].substring(1) + ' ' + yMMMd[4]; // 23 Dez 2017
 
-      return [anoMesDiaApresentacao, nextDate];
+      List x = anoMesDiaApresentacao.split(' '); //[3, Mar, 2018]
+
+      String mesNomeCompleto = mesAbreviadoParaCompleto(x[1]);
+      String proximoMes = mesNomeCompleto[0].toLowerCase() + mesNomeCompleto.substring(1) + ' de ' + x[2]; 
+      
+      return [anoMesDiaApresentacao, nextDate, proximoMes];
     }
 
     if(periodo == 'periodo') {
@@ -2387,12 +2409,11 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         );
       } else {
         ano = int.parse(listaPeriodoFiltro[2]);
-        DateTime date = new DateTime(ano, mes + 2, 0);
+        DateTime date = new DateTime(ano, mes + 1, 0);
         ultimoDia = date.day;
         datasDeRederencia.add(
           new DateFormat('yyyy-MM-dd').format(date)
         );
-        
       }
     }
 
@@ -2448,14 +2469,18 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       //DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
       DateTime ultimaDataReferencia = DateTime.parse(datasDeRederencia.last);
 
+      print([ultimoItemData, ultimaDataReferencia]);
       while(!ultimoItemData.isAfter(ultimaDataReferencia)) {
         String dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
         //int days = i * this.periodos[lancamentoDB.periodorepeticao];
         int _dia = int.parse(dataStringUltimoItem.substring(8,10));
         int _mes = int.parse(dataStringUltimoItem.substring(5,7));
         int _ano = int.parse(dataStringUltimoItem.substring(0,4));
+
         
         ultimoItemData = proximaData(datas[0]['periodorepeticao'], _dia, _mes, _ano);
+        dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
+        print([ultimoItemData, ultimaDataReferencia]);
         
         if(ultimoItemData.isAfter(ultimaDataReferencia)) {break;}
 
