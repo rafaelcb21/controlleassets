@@ -1121,6 +1121,12 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                             setState(() {
                               var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true, this.periodo);
                               this.periodoNext = listaFiltro[1];
+                              String proximaData;
+
+                              if(this.periodo == 'periodo') {
+                                this.from = listaFiltro[0];
+                                this.to = listaFiltro[1];
+                              }
 
                               if(this.periodo == 'periodo') {
                                 this.from = listaFiltro[0];

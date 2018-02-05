@@ -868,8 +868,8 @@ class Lancamento {
         nextDate = DateTime.parse(dataString).subtract(new Duration(days: 1));
 
       String hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(nextDate).toString(); //janeiro de 2018
-      
-      return [hojeMesDescrito, nextDate];
+
+      return [hojeMesDescrito, nextDate, date];
     }
 
     if(periodo == 'semana') {
@@ -892,7 +892,7 @@ class Lancamento {
 
       String anoMesDiaApresentacao = yMMMd[0] + ' ' + yMMMd[2][0].toUpperCase() + yMMMd[2].substring(1) + ' ' + yMMMd[4]; // 01 Dez à 07 Jan
 
-      return [anoMesDiaApresentacao, nextDate];
+      return [anoMesDiaApresentacao, nextDate, date];
     }
 
     if(periodo == 'mes') {
@@ -1008,7 +1008,7 @@ class Lancamento {
         int.parse(newNextDateFimString.substring(8, 10))
       );
 
-      return [resultadoDataInicio, resultadoDataFim];
+      return [resultadoDataInicio, resultadoDataFim, date];
     }
     
   }
@@ -1678,7 +1678,8 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     if(periodo == 'Diária') {
       DateTime diaTempo = new DateTime(ano, mes, dia);
       DateTime diaAcrecentado = diaTempo.add(new Duration(hours: 25));
-      return diaAcrecentado;
+      DateTime ajuste = new DateTime(diaAcrecentado.year, diaAcrecentado.month, diaAcrecentado.day);
+      return ajuste;
 
     } else if(periodo == 'Semanal') {
       DateTime diaTempo = new DateTime(ano, mes, dia);
@@ -2440,10 +2441,11 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       int mesFimProximo = mesEscolhidoAbreviado(ultimoDiaPeriodo[6]);
       int diaFimProximo = int.parse(ultimoDiaPeriodo[5]);
       DateTime ultimoDiaProximo = new DateTime(anoFimProximo, mesFimProximo, diaFimProximo);
-
-      datasDeRederencia.add(ultimoDiaProximo);
+      
+      datasDeRederencia.add(
+        new DateFormat('yyyy-MM-dd').format(ultimoDiaProximo)
+      );
     }
-    print(datasDeRederencia);
 
     // Seleciona todos os hash da tabela lancamentofixo
     List allHash = await db.rawQuery('SELECT hashlancamento FROM lancamentofixo');
@@ -2476,6 +2478,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       //DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
       DateTime ultimaDataReferencia = DateTime.parse(datasDeRederencia.last);
 
+      //print([ultimoItemData, ultimaDataReferencia]);
       while(!ultimoItemData.isAfter(ultimaDataReferencia)) {
         String dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
         //int days = i * this.periodos[lancamentoDB.periodorepeticao];
@@ -2486,6 +2489,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         ultimoItemData = proximaData(datas[0]['periodorepeticao'], _dia, _mes, _ano);
         dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
 
+        //print([ultimoItemData, ultimaDataReferencia]);
         if(ultimoItemData.isAfter(ultimaDataReferencia)) {break;}
 
         // Salvar no banco nas tabelas lancamento e lancamentofixo
