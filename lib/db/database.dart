@@ -1214,7 +1214,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       String ano = i.substring(0, 4);
       String fatura = mes + " de " + ano; //Janeiro de 2017
 
-      List listaIdCartaoww = await db.rawQuery("SELECT id, vencimento FROM cartao");
+      List listaIdCartao = await db.rawQuery("SELECT id, vencimento FROM cartao");
       
       listaIdCartao = await db.rawQuery("SELECT id, vencimento FROM cartao WHERE vencimento = ?", [dia]); //todos os ids de cartao de um determinado dia
       listaFaturaIdCartao.add([fatura, listaIdCartao]);
