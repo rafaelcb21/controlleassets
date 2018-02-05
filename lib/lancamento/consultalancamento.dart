@@ -1126,6 +1126,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                 this.from = listaFiltro[0];
                                 this.to = listaFiltro[1];
                               }
+                              print(listaFiltro);
 
                               lancamentoDB.lancamentoDeFixo(this.periodo, listaFiltro[2]).then((data) {
                                 if(this.periodo == "hoje") {

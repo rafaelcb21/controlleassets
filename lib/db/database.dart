@@ -2443,6 +2443,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
       datasDeRederencia.add(ultimoDiaProximo);
     }
+    print(datasDeRederencia);
 
     // Seleciona todos os hash da tabela lancamentofixo
     List allHash = await db.rawQuery('SELECT hashlancamento FROM lancamentofixo');
