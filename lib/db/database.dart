@@ -862,10 +862,12 @@ class Lancamento {
       String dataString = new DateFormat("yyyy-MM-dd").format(data);
       DateTime nextDate;
 
+      DateTime x = DateTime.parse(dataString);      
+
       next ? 
-        nextDate = DateTime.parse(dataString).add(new Duration(days: 1))
+        nextDate = new DateTime.utc(x.year, x.month, x.day).add(new Duration(days: 1))
       :
-        nextDate = DateTime.parse(dataString).subtract(new Duration(days: 1));
+        nextDate = new DateTime.utc(x.year, x.month, x.day).subtract(new Duration(days: 1));
 
       String hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(nextDate).toString(); //janeiro de 2018
 
@@ -882,10 +884,12 @@ class Lancamento {
       String dataString = new DateFormat("yyyy-MM-dd").format(data);
       DateTime nextDate;
 
+      DateTime x = DateTime.parse(dataString);  
+
       next ? 
-        nextDate = DateTime.parse(dataString).add(new Duration(days: 1)) 
+        nextDate = new DateTime.utc(x.year, x.month, x.day).add(new Duration(days: 1)) 
       :
-        nextDate = DateTime.parse(dataString).subtract(new Duration(days: 7));     
+        nextDate =new DateTime.utc(x.year, x.month, x.day).subtract(new Duration(days: 7));     
 
       String anoMesDia = new DateFormat.yMMMd("pt_BR").format(nextDate); // 23 de dez de 2017
       List yMMMd = anoMesDia.split(' ');
@@ -903,11 +907,11 @@ class Lancamento {
       DateTime data = new DateTime(ano, mes, 1);
       String dataString = new DateFormat("yyyy-MM-dd").format(data);
       DateTime nextDate;
-
+      DateTime z = DateTime.parse(dataString); 
       next ? 
-        nextDate = DateTime.parse(dataString).add(new Duration(days: 31)) 
+        nextDate = new DateTime.utc(z.year, z.month, z.day).add(new Duration(days: 31)) 
       :
-        nextDate = DateTime.parse(dataString).subtract(new Duration(days: 5));     
+        nextDate = new DateTime.utc(z.year, z.month, z.day).subtract(new Duration(days: 5));     
 
       String anoMesDia = new DateFormat.yMMMd("pt_BR").format(nextDate); // 23 de dez de 2017
       List yMMMd = anoMesDia.split(' ');
@@ -942,31 +946,37 @@ class Lancamento {
       int diaFim = int.parse(listaMesAno[5]);
       int anoFim = int.parse(listaMesAno[8]);
       int mesFim = mesEscolhidoAbreviado(nomeMesFim);
-      DateTime dataFim = new DateTime(anoFim, mesFim, diaFim);
+      DateTime dataFim = new DateTime.utc(anoFim, mesFim, diaFim);
       String dataStringFim = new DateFormat("yyyy-MM-dd").format(dataFim);
       int diferencaDias = dataFim.difference(dataInicio).inDays;
 
       //verificar se escolheu um periodo fechado ou não
       //periodo Fechado
-      if(dataFim.add(new Duration(hours: 25)).day == diaInicio) {        
+      if(dataFim.add(new Duration(days: 1)).day == diaInicio) {        
 
         //avancar data right
         if(next) {
-          nextDateInicio = DateTime.parse(dataStringFim).add(new Duration(hours: 25)); //DateTime
+          DateTime x = DateTime.parse(dataStringFim);          
+          nextDateInicio = new DateTime.utc(x.year, x.month, x.day).add(new Duration(days: 1)); //DateTime
           newNextDateInicioString = new DateFormat("yyyy-MM-dd").format(nextDateInicio); //String Resultado data Inicio
 
           //diferença entre datas
-          nextDateFim = DateTime.parse(newNextDateInicioString).add(new Duration(days: diferencaDias));
+          DateTime y = DateTime.parse(newNextDateInicioString);
+
+          nextDateFim = new DateTime.utc(y.year, y.month, y.day).add(new Duration(days: diferencaDias));
           
           String nextDateFimString = new DateFormat("yyyy-MM-dd").format(nextDateFim);
           newNextDateFimString = nextDateFimString.substring(0, 8) + dataStringFim.substring(8,10); // 2017-12-20 Resultado data Fim
         
         //recuar data left
         } else {
-          nextDateFim = DateTime.parse(dataStringInicio).subtract(new Duration(days: 1));
+          DateTime x = DateTime.parse(dataStringInicio);
+
+          nextDateFim = new DateTime.utc(x.year, x.month, x.day).subtract(new Duration(days: 1));
           newNextDateFimString = new DateFormat("yyyy-MM-dd").format(nextDateFim); // Resultado data Fim
 
-          nextDateInicio = DateTime.parse(newNextDateFimString).subtract(new Duration(days: diferencaDias));
+          DateTime y = DateTime.parse(newNextDateFimString);
+          nextDateInicio =  new DateTime.utc(y.year, y.month, y.day).subtract(new Duration(days: diferencaDias));
 
           String nextDateInicioString = new DateFormat("yyyy-MM-dd").format(nextDateInicio);
           newNextDateInicioString = nextDateInicioString.substring(0, 8) + dataStringInicio.substring(8,10); //String Resultado data Inicio
@@ -976,20 +986,25 @@ class Lancamento {
       } else {
         //avancar data right
         if(next) {
-          nextDateInicio = DateTime.parse(dataStringFim).add(new Duration(hours: 25)); //DateTime
+          DateTime x = DateTime.parse(dataStringFim);          
+          nextDateInicio = new DateTime.utc(x.year, x.month, x.day).add(new Duration(days: 1)); //DateTime
           newNextDateInicioString = new DateFormat("yyyy-MM-dd").format(nextDateInicio); //String Resultado data Inicio
           
           //diferença entre datas
-          nextDateFim = DateTime.parse(newNextDateInicioString).add(new Duration(days: diferencaDias));
+          DateTime y = DateTime.parse(newNextDateInicioString);
+
+          nextDateFim = new DateTime.utc(y.year, y.month, y.day).add(new Duration(days: diferencaDias));
           
           newNextDateFimString = new DateFormat("yyyy-MM-dd").format(nextDateFim);
           
         //recuar data left
         } else {
-          nextDateFim = DateTime.parse(dataStringInicio).subtract(new Duration(days: 1));
+          DateTime x = DateTime.parse(dataStringInicio); 
+          nextDateFim = new DateTime.utc(x.year, x.month, x.day).subtract(new Duration(days: 1));
           newNextDateFimString = new DateFormat("yyyy-MM-dd").format(nextDateFim); // Resultado data Fim
           
-          nextDateInicio = DateTime.parse(newNextDateFimString).subtract(new Duration(days: diferencaDias));
+          DateTime y = DateTime.parse(newNextDateFimString);
+          nextDateInicio = new DateTime.utc(y.year, y.month, y.day).subtract(new Duration(days: diferencaDias));
 
           newNextDateInicioString = new DateFormat("yyyy-MM-dd").format(nextDateInicio);
           
@@ -1157,27 +1172,34 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     var listaPorData = [];
     var listaDeFaturas = [];
 
-    if(diaDeReferencia.weekday == 1) {
-      inicioDaSemana = diaDeReferencia;
-      fimDaSemana = diaDeReferencia.add(new Duration(days: 6));
+    if(diaDeReferencia.weekday == 1) {      
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day);
+      fimDaSemana = inicioDaSemana.add(new Duration(days: 6));
+
     } else if(diaDeReferencia.weekday == 2) {
-      inicioDaSemana = diaDeReferencia.subtract(new Duration(days: 1));
-      fimDaSemana = diaDeReferencia.add(new Duration(days: 5));
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day).subtract(new Duration(days: 1));
+      fimDaSemana = inicioDaSemana.add(new Duration(days: 6));
+
     } else if(diaDeReferencia.weekday == 3) {
-      inicioDaSemana = diaDeReferencia.subtract(new Duration(days: 2));
-      fimDaSemana = diaDeReferencia.add(new Duration(days: 4));
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day).subtract(new Duration(days: 2));
+      fimDaSemana = inicioDaSemana.add(new Duration(days: 6));
+
     } else if(diaDeReferencia.weekday == 4) {
-      inicioDaSemana = diaDeReferencia.subtract(new Duration(days: 3));
-      fimDaSemana = diaDeReferencia.add(new Duration(days: 3));
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day).subtract(new Duration(days: 3));
+      fimDaSemana = inicioDaSemana.add(new Duration(days: 6));
+
     } else if(diaDeReferencia.weekday == 5) {
-      inicioDaSemana = diaDeReferencia.subtract(new Duration(days: 4));
-      fimDaSemana = diaDeReferencia.add(new Duration(days: 2));
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day).subtract(new Duration(days: 4));
+      fimDaSemana = inicioDaSemana.add(new Duration(days: 6));
+
     } else if(diaDeReferencia.weekday == 6) {
-      inicioDaSemana = diaDeReferencia.subtract(new Duration(days: 5));
-      fimDaSemana = diaDeReferencia.add(new Duration(days: 1));
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day).subtract(new Duration(days: 5));
+      fimDaSemana = inicioDaSemana.add(new Duration(days: 6));
+
     } else if(diaDeReferencia.weekday == 7) {
-      inicioDaSemana = diaDeReferencia.subtract(new Duration(days: 6));
-      fimDaSemana = diaDeReferencia;
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day).subtract(new Duration(days: 6));
+      fimDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day);
+
     }
     
     proximaData = inicioDaSemana;
@@ -1676,19 +1698,19 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     String dataStringUltimoItem;
 
     if(periodo == 'Diária') {
-      DateTime diaTempo = new DateTime(ano, mes, dia);
-      DateTime diaAcrecentado = diaTempo.add(new Duration(hours: 25));
+      DateTime diaTempo = new DateTime.utc(ano, mes, dia);
+      DateTime diaAcrecentado = diaTempo.add(new Duration(days: 1));
       DateTime ajuste = new DateTime(diaAcrecentado.year, diaAcrecentado.month, diaAcrecentado.day);
       return ajuste;
 
     } else if(periodo == 'Semanal') {
-      DateTime diaTempo = new DateTime(ano, mes, dia);
-      DateTime diaAcrecentado = diaTempo.add(new Duration(hours: 7*25));
+      DateTime diaTempo = new DateTime.utc(ano, mes, dia);
+      DateTime diaAcrecentado = diaTempo.add(new Duration(days: 7));
       return diaAcrecentado;
 
     } else if(periodo == 'Quinzenal') {
-      DateTime diaTempo = new DateTime(ano, mes, dia);
-      DateTime diaAcrecentado = diaTempo.add(new Duration(hours: 15*25));
+      DateTime diaTempo = new DateTime.utc(ano, mes, dia);
+      DateTime diaAcrecentado = diaTempo.add(new Duration(days: 15));
       return diaAcrecentado;
 
     } else if(periodo == 'Mensal') {
@@ -2366,6 +2388,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     String mesString = '';
     List listaDatas = [];
 
+    print([periodo, periodoFiltro]);
     //[hoje, 30 Jan 2018]
     //[semana, 29 Jan de 2018 à 04 Fev de 2018]
     //[mes, janeiro de 2018]
@@ -2377,16 +2400,17 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       int ano = int.parse(listaPeriodoFiltro[2]);
       int mes = mesEscolhidoAbreviado(listaPeriodoFiltro[1]);
       int dia = int.parse(listaPeriodoFiltro[0]);
-      DateTime dataReferencia = new DateTime(ano, mes, dia).add(new Duration(hours: 24));
+      DateTime dataReferencia = new DateTime.utc(ano, mes, dia).add(new Duration(days: 1));
       String data = new DateFormat("yyyy-MM-dd").format(dataReferencia);
       datasDeRederencia.add(data);
     }
+    print(datasDeRederencia);
 
     if(periodo == 'semana') {
       int anoFim = int.parse(listaPeriodoFiltro[8]);
       int mesFim = mesEscolhidoAbreviado(listaPeriodoFiltro[6]);
       int diaFim = int.parse(listaPeriodoFiltro[5]);
-      DateTime ultimoDia = new DateTime(anoFim, mesFim, diaFim).add(new Duration(hours: 7*24));
+      DateTime ultimoDia = new DateTime.utc(anoFim, mesFim, diaFim).add(new Duration(days: 7));
       String data = new DateFormat("yyyy-MM-dd").format(ultimoDia);
       datasDeRederencia.add(data);
     }
@@ -2457,7 +2481,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         allHashDistinct.add(hash['hashlancamento']);
       }      
     }
-
+    print(allHashDistinct);
     for(var hash in allHashDistinct) {
       listaDatas = [];
       //String hash = i['hashlancamento'];
@@ -2474,11 +2498,15 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
       List item = await db.rawQuery('SELECT * FROM lancamento WHERE hash = ? AND data = ?', [hash, primeiroItemDataString]);
 
+      
+      //print('${x.year}-${x.month.toString().padLeft(2, '0')}-${x.day.toString().padLeft(2, '0')}'); // 2018-02-12
+      //print('${y.year}-${y.month.toString().padLeft(2, '0')}-${y.day.toString().padLeft(2, '0')}'); // 2018-02-18
+
       // Se a ultima data for maior que a data final referencia => não evolui
       //DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
       DateTime ultimaDataReferencia = DateTime.parse(datasDeRederencia.last);
 
-      //print([ultimoItemData, ultimaDataReferencia]);
+      print([ultimoItemData, ultimaDataReferencia]);
       while(!ultimoItemData.isAfter(ultimaDataReferencia)) {
         String dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
         //int days = i * this.periodos[lancamentoDB.periodorepeticao];
@@ -2489,7 +2517,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         ultimoItemData = proximaData(datas[0]['periodorepeticao'], _dia, _mes, _ano);
         dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
 
-        //print([ultimoItemData, ultimaDataReferencia]);
+        print([ultimoItemData, ultimaDataReferencia]);
         if(ultimoItemData.isAfter(ultimaDataReferencia)) {break;}
 
         // Salvar no banco nas tabelas lancamento e lancamentofixo
