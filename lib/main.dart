@@ -14,7 +14,7 @@ import 'dart:ui' as ui;
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-import 'package:firebase_admob/firebase_admob.dart';
+//import 'package:firebase_admob/firebase_admob.dart';
 //import 'package:google_sign_in/google_sign_in.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
 
@@ -80,42 +80,42 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Animation<double> _animation2;
   Animation<double> _animation3;
 
- static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
-    testDevices: testDevice != null ? <String>[testDevice] : null,
-    keywords: <String>['foo', 'bar'],
-    contentUrl: 'http://foo.com/bar.html',
-    birthday: new DateTime.now(),
-    childDirected: true,
-    gender: MobileAdGender.male,
-  );
+  //static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
+  //  testDevices: testDevice != null ? <String>[testDevice] : null,
+  //  keywords: <String>['foo', 'bar'],
+  //  contentUrl: 'http://foo.com/bar.html',
+  //  birthday: new DateTime.now(),
+  //  childDirected: true,
+  //  gender: MobileAdGender.male,
+  //);
 
-  BannerAd _bannerAd;
-  InterstitialAd _interstitialAd;
+  //BannerAd _bannerAd;
+  //InterstitialAd _interstitialAd;
 
-  BannerAd createBannerAd() {
-    return new BannerAd(
-      unitId: bannerAdUnitId,
-      targetingInfo: targetingInfo,
-      listener: (MobileAdEvent event) {
-        print("BannerAd event $event");
-      },
-    );
-  }
+  //BannerAd createBannerAd() {
+  //  return new BannerAd(
+  //    unitId: bannerAdUnitId,
+  //    targetingInfo: targetingInfo,
+  //    listener: (MobileAdEvent event) {
+  //      print("BannerAd event $event");
+  //    },
+  //  );
+  //}
 
-  InterstitialAd createInterstitialAd() {
-    return new InterstitialAd(
-      unitId: interstitialAdUnitId,
-      targetingInfo: targetingInfo,
-      listener: (MobileAdEvent event) {
-        print("InterstitialAd event $event");
-      },
-    );
-  }
+  //InterstitialAd createInterstitialAd() {
+  //  return new InterstitialAd(
+  //    unitId: interstitialAdUnitId,
+  //    targetingInfo: targetingInfo,
+  //    listener: (MobileAdEvent event) {
+  //      print("InterstitialAd event $event");
+  //    },
+  //  );
+  //}
 
   @override
   void initState() {
     this.cores = listaCores.cores;
-    FirebaseAdMob.instance.initialize(appId: appId);
+    //FirebaseAdMob.instance.initialize(appId: appId);
     //_bannerAd = createBannerAd()..load();
     //_bannerAd ??= createBannerAd();
     //_bannerAd..load()..show();
@@ -174,7 +174,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void dispose() {
     //_bannerAd?.dispose();
-    _interstitialAd?.dispose();
+    //_interstitialAd?.dispose();
     super.dispose();
   }
 

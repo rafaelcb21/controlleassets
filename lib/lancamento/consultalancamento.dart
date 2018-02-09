@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:flutter/animation.dart';
 import "./lancamento.dart";
+import 'package:uuid/uuid.dart';
 
 class ConsultaLancamentoPage extends StatefulWidget {
   @override
@@ -28,6 +29,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
   DateTime to;
   String periodo = "mes";
   List total = [];
+  var uuid = new Uuid();
 
   AnimationController _controller;
   Animation<double> _animation;
@@ -202,8 +204,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
           
             this.listaLancamentos.add(
               new ItemLancamento(
-                //key: new ObjectKey(id),
-                key: new Key(id.toString()),
+                key: new ObjectKey(id),
+                //key: new Key(id.toString()),
                 id: id,
                 tipo: tipo,
                 categoria: categoria,
@@ -710,8 +712,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
 
             this.listaLancamentos.add(
               new ItemLancamentoCartao(
-                //key: new ObjectKey(ids[0]),
-                key: new Key(ids[0].toString()),
+                key: new ObjectKey(ids[0]),
+                //key: new Key(ids[0].toString()),
                 ids: ids,
                 tipo: tipo,
                 categoria: "cartão " + categoria,
@@ -841,6 +843,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
         children: <Widget>[
           this.listaDB == [] ? new Container() : 
           new ListView(
+            key: uuid.v4(),
             padding: new EdgeInsets.only(top: 16.0),
             children: buildLancamentos(this.listaDB)
           ),
@@ -1805,7 +1808,7 @@ class ItemLancamento extends StatefulWidget {
     this.hash,
     this.onPressed,
     this.onPressed2,
-    this.onPressed3,}) : super(key: key);
+    this.onPressed3,});// : super();
 
   @override
   ItemLancamentoState createState() => new ItemLancamentoState();
@@ -2037,7 +2040,7 @@ class ItemLancamentoCartao extends StatefulWidget {
     this.pago,
     this.textoPago,
     this.onPressed,
-    this.onPressed2,}) : super(key: key);
+    this.onPressed2,}); //: super();
 
   @override
   ItemLancamentoCartaoState createState() => new ItemLancamentoCartaoState();
@@ -2453,6 +2456,3 @@ class Sky extends CustomPainter {
     return _width != oldDelegate._width || _rectHeight != oldDelegate._rectHeight;
   }
 }
-
-
-
