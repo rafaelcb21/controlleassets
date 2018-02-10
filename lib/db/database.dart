@@ -2065,24 +2065,24 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       }
 
       //for(var lancamento in lancamentoList) {        
-      //  print(lancamento.idcategoria);
-      //  print(lancamento.idconta);
-      //  print(lancamento.fatura); //null
-      //  print(lancamento.hash); //yyyyyyy
-      //  print(lancamento.valor);
-      //  print(lancamento.data); //2018-01-22
-      //  print(lancamento.idcontadestino);
-      //  print(lancamento.idtag);
-      //  print(lancamento.pago);
-      //  print(lancamento.descricao);
-      //  print(lancamento.id);
-      //  print(lancamento.quantidaderepeticao); //2
-      //  print(lancamento.idcartao);
-      //  print(lancamento.tipo);
-      //  print(lancamento.datafatura);
-      //  print(lancamento.periodorepeticao); //Meses
-      //  print(lancamento.tiporepeticao); //Parcelada
-      //  print('============');
+      //  (lancamento.idcategoria);
+      //  (lancamento.idconta);
+      //  (lancamento.fatura); //null
+      //  (lancamento.hash); //yyyyyyy
+      //  (lancamento.valor);
+      //  (lancamento.data); //2018-01-22
+      //  (lancamento.idcontadestino);
+      //  (lancamento.idtag);
+      //  (lancamento.pago);
+      //  (lancamento.descricao);
+      //  (lancamento.id);
+      //  (lancamento.quantidaderepeticao); //2
+      //  (lancamento.idcartao);
+      //  (lancamento.tipo);
+      //  (lancamento.datafatura);
+      //  (lancamento.periodorepeticao); //Meses
+      //  (lancamento.tiporepeticao); //Parcelada
+      //  ('============');
       //}
 
       for(var lancamento in lancamentoList) {
@@ -2381,6 +2381,36 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     return lista;
   }
 
+  DateTime dataOfDelete(String data, String periodo) {
+
+    List listaPeriodoFiltro = data.split(' ');
+
+    //09 Fev 2018
+    if(periodo == 'hoje') {
+      int ano = int.parse(listaPeriodoFiltro[2]);
+      int mes = mesEscolhidoAbreviado(listaPeriodoFiltro[1]);
+      int dia = int.parse(listaPeriodoFiltro[0]);
+      DateTime dataReferencia = new DateTime.utc(ano, mes, dia);
+      return dataReferencia;
+
+    //05 Fev de 2018 à 11 Fev de 2018
+    } else if(periodo == 'semana') {
+      int ano = int.parse(listaPeriodoFiltro[3]);
+      int mes = mesEscolhidoAbreviado(listaPeriodoFiltro[1]);
+      int dia = int.parse(listaPeriodoFiltro[0]);
+      DateTime dataReferencia = new DateTime.utc(ano, mes, dia);
+      return dataReferencia;
+
+    //fevereiro de 2018
+    } else if(periodo == 'mes') {
+      int ano = int.parse(listaPeriodoFiltro[2]);
+      int mes = mesEscolhido(listaPeriodoFiltro[0]);
+      DateTime dataReferencia = new DateTime.utc(ano, mes, 1);
+      return dataReferencia;
+    }
+
+  }
+
   Future lancamentoDeFixo(String periodo, String periodoFiltro) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
@@ -2388,7 +2418,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     String mesString = '';
     List listaDatas = [];
 
-    print([periodo, periodoFiltro]);
     //[hoje, 30 Jan 2018]
     //[semana, 29 Jan de 2018 à 04 Fev de 2018]
     //[mes, janeiro de 2018]
@@ -2404,7 +2433,6 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       String data = new DateFormat("yyyy-MM-dd").format(dataReferencia);
       datasDeRederencia.add(data);
     }
-    print(datasDeRederencia);
 
     if(periodo == 'semana') {
       int anoFim = int.parse(listaPeriodoFiltro[8]);
@@ -2481,7 +2509,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         allHashDistinct.add(hash['hashlancamento']);
       }      
     }
-    print(allHashDistinct);
+
     for(var hash in allHashDistinct) {
       listaDatas = [];
       //String hash = i['hashlancamento'];
@@ -2499,8 +2527,8 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       List item = await db.rawQuery('SELECT * FROM lancamento WHERE hash = ? AND data = ?', [hash, primeiroItemDataString]);
 
       
-      //print('${x.year}-${x.month.toString().padLeft(2, '0')}-${x.day.toString().padLeft(2, '0')}'); // 2018-02-12
-      //print('${y.year}-${y.month.toString().padLeft(2, '0')}-${y.day.toString().padLeft(2, '0')}'); // 2018-02-18
+      //('${x.year}-${x.month.toString().padLeft(2, '0')}-${x.day.toString().padLeft(2, '0')}'); // 2018-02-12
+      //('${y.year}-${y.month.toString().padLeft(2, '0')}-${y.day.toString().padLeft(2, '0')}'); // 2018-02-18
 
       // Se a ultima data for maior que a data final referencia => não evolui
       //DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
@@ -2566,11 +2594,11 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
     //List items = await db.rawQuery('SELECT * FROM lancamento');
     //for(var x in items) {
-    //  print(x);
+    //  (x);
     //}
     //List items2 = await db.rawQuery('SELECT * FROM lancamentofixo');
     //for(var y in items2) {
-    //  print(y);
+    //  (y);
     //}
     
 

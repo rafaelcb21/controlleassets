@@ -98,6 +98,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
     return '';    
   }
 
+  
+
   void showDialogPeriodos<T>({ BuildContext context, Widget child }) {
     showDialog<T>(
       context: context,
@@ -394,8 +396,9 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                             child: const Text('OK'),
                             onPressed: () {
                               lancamentoDB.deleteLancamentoNaoRepetidos(id).then((data) {
+                                DateTime dataRef = lancamentoDB.dataOfDelete(this.periodoFiltro, this.periodo);
                                 if(this.periodo == "hoje") {
-                                  lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                                  lancamentoDB.getLancamentoHoje(dataRef).then(
                                     (list) {
                                       setState(() {
                                         if(list.length > 0) {
@@ -405,7 +408,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                     }
                                   );
                                 } else if(this.periodo == "semana") {
-                                  lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                                  DateTime dataRef = lancamentoDB.dataOfDelete(this.periodoFiltro, this.periodo);
+                                  lancamentoDB.getLancamentoSemana(dataRef).then(
                                     (list) {
                                       setState(() {
                                         if(list.length > 0) {
@@ -415,7 +419,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                     }
                                   );
                                 } else if(this.periodo == "mes") {
-                                  lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                  DateTime dataRef = lancamentoDB.dataOfDelete(this.periodoFiltro, this.periodo);
+                                  lancamentoDB.getLancamentoMes(dataRef).then(
                                     (list) {
                                       setState(() {
                                         if(list.length > 0) {
@@ -425,8 +430,12 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                     }
                                   );
                                 } else if(this.periodo == "periodo") {
+                                  print(this.periodoFiltro);
+                                  print(this.periodoNext);
+                                  print([this.from, this.to]);
                                   lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
                                     (list) {
+                                      print(list);
                                       setState(() {
                                         if(list.length > 0) {
                                           Navigator.pop(context, [list, 'periodo']);
@@ -1135,14 +1144,10 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                 this.from = listaFiltro[0];
                                 this.to = listaFiltro[1];
                               }
-                              print('++++++');
-                              print([this.periodo, listaFiltro[2]]);
-                              print('===');
 
                               lancamentoDB.lancamentoDeFixo(this.periodo, listaFiltro[2]).then((data) {
                                 if(this.periodo == "hoje") {                                  
                                   this.periodoNext = new DateTime.utc(this.periodoNext.year, this.periodoNext.month, this.periodoNext.day);
-                                  print(this.periodoNext);
                                   lancamentoDB.getLancamentoHoje(this.periodoNext).then(
                                     (list) {
                                       setState(() {
