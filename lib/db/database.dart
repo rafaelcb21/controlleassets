@@ -935,11 +935,12 @@ class Lancamento {
       //List mesesNaoPossuemDia31 = [2, 4, 6, 7, 9, 11];
 
       List listaMesAno = date.split(" "); // ['17', 'Dez', 'à', '23', 'Dez'] 01 Jan de 2018 à 07 Jan de 2018
+
       String nomeMesInicio = listaMesAno[1];
       int diaInicio = int.parse(listaMesAno[0]);
       int anoInicio = int.parse(listaMesAno[3]);
       int mesInicio = mesEscolhidoAbreviado(nomeMesInicio);
-      DateTime dataInicio = new DateTime(anoInicio, mesInicio, diaInicio);
+      DateTime dataInicio = new DateTime.utc(anoInicio, mesInicio, diaInicio);
       String dataStringInicio = new DateFormat("yyyy-MM-dd").format(dataInicio);
 
       String nomeMesFim = listaMesAno[6];
@@ -956,7 +957,7 @@ class Lancamento {
 
         //avancar data right
         if(next) {
-          DateTime x = DateTime.parse(dataStringFim);          
+          DateTime x = DateTime.parse(dataStringFim);
           nextDateInicio = new DateTime.utc(x.year, x.month, x.day).add(new Duration(days: 1)); //DateTime
           newNextDateInicioString = new DateFormat("yyyy-MM-dd").format(nextDateInicio); //String Resultado data Inicio
 
@@ -967,7 +968,7 @@ class Lancamento {
           
           String nextDateFimString = new DateFormat("yyyy-MM-dd").format(nextDateFim);
           newNextDateFimString = nextDateFimString.substring(0, 8) + dataStringFim.substring(8,10); // 2017-12-20 Resultado data Fim
-        
+
         //recuar data left
         } else {
           DateTime x = DateTime.parse(dataStringInicio);
