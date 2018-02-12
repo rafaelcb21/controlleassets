@@ -123,6 +123,22 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
     });
   }
 
+  List fromTo(String periodoFiltro) {
+    List listaPeriodo = periodoFiltro.split(' ');
+    int diaPrimeiro = int.parse(listaPeriodo[0]);
+    int mesPrimeiro = lancamentoDB.mesEscolhidoAbreviado(listaPeriodo[1]);
+    int anoPrimeiro = int.parse(listaPeriodo[3]);
+    DateTime primeiroDia = new DateTime.utc(anoPrimeiro, mesPrimeiro, diaPrimeiro);
+
+    int diaUltimo = int.parse(listaPeriodo[5]);
+    int mesUltimo = lancamentoDB.mesEscolhidoAbreviado(listaPeriodo[6]);
+    int anoUltimo = int.parse(listaPeriodo[8]);
+    DateTime ultimoDia = new DateTime.utc(anoUltimo, mesUltimo, diaUltimo);
+
+    return [primeiroDia, ultimoDia];
+  }
+    
+
   @override
   Widget build(BuildContext context) {
     final ui.Size logicalSize = MediaQuery.of(context).size;
@@ -322,7 +338,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                 }
                               );
                             } else if(this.periodo == 'periodo') {
-                              lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
+                              List fromToList = fromTo(this.periodoFiltro);
+                              lancamentoDB.getLancamentoPeriodo(fromToList[0], fromToList[1]).then(
                                 (list) {
                                   setState(() {
                                     if(list.length > 0) {
@@ -430,12 +447,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                     }
                                   );
                                 } else if(this.periodo == "periodo") {
-                                  print(this.periodoFiltro);
-                                  print(this.periodoNext);
-                                  print([this.from, this.to]);
                                   lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
                                     (list) {
-                                      print(list);
                                       setState(() {
                                         if(list.length > 0) {
                                           Navigator.pop(context, [list, 'periodo']);
@@ -1132,13 +1145,9 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                           onTap: () {
                             setState(() {
                               var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true, this.periodo);
+                              print(listaFiltro);
                               this.periodoNext = listaFiltro[1];
                               String proximaData;
-
-                              if(this.periodo == 'periodo') {
-                                this.from = listaFiltro[0];
-                                this.to = listaFiltro[1];
-                              }
 
                               if(this.periodo == 'periodo') {
                                 this.from = listaFiltro[0];
@@ -1186,8 +1195,10 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                     }
                                   );
                                 } else if(this.periodo == "periodo") {
+                                  print([this.from, this.to]);
                                   lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
                                     (list) {
+                                      print(list);
                                       setState(() {
                                         if(list.length > 0) {
                                           this.listaDB = list[0];
@@ -1400,8 +1411,9 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                         });
                                         
                                       } else if(this.periodo == 'periodo') {
+                                        List fromToList = fromTo(this.periodoFiltro);
                                         lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
-                                          lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
+                                          lancamentoDB.getLancamentoPeriodo(fromToList[0], fromToList[1]).then(
                                             (list) {
                                               setState(() {
                                                 if(list.length > 0) {
@@ -1549,8 +1561,9 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                           );
                                         });
                                       } else if(this.periodo == 'periodo') {
+                                        List fromToList = fromTo(this.periodoFiltro);
                                         lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
-                                          lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
+                                          lancamentoDB.getLancamentoPeriodo(fromToList[0], fromToList[1]).then(
                                             (list) {
                                               setState(() {
                                                 if(list.length > 0) {
@@ -1697,8 +1710,10 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                           );
                                         });
                                       } else if(this.periodo == 'periodo') {
+
+                                        List fromToList = fromTo(this.periodoFiltro);
                                         lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
-                                          lancamentoDB.getLancamentoPeriodo(this.periodoFiltroDateTimeList[0], this.periodoFiltroDateTimeList[1]).then(
+                                          lancamentoDB.getLancamentoPeriodo(fromToList[0], fromToList[1]).then(
                                             (list) {
                                               setState(() {
                                                 if(list.length > 0) {

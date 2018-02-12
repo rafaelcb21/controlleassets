@@ -648,7 +648,6 @@ class FormularioState extends State<Formulario> {
       this.formSubmit['tipo'] = this.lancamentoDBEditar.tipo;
 
       this._toDate = DateTime.parse(this.lancamentoDBEditar.data);
-
       if(this.editar && lancamentoDB.tiporepeticao != null && lancamentoDB.tiporepeticao != 'Fixa') {
         this.campoRepeticao = false;
 
@@ -656,6 +655,8 @@ class FormularioState extends State<Formulario> {
         this.ultimoElemento = descricaoList.removeLast();
         this.lancamentoDBEditar.descricao = descricaoList.join(' ');
         this.formSubmit['descricao'] = this.lancamentoDBEditar.descricao;
+      } else if(this.editar && lancamentoDB.tiporepeticao != null && lancamentoDB.tiporepeticao == 'Fixa') {
+        this.campoRepeticao = false;
       }
 
       categoriaDB.getCategoria(this.lancamentoDBEditar.idcategoria).then((categoria) {
@@ -684,11 +685,10 @@ class FormularioState extends State<Formulario> {
             this._valueTextContaDestino = contaDestino[0]['conta'];
           });
         }); 
-      }           
+      }
 
       _controller.text = this.lancamentoDBEditar.descricao;
       //this.nomeMes = this.lancamentoDBEditar.fatura;
-
     }
 
     if(color == const Color(0xFFE57373)){
