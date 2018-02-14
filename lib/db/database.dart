@@ -820,6 +820,23 @@ class Lancamento {
     }
   }
 
+  String mesEscolhidoNomeAbreviado(month) {
+    switch(month) {
+      case 1: return "Jan"; break;
+      case 2: return "Fev"; break;
+      case 3: return "Mar"; break;
+      case 4: return "Abr"; break;
+      case 5: return "Mai"; break;
+      case 6: return "Jun"; break;
+      case 7: return "Jul"; break;
+      case 8: return "Ago"; break;
+      case 9: return "Set"; break;
+      case 10:return "Out"; break;
+      case 11:return "Nov"; break;
+      case 12:return "Dez"; break;
+    }
+  }
+
   String mesAbreviadoParaCompleto(month) {
     switch(month) {
       case "Jan": return "Janeiro"; break;
@@ -2535,7 +2552,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       //DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
       DateTime ultimaDataReferencia = DateTime.parse(datasDeRederencia.last);
 
-      print([ultimoItemData, ultimaDataReferencia]);
+      //print([ultimoItemData, ultimaDataReferencia]);
       while(!ultimoItemData.isAfter(ultimaDataReferencia)) {
         String dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
         //int days = i * this.periodos[lancamentoDB.periodorepeticao];
@@ -2546,7 +2563,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         ultimoItemData = proximaData(datas[0]['periodorepeticao'], _dia, _mes, _ano);
         dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
 
-        print([ultimoItemData, ultimaDataReferencia]);
+        //print([ultimoItemData, ultimaDataReferencia]);
         if(ultimoItemData.isAfter(ultimaDataReferencia)) {break;}
 
         // Salvar no banco nas tabelas lancamento e lancamentofixo

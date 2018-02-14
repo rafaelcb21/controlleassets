@@ -1145,13 +1145,22 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                           onTap: () {
                             setState(() {
                               var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true, this.periodo);
-                              print(listaFiltro);
                               this.periodoNext = listaFiltro[1];
                               String proximaData;
 
                               if(this.periodo == 'periodo') {
                                 this.from = listaFiltro[0];
-                                this.to = listaFiltro[1];
+                                this.to = listaFiltro[1];                              
+
+                                String diaInicio = this.from.day.toString();
+                                String anoInicio = this.from.year.toString();
+                                String mesInicio = lancamentoDB.mesEscolhidoNomeAbreviado(this.from.month);
+
+                                String diaFim = this.to.day.toString();
+                                String anoFim = this.to.year.toString();
+                                String mesFim = lancamentoDB.mesEscolhidoNomeAbreviado(this.to.month);
+
+                                listaFiltro[2] = diaInicio +' '+ mesInicio +' de '+ anoInicio +' à '+ diaFim +' '+ mesFim +' de '+ anoFim;
                               }
 
                               lancamentoDB.lancamentoDeFixo(this.periodo, listaFiltro[2]).then((data) {
@@ -1195,10 +1204,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                     }
                                   );
                                 } else if(this.periodo == "periodo") {
-                                  print([this.from, this.to]);
                                   lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
                                     (list) {
-                                      print(list);
                                       setState(() {
                                         if(list.length > 0) {
                                           this.listaDB = list[0];
