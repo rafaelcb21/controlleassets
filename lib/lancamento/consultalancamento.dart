@@ -1162,7 +1162,6 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
 
                                 listaFiltro[2] = diaInicio +' '+ mesInicio +' de '+ anoInicio +' à '+ diaFim +' '+ mesFim +' de '+ anoFim;
                               }
-
                               lancamentoDB.lancamentoDeFixo(this.periodo, listaFiltro[2]).then((data) {
                                 if(this.periodo == "hoje") {                                  
                                   this.periodoNext = new DateTime.utc(this.periodoNext.year, this.periodoNext.month, this.periodoNext.day);

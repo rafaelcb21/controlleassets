@@ -2538,6 +2538,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         listaDatas.add(DateTime.parse(j['data']));
       }
       listaDatas.sort();
+
       DateTime primeiroItemData = listaDatas[0];
       String primeiroItemDataString = new DateFormat("yyyy-MM-dd").format(primeiroItemData).toString().substring(0,10);
       DateTime ultimoItemData = listaDatas.last;
@@ -2654,30 +2655,97 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
-    
+
     if(id != null) {
       List lancamentoById = await db.rawQuery('SELECT * FROM lancamento WHERE id = ?', [id]);
       String hash = lancamentoById[0]['hash'];
+      String tiporepeticao = lancamentoById[0]['tiporepeticao'];
+      String periodorepeticao = lancamentoById[0]['periodorepeticao'];
+      String data = lancamentoById[0]['data'];
 
-      await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]).then(
-        (result) async {
-          List lancamentosByHash = await db.rawQuery('SELECT * FROM lancamento WHERE hash = ?', [hash]);
+      if(tiporepeticao == 'Parcelada') {
+        await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]).then(
+          (result) async {
+            List lancamentosByHash = await db.rawQuery('SELECT * FROM lancamento WHERE hash = ?', [hash]);
 
-          for(int i = 0; i < lancamentosByHash.length; i++) {
-            id = lancamentosByHash[i]['id'];
-            List descricaoList = lancamentosByHash[i]['descricao'].split(' ');
-            var ultimoElemento = descricaoList.removeLast();
-            String contador = (i + 1).toString() + '/' + lancamentosByHash.length.toString();
-            String descricao = descricaoList.join(' ');
-            String descricaoCompleta = descricao + ' ' + contador;
+            for(int i = 0; i < lancamentosByHash.length; i++) {
+              id = lancamentosByHash[i]['id'];
+              List descricaoList = lancamentosByHash[i]['descricao'].split(' ');
+              var ultimoElemento = descricaoList.removeLast();
+              String contador = (i + 1).toString() + '/' + lancamentosByHash.length.toString();
+              String descricao = descricaoList.join(' ');
+              String descricaoCompleta = descricao + ' ' + contador;
 
-            await db.rawUpdate("UPDATE lancamento SET descricao = ? WHERE id = ?", [descricaoCompleta, id]);
+              await db.rawUpdate("UPDATE lancamento SET descricao = ? WHERE id = ?", [descricaoCompleta, id]);
+            }
+            await db.close();
+
+            return true;
           }
-          await db.close();
+        );
+      } else if(tiporepeticao == 'Fixa') {
+        List dataSeparada = data.split('-');
+        int dia = int.parse(dataSeparada[2]);
+        int mes = int.parse(dataSeparada[1]);
+        int ano = int.parse(dataSeparada[0]);
 
-          return true;
+        DateTime proximaDataFixa = proximaData(periodorepeticao, dia, mes, ano);
+        String proximaDataFixaString = new DateFormat("yyyy-MM-dd").format(proximaDataFixa);
+
+        List temProximoLancamento = await db.rawQuery('SELECT * FROM lancamentofixo WHERE hashlancamento = ? AND data = ?', [hash, proximaDataFixaString]);
+
+        if(temProximoLancamento.length == 1) {
+          await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]).then(
+            (resultado) async {
+              await db.rawDelete("DELETE FROM lancamentofixo WHERE data = ? AND hashlancamento = ?", [data, hash]).then(
+                (dado) {
+                  return true;
+                }
+              );
+            }
+          );
+        } else if(temProximoLancamento.length == 0) {
+          await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]).then(
+            (resultado) async {
+              await db.rawDelete("DELETE FROM lancamentofixo WHERE data = ? AND hashlancamento = ?", [data, hash]).then(
+                (dado) async {
+                  Lancamento lancamento = new Lancamento();
+                  lancamento.tipo = lancamentoById[0]['tipo'];
+                  lancamento.fatura = lancamentoById[0]['fatura'];
+                  lancamento.idcategoria = lancamentoById[0]['idcategoria'];
+                  lancamento.idtag = lancamentoById[0]['idtag'];
+                  lancamento.idconta = lancamentoById[0]['idconta'];
+                  lancamento.idcontadestino = lancamentoById[0]['idcontadestino'];
+                  lancamento.idcartao = lancamentoById[0]['idcartao'];
+                  lancamento.valor = lancamentoById[0]['valor'];
+                  lancamento.descricao = lancamentoById[0]['descricao'];
+                  lancamento.tiporepeticao = lancamentoById[0]['tiporepeticao'];
+                  lancamento.quantidaderepeticao = lancamentoById[0]['quantidaderepeticao'];
+                  lancamento.periodorepeticao = lancamentoById[0]['periodorepeticao'];
+                  lancamento.datafatura = lancamentoById[0]['datafatura'];
+                  lancamento.pago = 0;
+                  lancamento.hash = lancamentoById[0]['hash'];
+                  lancamento.data = proximaDataFixaString;
+
+                  upsertLancamento([lancamento]);
+
+                  LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
+                  lancamentoFixoTable.hashlancamento = lancamento.hash;
+                  lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
+                  lancamentoFixoTable.data = lancamento.data;
+                  lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
+
+                  //List lancamentosByHash = await db.rawQuery('SELECT * FROM lancamentofixo WHERE hashlancamento = ?', [hash]);
+                  //for(var x in lancamentosByHash) {print(x);}
+                  //print('================================');
+                  return true;
+                }
+              );
+            }
+          );
         }
-      );
+      }
+      
     }
   }
 
