@@ -865,7 +865,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
         children: <Widget>[
           this.listaDB == [] ? new Container() : 
           new ListView(
-            key: uuid.v4(),
+            key: new Key(uuid.v4()),
             padding: new EdgeInsets.only(top: 16.0),
             children: buildLancamentos(this.listaDB)
           ),
@@ -876,7 +876,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
             left: 0.0,
             child: new Column(
               children: <Widget>[
-                ///FIltro
+                ///Filtro
                 new Container(
                   padding: new EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8.0, top: 12.0),
                   decoration: new BoxDecoration(
@@ -1163,7 +1163,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                 listaFiltro[2] = diaInicio +' '+ mesInicio +' de '+ anoInicio +' à '+ diaFim +' '+ mesFim +' de '+ anoFim;
                               }
                               lancamentoDB.lancamentoDeFixo(this.periodo, listaFiltro[2]).then((data) {
-                                if(this.periodo == "hoje") {                                  
+                                if(this.periodo == "hoje") {
                                   this.periodoNext = new DateTime.utc(this.periodoNext.year, this.periodoNext.month, this.periodoNext.day);
                                   lancamentoDB.getLancamentoHoje(this.periodoNext).then(
                                     (list) {
