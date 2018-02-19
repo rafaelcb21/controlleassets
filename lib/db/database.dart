@@ -2608,7 +2608,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       //DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
       DateTime ultimaDataReferencia = DateTime.parse(datasDeRederencia.last);
 
-      //print([ultimoItemData, ultimaDataReferencia]);
+      print([ultimoItemData, ultimaDataReferencia]);
       while(!ultimoItemData.isAfter(ultimaDataReferencia)) {
         String dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
         //int days = i * this.periodos[lancamentoDB.periodorepeticao];
@@ -2622,34 +2622,49 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         //print([ultimoItemData, ultimaDataReferencia]);
         if(ultimoItemData.isAfter(ultimaDataReferencia)) {break;}
 
-        // Salvar no banco nas tabelas lancamento e lancamentofixo
-        Lancamento lancamento = new Lancamento();
-        lancamento.tipo = item[0]['tipo'];
-        lancamento.fatura = item[0]['fatura'];
-        lancamento.idcategoria = item[0]['idcategoria'];
-        lancamento.idtag = item[0]['idtag'];
-        lancamento.idconta = item[0]['idconta'];
-        lancamento.idcontadestino = item[0]['idcontadestino'];
-        lancamento.idcartao = item[0]['idcartao'];
-        lancamento.valor = item[0]['valor'];
-        lancamento.descricao = item[0]['descricao'];
-        lancamento.tiporepeticao = item[0]['tiporepeticao'];
-        lancamento.quantidaderepeticao = item[0]['quantidaderepeticao'];
-        lancamento.periodorepeticao = item[0]['periodorepeticao'];
-        lancamento.datafatura = item[0]['datafatura'];
-        lancamento.pago = 0;
-        lancamento.hash = item[0]['hash'];
-        lancamento.data = dataStringUltimoItem;
+        // Verifica se a data que será gerada já foi deletada, se o valor for 0 pode gerar a data
+        List limite = await db.rawQuery('SELECT * FROM deletadoslancamentofixo WHERE hashdeletado = ? AND data = ?', [item[0]['hash'], dataStringUltimoItem]);
 
-        upsertLancamento([lancamento]);
-        //await db.insert("lancamento", lancamento.toMap());
+        // Verificar se a data que sera salva ja possui uma data anterior com limite 1
+        List limiteData = await db.rawQuery('SELECT data FROM deletadoslancamentofixo WHERE hashdeletado = ? AND limite = 1', [item[0]['hash']]);
+        List datasDeletadas = [];
+        for(var i in limiteData) {
+            datasDeletadas.add(DateTime.parse(i['data']));
+          }
+        datasDeletadas.sort();
+        DateTime primeiroRegistroComLimiteHum == null ?  : datasDeletadas.first;
 
-        LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
-        lancamentoFixoTable.hashlancamento = lancamento.hash;
-        lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
-        lancamentoFixoTable.data = lancamento.data;
-        lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
-        
+        if(ultimoItemData.isAfter(primeiroRegistroComLimiteHum)) {
+          if(limite.length == 0) {
+            // Salvar no banco nas tabelas lancamento e lancamentofixo
+            Lancamento lancamento = new Lancamento();
+            lancamento.tipo = item[0]['tipo'];
+            lancamento.fatura = item[0]['fatura'];
+            lancamento.idcategoria = item[0]['idcategoria'];
+            lancamento.idtag = item[0]['idtag'];
+            lancamento.idconta = item[0]['idconta'];
+            lancamento.idcontadestino = item[0]['idcontadestino'];
+            lancamento.idcartao = item[0]['idcartao'];
+            lancamento.valor = item[0]['valor'];
+            lancamento.descricao = item[0]['descricao'];
+            lancamento.tiporepeticao = item[0]['tiporepeticao'];
+            lancamento.quantidaderepeticao = item[0]['quantidaderepeticao'];
+            lancamento.periodorepeticao = item[0]['periodorepeticao'];
+            lancamento.datafatura = item[0]['datafatura'];
+            lancamento.pago = 0;
+            lancamento.hash = item[0]['hash'];
+            lancamento.data = dataStringUltimoItem;
+
+            upsertLancamento([lancamento]);
+            //await db.insert("lancamento", lancamento.toMap());
+
+            LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
+            lancamentoFixoTable.hashlancamento = lancamento.hash;
+            lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
+            lancamentoFixoTable.data = lancamento.data;
+            lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
+          }
+        }
       }
       
 
@@ -2754,11 +2769,15 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
 
           List listaDeterminadoHashLancamentoFixo = await db.rawQuery('SELECT * FROM lancamentofixo WHERE hashlancamento = ?', [hash]);
           List listaDeterminadoHashDeletados = await db.rawQuery('SELECT * FROM deletadoslancamentofixo WHERE hashdeletado = ?', [hash]);
-          
+
+          List listaLimite = await db.rawQuery('SELECT * FROM deletadoslancamentofixo WHERE hashdeletado = ? AND data = ? AND limite = 1', [hash, proximaDataFixaString]);
+          print(listaLimite.length);
+
           List datasDeletadas = [];
           List datasDoLancamentoFixo = [];
 
           for(var i in listaDeterminadoHashLancamentoFixo) {
+            print(i);
             datasDoLancamentoFixo.add(DateTime.parse(i['data']));
           }
           datasDoLancamentoFixo.sort();
@@ -2771,44 +2790,52 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
           DateTime ultimaDataDeletados = datasDeletadas.last;
 
           //a data deletada é a ultima nao tem mais nenhuma maior que ela, logo é true
+          print([ultimaDataDeletados, ultimaDataLancamentoFixo, proximaDataFixaString]);
           if(ultimaDataDeletados.isAfter(ultimaDataLancamentoFixo) || ultimaDataDeletados == ultimaDataLancamentoFixo) {
             //Como a data deletada nao possui outra data maior registrada precisa se criar uma data superior
             await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]).then(
               (resultado) async {
                 await db.rawDelete("DELETE FROM lancamentofixo WHERE data = ? AND hashlancamento = ?", [data, hash]).then(
                   (dado) async {
-                    Lancamento lancamento = new Lancamento();
-                    lancamento.tipo = lancamentoById[0]['tipo'];
-                    lancamento.fatura = lancamentoById[0]['fatura'];
-                    lancamento.idcategoria = lancamentoById[0]['idcategoria'];
-                    lancamento.idtag = lancamentoById[0]['idtag'];
-                    lancamento.idconta = lancamentoById[0]['idconta'];
-                    lancamento.idcontadestino = lancamentoById[0]['idcontadestino'];
-                    lancamento.idcartao = lancamentoById[0]['idcartao'];
-                    lancamento.valor = lancamentoById[0]['valor'];
-                    lancamento.descricao = lancamentoById[0]['descricao'];
-                    lancamento.tiporepeticao = lancamentoById[0]['tiporepeticao'];
-                    lancamento.quantidaderepeticao = lancamentoById[0]['quantidaderepeticao'];
-                    lancamento.periodorepeticao = lancamentoById[0]['periodorepeticao'];
-                    lancamento.datafatura = lancamentoById[0]['datafatura'];
-                    lancamento.pago = 0;
-                    lancamento.hash = lancamentoById[0]['hash'];
-                    lancamento.data = proximaDataFixaString;
 
-                    upsertLancamento([lancamento]);
+                    if(listaLimite.length == 0) {
+                      Lancamento lancamento = new Lancamento();
+                      lancamento.tipo = lancamentoById[0]['tipo'];
+                      lancamento.fatura = lancamentoById[0]['fatura'];
+                      lancamento.idcategoria = lancamentoById[0]['idcategoria'];
+                      lancamento.idtag = lancamentoById[0]['idtag'];
+                      lancamento.idconta = lancamentoById[0]['idconta'];
+                      lancamento.idcontadestino = lancamentoById[0]['idcontadestino'];
+                      lancamento.idcartao = lancamentoById[0]['idcartao'];
+                      lancamento.valor = lancamentoById[0]['valor'];
+                      lancamento.descricao = lancamentoById[0]['descricao'];
+                      lancamento.tiporepeticao = lancamentoById[0]['tiporepeticao'];
+                      lancamento.quantidaderepeticao = lancamentoById[0]['quantidaderepeticao'];
+                      lancamento.periodorepeticao = lancamentoById[0]['periodorepeticao'];
+                      lancamento.datafatura = lancamentoById[0]['datafatura'];
+                      lancamento.pago = 0;
+                      lancamento.hash = lancamentoById[0]['hash'];
+                      lancamento.data = proximaDataFixaString;
 
-                    LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
-                    lancamentoFixoTable.hashlancamento = lancamento.hash;
-                    lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
-                    lancamentoFixoTable.data = lancamento.data;
-                    lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
+                      upsertLancamento([lancamento]);
 
-                    //List lancamentosByHash = await db.rawQuery('SELECT * FROM lancamentofixo');
-                    //for(var x in lancamentosByHash) {print(x);}
-                    //print('================================');
-                    //List lancamentosByHash2 = await db.rawQuery('SELECT * FROM lancamento');
-                    //for(var y in lancamentosByHash2) {print(y);}
-                    //print('++++++++++++++++++++++++++++++');
+                      LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
+                      lancamentoFixoTable.hashlancamento = lancamento.hash;
+                      lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
+                      lancamentoFixoTable.data = lancamento.data;
+                      lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
+                    }
+                    
+
+                    List lancamentosByHash = await db.rawQuery('SELECT * FROM lancamentofixo');
+                    for(var x in lancamentosByHash) {print(x);}
+                    print('================================');
+                    List lancamentosByHash2 = await db.rawQuery('SELECT * FROM lancamento');
+                    for(var y in lancamentosByHash2) {print(y);}
+                    print('++++++++++++++++++++++++++++++');
+                    List lancamentosByHash3 = await db.rawQuery('SELECT * FROM deletadoslancamentofixo');
+                    for(var u in lancamentosByHash3) {print(u);}
+                    print('******************************');
 
                     return true;
                   }
@@ -2826,65 +2853,8 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
               }
             );
           }
-
-          //if(temProximoLancamento.length == 1) {
-          //  await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]).then(
-          //    (resultado) async {
-          //      await db.rawDelete("DELETE FROM lancamentofixo WHERE data = ? AND hashlancamento = ?", [data, hash]).then(
-          //        (dado) {
-          //          return true;
-          //        }
-          //      );
-          //    }
-          //  );
-          //} 
-            
         });
-
-        
-
-        //else if(temProximoLancamento.length == 0) {
-        //  await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]).then(
-        //    (resultado) async {
-        //      await db.rawDelete("DELETE FROM lancamentofixo WHERE data = ? AND hashlancamento = ?", [data, hash]).then(
-        //        (dado) async {
-        //          Lancamento lancamento = new Lancamento();
-        //          lancamento.tipo = lancamentoById[0]['tipo'];
-        //          lancamento.fatura = lancamentoById[0]['fatura'];
-        //          lancamento.idcategoria = lancamentoById[0]['idcategoria'];
-        //          lancamento.idtag = lancamentoById[0]['idtag'];
-        //          lancamento.idconta = lancamentoById[0]['idconta'];
-        //          lancamento.idcontadestino = lancamentoById[0]['idcontadestino'];
-        //          lancamento.idcartao = lancamentoById[0]['idcartao'];
-        //          lancamento.valor = lancamentoById[0]['valor'];
-        //          lancamento.descricao = lancamentoById[0]['descricao'];
-        //          lancamento.tiporepeticao = lancamentoById[0]['tiporepeticao'];
-        //          lancamento.quantidaderepeticao = lancamentoById[0]['quantidaderepeticao'];
-        //          lancamento.periodorepeticao = lancamentoById[0]['periodorepeticao'];
-        //          lancamento.datafatura = lancamentoById[0]['datafatura'];
-        //          lancamento.pago = 0;
-        //          lancamento.hash = lancamentoById[0]['hash'];
-        //          lancamento.data = proximaDataFixaString;
-
-        //          upsertLancamento([lancamento]);
-
-        //          LancamentoFixo lancamentoFixoTable = new LancamentoFixo();
-        //          lancamentoFixoTable.hashlancamento = lancamento.hash;
-        //          lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
-        //          lancamentoFixoTable.data = lancamento.data;
-        //          lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
-
-        //          //List lancamentosByHash = await db.rawQuery('SELECT * FROM lancamentofixo WHERE hashlancamento = ?', [hash]);
-        //          //for(var x in lancamentosByHash) {print(x);}
-        //          //print('================================');
-        //          return true;
-        //        }
-        //      );
-        //    }
-        //  );
-        //}
       }
-//      
     }
   }
 
@@ -2902,10 +2872,13 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
     DateTime dataCompare;
+    DateTime dataCompareLctoFixo;
     DateTime data = new DateFormat("yyyy-MM-dd").parse(date);
     List listaId = [];
+    List listaIdLctoFixo = [];
 
     List listaHash = await db.rawQuery("SELECT id, data FROM lancamento WHERE hash = ?", [hash]);
+    List listaHashDate = await db.rawQuery("SELECT * FROM lancamento WHERE hash = ? AND data = ?", [hash, date]);
     
     for(var i in listaHash) {
       dataCompare = new DateFormat("yyyy-MM-dd").parse(i['data']);
@@ -2914,10 +2887,27 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       }
     }
 
+    for(var i in listaHashDate) {
+      if(i['tiporepeticao'] == 'Fixa') {
+        await db.rawInsert("INSERT INTO deletadoslancamentofixo (hashdeletado, data, limite) VALUES (?, ?, 1)", [hash, date]);
+        
+        List listaHashLancamentoFixo = await db.rawQuery("SELECT * FROM lancamentofixo WHERE hashlancamento = ?", [hash]);
+        
+        for(var i in listaHashLancamentoFixo) {
+          dataCompareLctoFixo = new DateFormat("yyyy-MM-dd").parse(i['data']);
+          if(dataCompareLctoFixo.isAfter(data) || dataCompareLctoFixo == data) {
+            listaIdLctoFixo.add(i['id']);
+          }
+        }
+        for(var id in listaIdLctoFixo) {
+          await db.rawDelete("DELETE FROM lancamentofixo WHERE id = ?", [id]);
+        }        
+      }
+    }
+
     for(var u in listaId) {
       await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [u]);
     }
-    await db.rawDelete("DELETE FROM lancamentofixo WHERE hashlancamento = ?", [hash]);
 
     await db.close();
 
