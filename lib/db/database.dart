@@ -2632,9 +2632,15 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
             datasDeletadas.add(DateTime.parse(i['data']));
           }
         datasDeletadas.sort();
-        DateTime primeiroRegistroComLimiteHum == null ?  : datasDeletadas.first;
 
-        if(ultimoItemData.isAfter(primeiroRegistroComLimiteHum)) {
+        DateTime primeiroRegistroComLimiteHum;
+        if(datasDeletadas.length == 0) {
+          primeiroRegistroComLimiteHum = ultimoItemData.add(new Duration(days: 1));
+        } else {
+          primeiroRegistroComLimiteHum = datasDeletadas.first;
+        }        
+
+        if(!ultimoItemData.isAfter(primeiroRegistroComLimiteHum)) {
           if(limite.length == 0) {
             // Salvar no banco nas tabelas lancamento e lancamentofixo
             Lancamento lancamento = new Lancamento();
