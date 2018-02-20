@@ -1504,6 +1504,7 @@ class FormularioState extends State<Formulario> {
           new EnsureVisibleWhenFocused(
             focusNode: _focusNode,            
             child: new TextField(
+              //keyboardType: TextInputType.text,
               controller: _controller,
               maxLines: 1,
               focusNode: _focusNode,

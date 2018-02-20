@@ -2608,7 +2608,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
       //DateTime primeiraDataReferencia = DateTime.parse(datasDeRederencia[0]);
       DateTime ultimaDataReferencia = DateTime.parse(datasDeRederencia.last);
 
-      print([ultimoItemData, ultimaDataReferencia]);
+      //print([ultimoItemData, ultimaDataReferencia]);
       while(!ultimoItemData.isAfter(ultimaDataReferencia)) {
         String dataStringUltimoItem = new DateFormat("yyyy-MM-dd").format(ultimoItemData).toString();
         //int days = i * this.periodos[lancamentoDB.periodorepeticao];
@@ -2629,8 +2629,8 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
         List limiteData = await db.rawQuery('SELECT data FROM deletadoslancamentofixo WHERE hashdeletado = ? AND limite = 1', [item[0]['hash']]);
         List datasDeletadas = [];
         for(var i in limiteData) {
-            datasDeletadas.add(DateTime.parse(i['data']));
-          }
+          datasDeletadas.add(DateTime.parse(i['data']));
+        }
         datasDeletadas.sort();
 
         DateTime primeiroRegistroComLimiteHum;
@@ -2776,14 +2776,12 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
           List listaDeterminadoHashLancamentoFixo = await db.rawQuery('SELECT * FROM lancamentofixo WHERE hashlancamento = ?', [hash]);
           List listaDeterminadoHashDeletados = await db.rawQuery('SELECT * FROM deletadoslancamentofixo WHERE hashdeletado = ?', [hash]);
 
-          List listaLimite = await db.rawQuery('SELECT * FROM deletadoslancamentofixo WHERE hashdeletado = ? AND data = ? AND limite = 1', [hash, proximaDataFixaString]);
-          print(listaLimite.length);
+          List listaLimite = await db.rawQuery('SELECT * FROM deletadoslancamentofixo WHERE hashdeletado = ? AND limite = 1', [hash]);
 
           List datasDeletadas = [];
           List datasDoLancamentoFixo = [];
 
           for(var i in listaDeterminadoHashLancamentoFixo) {
-            print(i);
             datasDoLancamentoFixo.add(DateTime.parse(i['data']));
           }
           datasDoLancamentoFixo.sort();
@@ -2796,7 +2794,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
           DateTime ultimaDataDeletados = datasDeletadas.last;
 
           //a data deletada é a ultima nao tem mais nenhuma maior que ela, logo é true
-          print([ultimaDataDeletados, ultimaDataLancamentoFixo, proximaDataFixaString]);
+          //print([ultimaDataDeletados, ultimaDataLancamentoFixo, proximaDataFixaString]);
           if(ultimaDataDeletados.isAfter(ultimaDataLancamentoFixo) || ultimaDataDeletados == ultimaDataLancamentoFixo) {
             //Como a data deletada nao possui outra data maior registrada precisa se criar uma data superior
             await db.rawDelete("DELETE FROM lancamento WHERE id = ?", [id]).then(
@@ -2830,18 +2828,17 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
                       lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
                       lancamentoFixoTable.data = lancamento.data;
                       lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
-                    }
-                    
+                    }                    
 
-                    List lancamentosByHash = await db.rawQuery('SELECT * FROM lancamentofixo');
-                    for(var x in lancamentosByHash) {print(x);}
-                    print('================================');
-                    List lancamentosByHash2 = await db.rawQuery('SELECT * FROM lancamento');
-                    for(var y in lancamentosByHash2) {print(y);}
-                    print('++++++++++++++++++++++++++++++');
-                    List lancamentosByHash3 = await db.rawQuery('SELECT * FROM deletadoslancamentofixo');
-                    for(var u in lancamentosByHash3) {print(u);}
-                    print('******************************');
+                    //List lancamentosByHash = await db.rawQuery('SELECT * FROM lancamentofixo');
+                    //for(var x in lancamentosByHash) {print(x);}
+                    //print('================================');
+                    //List lancamentosByHash2 = await db.rawQuery('SELECT * FROM lancamento');
+                    //for(var y in lancamentosByHash2) {print(y);}
+                    //print('++++++++++++++++++++++++++++++');
+                    //List lancamentosByHash3 = await db.rawQuery('SELECT * FROM deletadoslancamentofixo');
+                    //for(var u in lancamentosByHash3) {print(u);}
+                    //print('******************************');
 
                     return true;
                   }
