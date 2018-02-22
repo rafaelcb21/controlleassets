@@ -857,7 +857,28 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
           new IconButton(
             icon: const Icon(Icons.filter_list),
             color: new Color(0xFFFFFFFF),
-            onPressed: () {}
+            onPressed: () async {
+              await Navigator.of(context).push(new PageRouteBuilder(
+                opaque: false,
+                pageBuilder: (BuildContext context, _, __) {
+                  return new FullScreenFiltro();
+                },
+                transitionsBuilder: (
+                  BuildContext context,
+                  Animation<double> animation,
+                  Animation<double> secondaryAnimation,
+                  Widget child,
+                ) {
+                  return new SlideTransition(
+                    position: new Tween<Offset>(
+                      begin:  const Offset(1.0, 0.0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  );
+                }
+              ));
+            }
           )
         ],
       ),
@@ -2481,5 +2502,101 @@ class Sky extends CustomPainter {
   @override
   bool shouldRepaint(Sky oldDelegate) {
     return _width != oldDelegate._width || _rectHeight != oldDelegate._rectHeight;
+  }
+}
+
+// Filtro
+class FullScreenFiltro extends StatefulWidget {
+  @override
+  FullScreenFiltroState createState() => new FullScreenFiltroState();
+}
+
+class FullScreenFiltroState extends State<FullScreenFiltro> {
+  Color azulAppbar = new Color(0xFF26C6DA);
+  String filtroLancamento = 'Todos os lançamentos';
+
+  //@override
+  //void initState() {    
+  //  this.expandir(true);
+  //}
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return new Scaffold(
+      appBar: new AppBar(
+        title: const Text('Filtro'),
+        backgroundColor: azulAppbar,
+        leading: new GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: new Container(
+            child: new Icon(
+              Icons.close,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+      body: new Container(
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            new Container(
+              margin: new EdgeInsets.only(top: 16.0, bottom: 8.0, left: 16.0),
+              child: new Text(
+                'Tipo de Lançamento',
+                style: new TextStyle(
+                  fontSize: 12.0,
+                  fontFamily: 'Roboto',
+                  color: new Color(0xFF757575),
+                ),
+              ),
+            ),
+            new ExpansionTile(
+              title: new Text(this.filtroLancamento),
+              backgroundColor: Theme.of(context).accentColor.withOpacity(0.025),
+              children: <Widget>[
+                new ListTile(
+                  onTap: () {
+                    setState(() {
+                      this.filtroLancamento = 'One';
+                    });
+                  },
+                  title: const Text('One')
+                ),
+                const ListTile(title: const Text('Two')),
+                const ListTile(title: const Text('Free')),
+                const ListTile(title: const Text('Four'))
+             ]
+            ),
+            new Container(
+              margin: new EdgeInsets.only(top: 8.0, bottom: 8.0, left: 16.0),
+              child: new Text(
+                'Conta',
+                style: new TextStyle(
+                  fontSize: 12.0,
+                  fontFamily: 'Roboto',
+                  color: new Color(0xFF757575),
+                ),
+              ),
+            ),
+            new ExpansionTile(
+              title: const Text('Todas as Contas'),
+              backgroundColor: Theme.of(context).accentColor.withOpacity(0.025),
+              children: const <Widget>[
+                const ListTile(title: const Text('One')),
+                const ListTile(title: const Text('Two')),
+                const ListTile(title: const Text('Free')),
+                const ListTile(title: const Text('Four'))
+             ]
+            ),
+          ],
+        ),
+      )
+    );
   }
 }
