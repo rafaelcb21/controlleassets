@@ -7,7 +7,6 @@ import 'dart:async';
 import 'package:flutter/animation.dart';
 import './lancamento.dart';
 import 'package:uuid/uuid.dart';
-import './expansiontile.dart';
 
 class ConsultaLancamentoPage extends StatefulWidget {
   @override
@@ -1035,7 +1034,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                       ],
                                     ),
                                     children: <Widget>[
-                                      new DialogItem(
+                                      new DialogItemConsulta(
                                         text: "Hoje",
                                         onPressed: () {
                                           lancamentoDB.getLancamentoHoje(new DateTime.now()).then(
@@ -1053,7 +1052,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                           Navigator.pop(context, new DateTime.now());
                                         }
                                       ),
-                                      new DialogItem(
+                                      new DialogItemConsulta(
                                         text: "Esta semana",
                                         onPressed: () {
                                           //DateTime agoraDate = new DateTime.now();
@@ -1074,7 +1073,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                           Navigator.pop(context, new DateTime.now());
                                         }
                                       ),
-                                      new DialogItem(
+                                      new DialogItemConsulta(
                                         text: "Este mes",
                                         onPressed: () {
                                           lancamentoDB.getLancamentoMes(new DateTime.now()).then(
@@ -1092,7 +1091,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                           Navigator.pop(context, new DateTime.now());
                                         }
                                       ),
-                                      new DialogItem(
+                                      new DialogItemConsulta(
                                         text: "Escolher periodo",
                                         onPressed: () async {
                                           Navigator.pop(context);
@@ -2224,8 +2223,8 @@ class ItemLancamentoCartaoState extends State<ItemLancamentoCartao> {
   }
 }
 
-class DialogItem extends StatelessWidget {
-  DialogItem({ Key key, this.text, this.onPressed }) : super(key: key);
+class DialogItemConsulta extends StatelessWidget {
+  DialogItemConsulta({ Key key, this.text, this.onPressed }) : super(key: key);
 
   final String text;
   final VoidCallback onPressed;
@@ -2519,20 +2518,87 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
   String filtrocARTAO = 'Todos os cartões';
   String filtroCategoria = 'Todas as categorias';
   String filtroTag = 'Todas as tags';
-  final GlobalKey<AppExpansionTileState> tipoLancamento = new GlobalKey();
-  final GlobalKey<AppExpansionTileState> tipoConta = new GlobalKey();
-  final GlobalKey<AppExpansionTileState> tipoCartao = new GlobalKey();
-  final GlobalKey<AppExpansionTileState> tipoCategoria = new GlobalKey();
-  final GlobalKey<AppExpansionTileState> tipoTag = new GlobalKey();
+  
+  List listaContas = [];
+  List cores = [];
+  Palette listaCores = new Palette();
+  List<Widget> listaContasOrigem = [];
+  List listaContasDB = [];
+  String _valueTextCartao = 'Todas as contas';
 
-  //@override
-  //void initState() {    
-  //  this.expandir(true);
-  //}
+  Categoria categoriaDB = new Categoria();
+  Tag tagDB = new Tag();
+  Conta contaDB = new Conta();
+  Cartao cartaoDB = new Cartao();
+
+  @override
+  void initState() {
+    this.cores = listaCores.cores;
+    contaDB.getAllContaAtivas().then((list) {
+      setState(() {
+        this.listaContasDB = list;
+      });
+    });
+  }
+
+  void showDialogCartao<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) {
+      if (value != null) {
+        setState(() {
+          _valueTextCartao = value.toString();
+        });
+      }
+    });
+  }
+
+  List<Widget> buildListaConta(listAccount) {
+      this.listaContas = [];
+
+      this.listaContas.add( //HEADER Contas
+        new Container(
+          padding: new EdgeInsets.only(left: 24.0, top: 8.0, bottom: 8.0),
+          color: new Color(0xFFDFD9D9),
+          child: new Text('CONTAS'),
+        )
+      );
+      for(var i in listAccount) {
+        var conta = i['conta'];
+        var cor = this.cores[i['cor']];
+        this.listaContas.add(
+          new DialogItem(
+            icon: Icons.brightness_1,
+            color: cor,
+            text: conta,
+            onPressed: () {
+              Navigator.pop(context, conta);
+            }
+          ),
+        );
+      }
+
+      this.listaContas.add(
+        new DialogItem(
+          icon: Icons.brightness_1,
+          color: Colors.black,
+          text: 'Todas as contas',
+          onPressed: () {
+            Navigator.pop(context, 'Todas as contas');
+          }
+        ),
+      );
+      
+      this.listaContasOrigem = this.listaContas.sublist(1, this.listaContas.length);
+      return this.listaContasOrigem;      
+    }
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final TextStyle valueStyle = Theme.of(context).textTheme.title;
+
     return new Scaffold(
       appBar: new AppBar(
         title: const Text('Filtro'),
@@ -2552,144 +2618,34 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
       body: new ListView(
         children: <Widget>[
           new Container(
-            child: new Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            margin: new EdgeInsets.all(16.0),
+            child: new Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                new Container(
-                  margin: new EdgeInsets.only(top: 16.0, bottom: 8.0, left: 16.0),
-                  child: new Text(
-                    'Tipo de Lançamento',
-                    style: new TextStyle(
-                      fontSize: 12.0,
-                      fontFamily: 'Roboto',
-                      color: new Color(0xFF757575),
-                    ),
-                  ),
-                ),
-                new AppExpansionTile(
-                  key: tipoLancamento,
-                  title: new Text(this.filtroLancamento),
-                  backgroundColor: Theme.of(context).accentColor.withOpacity(0.025),
-                  children: <Widget>[
-                    new ListTile(
-                      onTap: () {
-                        setState(() {
-                          this.filtroLancamento = 'Despesas';
-                          tipoLancamento.currentState.collapse();
-                        });
-                      },
-                      title: const Text('Despesas')
-                    ),
-                    new ListTile(
-                      onTap: () {
-                        setState(() {
-                          this.filtroLancamento = 'Despesas pagas';
-                          tipoLancamento.currentState.collapse();
-                        });
-                      },
-                      title: const Text('Despesas pagas')
-                    ),
-                    new ListTile(
-                      onTap: () {
-                        setState(() {
-                          this.filtroLancamento = 'Despesas não pagas';
-                          tipoLancamento.currentState.collapse();
-                        });
-                      },
-                      title: const Text('Despesas não pagas')
-                    ),
-                    new ListTile(
-                      onTap: () {
-                        setState(() {
-                          this.filtroLancamento = 'Receitas';
-                          tipoLancamento.currentState.collapse();
-                        });
-                      },
-                      title: const Text('Receitas')
-                    ),
-                    new ListTile(
-                      onTap: () {
-                        setState(() {
-                          this.filtroLancamento = 'Receitas recebidas';
-                          tipoLancamento.currentState.collapse();
-                        });
-                      },
-                      title: const Text('Receitas recebidas')
-                    ),
-                    new ListTile(
-                      onTap: () {
-                        setState(() {
-                          this.filtroLancamento = 'Receitas não recebidas';
-                          tipoLancamento.currentState.collapse();
-                        });
-                      },
-                      title: const Text('Receitas não recebidas')
-                    ),
-                    new ListTile(
-                      onTap: () {
-                        setState(() {
-                          this.filtroLancamento = 'Transferências';
-                          tipoLancamento.currentState.collapse();
-                        });
-                      },
-                      title: const Text('Transferências')
-                    ),
-                    new ListTile(
-                      onTap: () {
-                        setState(() {
-                          this.filtroLancamento = 'Lançamentos fixos';
-                          tipoLancamento.currentState.collapse();
-                        });
-                      },
-                      title: const Text('Lançamentos fixos')
-                    ),
-                    new ListTile(
-                      onTap: () {
-                        setState(() {
-                          this.filtroLancamento = 'Lançamentos parcelados';
-                          tipoLancamento.currentState.collapse();
-                        });
-                      },
-                      title: const Text('Lançamentos parcelados')
-                    ),
-                    new ListTile(
-                      onTap: () {
-                        setState(() {
-                          this.filtroLancamento = 'Todos os lançamentos';
-                          tipoLancamento.currentState.collapse();
-                        });
-                      },
-                      title: const Text('Todos os lançamentos')
-                    ),
-                ]
-                ),
-                new Container(
-                  margin: new EdgeInsets.only(top: 8.0, bottom: 8.0, left: 16.0),
-                  child: new Text(
-                    'Conta',
-                    style: new TextStyle(
-                      fontSize: 12.0,
-                      fontFamily: 'Roboto',
-                      color: new Color(0xFF757575),
-                    ),
-                  ),
-                ),
-                new AppExpansionTile(
-                  key: tipoConta,
-                  title: const Text('Todas as Contas'),
-                  backgroundColor: Theme.of(context).accentColor.withOpacity(0.025),
-                  children: const <Widget>[
-                    const ListTile(title: const Text('One')),
-                    const ListTile(title: const Text('Two')),
-                    const ListTile(title: const Text('Free')),
-                    const ListTile(title: const Text('Four'))
-                  ]
-                ),
+                new Expanded(
+                  flex: 4,
+                  child: new InputDropdown2(
+                    labelText: 'Conta',
+                    valueText: _valueTextCartao,
+                    valueStyle: valueStyle,
+                    isCard: false,
+                    onPressed: () {
+                      showDialogCartao<String>(
+                        context: context,
+                        child: new SimpleDialog(
+                          title: const Text('Selecione uma conta'),
+                          children: buildListaConta(this.listaContasDB)
+                        )
+                      );
+                    },
+                  )
+                )
               ],
             ),
           )
         ],
-      )
+      ),
     );
   }
 }
+

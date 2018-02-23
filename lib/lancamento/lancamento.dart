@@ -1446,7 +1446,7 @@ class FormularioState extends State<Formulario> {
             children: <Widget>[
               new Expanded(
                 flex: 4,
-                child: new _InputDropdown2(
+                child: new InputDropdown2(
                   labelText: this.color == const Color(0xff9e9e9e) ? 'Conta origem' : 'Conta/Cartão',
                   labelTextPeriod: this.nomeMes,
                   valueText: _valueTextCartao,
@@ -2615,8 +2615,8 @@ class _InputDropdown extends StatelessWidget {
   }
 }
 
-class _InputDropdown2 extends StatelessWidget {
-  const _InputDropdown2({
+class InputDropdown2 extends StatelessWidget {
+  const InputDropdown2({
     Key key,
     this.child,
     this.labelText,
