@@ -5,8 +5,9 @@ import '../db/database.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:flutter/animation.dart';
-import "./lancamento.dart";
+import './lancamento.dart';
 import 'package:uuid/uuid.dart';
+import './expansiontile.dart';
 
 class ConsultaLancamentoPage extends StatefulWidget {
   @override
@@ -2514,13 +2515,20 @@ class FullScreenFiltro extends StatefulWidget {
 class FullScreenFiltroState extends State<FullScreenFiltro> {
   Color azulAppbar = new Color(0xFF26C6DA);
   String filtroLancamento = 'Todos os lançamentos';
+  String filtroConta = 'Todas as contas';
+  String filtrocARTAO = 'Todos os cartões';
+  String filtroCategoria = 'Todas as categorias';
+  String filtroTag = 'Todas as tags';
+  final GlobalKey<AppExpansionTileState> tipoLancamento = new GlobalKey();
+  final GlobalKey<AppExpansionTileState> tipoConta = new GlobalKey();
+  final GlobalKey<AppExpansionTileState> tipoCartao = new GlobalKey();
+  final GlobalKey<AppExpansionTileState> tipoCategoria = new GlobalKey();
+  final GlobalKey<AppExpansionTileState> tipoTag = new GlobalKey();
 
   //@override
   //void initState() {    
   //  this.expandir(true);
   //}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -2541,61 +2549,146 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
           ),
         ),
       ),
-      body: new Container(
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            new Container(
-              margin: new EdgeInsets.only(top: 16.0, bottom: 8.0, left: 16.0),
-              child: new Text(
-                'Tipo de Lançamento',
-                style: new TextStyle(
-                  fontSize: 12.0,
-                  fontFamily: 'Roboto',
-                  color: new Color(0xFF757575),
-                ),
-              ),
-            ),
-            new ExpansionTile(
-              title: new Text(this.filtroLancamento),
-              backgroundColor: Theme.of(context).accentColor.withOpacity(0.025),
+      body: new ListView(
+        children: <Widget>[
+          new Container(
+            child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new ListTile(
-                  onTap: () {
-                    setState(() {
-                      this.filtroLancamento = 'One';
-                    });
-                  },
-                  title: const Text('One')
+                new Container(
+                  margin: new EdgeInsets.only(top: 16.0, bottom: 8.0, left: 16.0),
+                  child: new Text(
+                    'Tipo de Lançamento',
+                    style: new TextStyle(
+                      fontSize: 12.0,
+                      fontFamily: 'Roboto',
+                      color: new Color(0xFF757575),
+                    ),
+                  ),
                 ),
-                const ListTile(title: const Text('Two')),
-                const ListTile(title: const Text('Free')),
-                const ListTile(title: const Text('Four'))
-             ]
-            ),
-            new Container(
-              margin: new EdgeInsets.only(top: 8.0, bottom: 8.0, left: 16.0),
-              child: new Text(
-                'Conta',
-                style: new TextStyle(
-                  fontSize: 12.0,
-                  fontFamily: 'Roboto',
-                  color: new Color(0xFF757575),
+                new AppExpansionTile(
+                  key: tipoLancamento,
+                  title: new Text(this.filtroLancamento),
+                  backgroundColor: Theme.of(context).accentColor.withOpacity(0.025),
+                  children: <Widget>[
+                    new ListTile(
+                      onTap: () {
+                        setState(() {
+                          this.filtroLancamento = 'Despesas';
+                          tipoLancamento.currentState.collapse();
+                        });
+                      },
+                      title: const Text('Despesas')
+                    ),
+                    new ListTile(
+                      onTap: () {
+                        setState(() {
+                          this.filtroLancamento = 'Despesas pagas';
+                          tipoLancamento.currentState.collapse();
+                        });
+                      },
+                      title: const Text('Despesas pagas')
+                    ),
+                    new ListTile(
+                      onTap: () {
+                        setState(() {
+                          this.filtroLancamento = 'Despesas não pagas';
+                          tipoLancamento.currentState.collapse();
+                        });
+                      },
+                      title: const Text('Despesas não pagas')
+                    ),
+                    new ListTile(
+                      onTap: () {
+                        setState(() {
+                          this.filtroLancamento = 'Receitas';
+                          tipoLancamento.currentState.collapse();
+                        });
+                      },
+                      title: const Text('Receitas')
+                    ),
+                    new ListTile(
+                      onTap: () {
+                        setState(() {
+                          this.filtroLancamento = 'Receitas recebidas';
+                          tipoLancamento.currentState.collapse();
+                        });
+                      },
+                      title: const Text('Receitas recebidas')
+                    ),
+                    new ListTile(
+                      onTap: () {
+                        setState(() {
+                          this.filtroLancamento = 'Receitas não recebidas';
+                          tipoLancamento.currentState.collapse();
+                        });
+                      },
+                      title: const Text('Receitas não recebidas')
+                    ),
+                    new ListTile(
+                      onTap: () {
+                        setState(() {
+                          this.filtroLancamento = 'Transferências';
+                          tipoLancamento.currentState.collapse();
+                        });
+                      },
+                      title: const Text('Transferências')
+                    ),
+                    new ListTile(
+                      onTap: () {
+                        setState(() {
+                          this.filtroLancamento = 'Lançamentos fixos';
+                          tipoLancamento.currentState.collapse();
+                        });
+                      },
+                      title: const Text('Lançamentos fixos')
+                    ),
+                    new ListTile(
+                      onTap: () {
+                        setState(() {
+                          this.filtroLancamento = 'Lançamentos parcelados';
+                          tipoLancamento.currentState.collapse();
+                        });
+                      },
+                      title: const Text('Lançamentos parcelados')
+                    ),
+                    new ListTile(
+                      onTap: () {
+                        setState(() {
+                          this.filtroLancamento = 'Todos os lançamentos';
+                          tipoLancamento.currentState.collapse();
+                        });
+                      },
+                      title: const Text('Todos os lançamentos')
+                    ),
+                ]
                 ),
-              ),
+                new Container(
+                  margin: new EdgeInsets.only(top: 8.0, bottom: 8.0, left: 16.0),
+                  child: new Text(
+                    'Conta',
+                    style: new TextStyle(
+                      fontSize: 12.0,
+                      fontFamily: 'Roboto',
+                      color: new Color(0xFF757575),
+                    ),
+                  ),
+                ),
+                new AppExpansionTile(
+                  key: tipoConta,
+                  title: const Text('Todas as Contas'),
+                  backgroundColor: Theme.of(context).accentColor.withOpacity(0.025),
+                  children: const <Widget>[
+                    const ListTile(title: const Text('One')),
+                    const ListTile(title: const Text('Two')),
+                    const ListTile(title: const Text('Free')),
+                    const ListTile(title: const Text('Four'))
+                  ]
+                ),
+              ],
             ),
-            new ExpansionTile(
-              title: const Text('Todas as Contas'),
-              backgroundColor: Theme.of(context).accentColor.withOpacity(0.025),
-              children: const <Widget>[
-                const ListTile(title: const Text('One')),
-                const ListTile(title: const Text('Two')),
-                const ListTile(title: const Text('Free')),
-                const ListTile(title: const Text('Four'))
-             ]
-            ),
-          ],
-        ),
+          )
+        ],
       )
     );
   }
