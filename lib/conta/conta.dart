@@ -536,7 +536,7 @@ class NovaContaPageState extends State<NovaContaPage>{
                             children: <Widget>[
                               new Column(
                                 children: <Widget>[
-                                  new DialogItem(
+                                  new DialogItemSimples(
                                     text: 'Conta corrente',
                                     onPressed: () {
                                       contaDB.tipo = 'Conta corrente';
@@ -544,7 +544,7 @@ class NovaContaPageState extends State<NovaContaPage>{
                                       Navigator.pop(context, 'Conta corrente');
                                     }
                                   ),
-                                  new DialogItem(
+                                  new DialogItemSimples(
                                     text: 'Conta poupança',
                                     onPressed: () {
                                       contaDB.tipo = 'Conta poupança';
@@ -552,7 +552,7 @@ class NovaContaPageState extends State<NovaContaPage>{
                                       Navigator.pop(context, 'Conta poupança');
                                     }
                                   ),
-                                  new DialogItem(
+                                  new DialogItemSimples(
                                     text: 'Outros',
                                     onPressed: () {
                                       contaDB.tipo = 'Outros';
@@ -735,7 +735,7 @@ class NovaContaPageState extends State<NovaContaPage>{
                           );
                         }
                       });
-                    }                    
+                    }
                   ),
                 ],
               )
@@ -747,11 +747,11 @@ class NovaContaPageState extends State<NovaContaPage>{
   }
 }
 
-class DialogItem extends StatelessWidget {
-  DialogItem({ Key key, this.icon, this.size, this.color, this.text, this.onPressed }) : super(key: key);
+class DialogItemSimples extends StatelessWidget {
+  DialogItemSimples({ Key key, this.icon, this.size, this.color, this.text, this.onPressed }) : super(key: key);
  
   final IconData icon;
-  double size = 36.0;
+  double size = 16.0;
   final Color color;
   final String text;
   final VoidCallback onPressed;
@@ -768,7 +768,7 @@ class DialogItem extends StatelessWidget {
             new Text(
               text,
               style: new TextStyle(
-                fontSize: 16.0
+                fontSize: size
               ),
             )
           ],

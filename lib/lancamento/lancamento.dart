@@ -1392,7 +1392,7 @@ class FormularioState extends State<Formulario> {
             children: <Widget>[
               new Expanded(
                 flex: 4,
-                child: new _InputDropdown(
+                child: new InputDropdown(
                   labelText: 'Categoria',
                   valueText: _valueText,
                   valueStyle: valueStyle,
@@ -1416,7 +1416,7 @@ class FormularioState extends State<Formulario> {
             children: <Widget>[
               new Expanded(
                 flex: 4,
-                child: new _InputDropdown3(
+                child: new InputDropdown3(
                   labelText: 'Tag',
                   valueText: this.valueTextTag,
                   valueStyle: valueStyle,
@@ -1483,7 +1483,7 @@ class FormularioState extends State<Formulario> {
             children: <Widget>[
               new Expanded(
                 flex: 4,
-                child: new _InputDropdown(
+                child: new InputDropdown(
                   labelText: 'Conta destino',
                   valueText: _valueTextContaDestino,
                   valueStyle: valueStyle,
@@ -2566,7 +2566,7 @@ class _DateTimePicker extends StatelessWidget {
       children: <Widget>[
         new Expanded(
           flex: 4,
-          child: new _InputDropdown(
+          child: new InputDropdown(
             labelText: labelText,
             valueText: new DateFormat.yMd().format(selectedDate),
             valueStyle: valueStyle,
@@ -2578,8 +2578,8 @@ class _DateTimePicker extends StatelessWidget {
   }
 }
 
-class _InputDropdown extends StatelessWidget {
-  const _InputDropdown({
+class InputDropdown extends StatelessWidget {
+  const InputDropdown({
     Key key,
     this.child,
     this.labelText,
@@ -2703,8 +2703,8 @@ class InputDropdown2 extends StatelessWidget {
   }
 }
 
-class _InputDropdown3 extends StatelessWidget {
-  const _InputDropdown3({
+class InputDropdown3 extends StatelessWidget {
+  const InputDropdown3({
     Key key,
     this.child,
     this.labelText,
