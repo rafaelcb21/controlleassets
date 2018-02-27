@@ -17,6 +17,7 @@ class ConsultaLancamentoPage extends StatefulWidget {
 class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with TickerProviderStateMixin {
   Color azulAppbar = new Color(0xFF26C6DA);
   Lancamento lancamentoDB = new Lancamento();
+  Filtro filtroDB = new Filtro();
   List<Widget> listaLancamentos = [];
   List listaDB = [];
   Palette listaCores = new Palette();
@@ -879,6 +880,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                   );
                 }
               ));
+              //filtroDB.getFiltro();
 
 
             }
