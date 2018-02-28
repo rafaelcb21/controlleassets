@@ -11,27 +11,25 @@ class FullScreenFiltro extends StatefulWidget {
 
 class FullScreenFiltroState extends State<FullScreenFiltro> {
   Color azulAppbar = new Color(0xFF26C6DA);
-  String filtroLancamento = 'Todos os lançamentos';
-  String filtroConta = 'Todas as contas';
-  String filtrocARTAO = 'Todos os cartões';
-  String filtroCategoria = 'Todas as categorias';
-  String filtroTag = 'Todas as tags';
   
   List listaLancamento = [
     'Despesas', 'Despesas pagas', 'Despesas não pagas',
     'Receitas', 'Receitas recebidas', 'Receitas não recebidas',
-    'Transferências', 'Transferências transferidas', 'Transferências não transferidas'
+    'Transferências', 'Transf. transferidas', 'Transf. não transferidas'
   ];
 
   List listaLctoFixoParcelado = [
-    'Lançamentos fixos', 'Lançamentos parcelados',
-    'Lançamentos não fixos', 'Lançamentos não parcelados',
-    'Lanç. não fixos e não parcelados',
-    'Lançamentos fixos e parcelados'
+    'Lcto fixos', 'Lcto parcelados',
+    'Lcto não fixos', 'Lcto não parcelados',
+    'Lcto não fixos e não parc.',
+    'Lcto fixos e parcelados'
   ];
 
+  List listaPgtoCartao = ['Cartão pago', 'Cartão não pago'];
 
   List listaLancamentoDialog = [];
+  List listaLancamentoFixaParcelada = [];
+  List listaLancamentoPgtoCartao = [];
   List listaContas = [];
   List listaCartoes = [];
   List listaContasCartoes = [];
@@ -42,14 +40,23 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
   List listaContasDB = [];
   List listaCartoesDB = [];
   List listaCategoriasDB = [];
-  List listaTagsDB = [];  
+  List listaTagsDB = [];
+  List idsTodasAsContas = [];
+  List idsTodosOsCartoes = [];
   
-  String _valueTextConta = '';
-  String _valueTextCartao = '';
-  String _valueTextCategoria = '';
-  String _valueTextTag = '';
-  String _valueTextLancamento = '';
-  String _valueTextLctoFixaParcelada = '';
+  String _valueTextContaCartao = ' ';
+  String _valueTextCategoria = ' ';
+  String _valueTextTag = ' ';
+  String _valueTextLancamento = ' ';
+  String _valueTextLctoFixaParcelada = ' ';
+  String _valueTextPgtoCartao = ' ';
+
+  int idconta = 0;
+  int idcartao = 0;
+  int idcategoria = 0;
+  int idtag = 0;
+
+  bool ehCartao = false;
 
   Categoria categoriaDB = new Categoria();
   Tag tagDB = new Tag();
@@ -109,6 +116,20 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
       }
     });
   }
+  
+  void showDialogPgtoCartao<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) {
+      if (value != null) {
+        setState(() {
+          _valueTextPgtoCartao = value.toString();
+        });
+      }
+    });
+  }
 
   void showDialogContaCartao<T>({ BuildContext context, Widget child }) {
     showDialog<T>(
@@ -118,7 +139,7 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
     .then<Null>((T value) {
       if (value != null) {
         setState(() {
-          _valueTextConta = value.toString();
+          _valueTextContaCartao = value.toString();
         });
       }
     });
@@ -170,9 +191,9 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
   }
 
   List<Widget> buildListaFixaParcelada(list) {
-    this.listaLancamentoDialog = [];
+    this.listaLancamentoFixaParcelada = [];
     for(var text in list) {
-      this.listaLancamentoDialog.add(
+      this.listaLancamentoFixaParcelada.add(
         new DialogItemSimples(
           size: 12.0,
           text: text,
@@ -182,12 +203,30 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
         ),
       );
     }    
-    return this.listaLancamentoDialog;
+    return this.listaLancamentoFixaParcelada;
   }  
+
+  List<Widget> buildListaPgtoCartao(list) {
+    this.listaLancamentoPgtoCartao = [];
+    for(var text in list) {
+      this.listaLancamentoPgtoCartao.add(
+        new DialogItemSimples(
+          size: 12.0,
+          text: text,
+          onPressed: () {
+            Navigator.pop(context, text);
+          }
+        ),
+      );
+    }    
+    return this.listaLancamentoPgtoCartao;
+  }
 
   List<Widget> buildListaContaCartao(listAccount, listCard) {
     this.listaContas = [];
     this.listaCartoes = [];
+    this.idsTodasAsContas = [];
+    this.idsTodosOsCartoes = [];
 
     this.listaContas.add( //HEADER Contas
       new Container(
@@ -198,6 +237,7 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
     );
 
     for(var i in listAccount) {
+      this.idsTodasAsContas.add(i['id']);
       var conta = i['conta'];
       var cor = this.cores[i['cor']];
       this.listaContas.add(
@@ -206,6 +246,10 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
           color: cor,
           text: conta,
           onPressed: () {
+            this.ehCartao = false;
+            _valueTextPgtoCartao = ' ';
+            this.idconta =  i['id'];
+            this.idcartao = 0;
             Navigator.pop(context, conta);
           }
         ),
@@ -217,20 +261,24 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
         color: Colors.black,
         text: 'Todas as contas',
         onPressed: () {
+          this.ehCartao = false;
+          _valueTextPgtoCartao = ' ';
+          this.idcartao = 0;
           Navigator.pop(context, 'Todas as contas');
         }
       ),
     );
     
     this.listaCartoes.add( //HEADER Cartoes
-        new Container(
-          padding: new EdgeInsets.only(left: 24.0, top: 8.0, bottom: 8.0),
-          color: new Color(0xFFDFD9D9),
-          child: new Text('CARTÕES'),
-        )
-      );
+      new Container(
+        padding: new EdgeInsets.only(left: 24.0, top: 8.0, bottom: 8.0),
+        color: new Color(0xFFDFD9D9),
+        child: new Text('CARTÕES'),
+      )
+    );
 
     for(var i in listCard) {
+      this.idsTodosOsCartoes.add(i['id']);      
       var cartao = i['cartao'];
       var cor = this.cores[i['cor']];
       this.listaCartoes.add(
@@ -239,6 +287,15 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
           color: cor,
           text: cartao,
           onPressed: () {
+            this.ehCartao = true;
+            _valueTextLancamento = ' ';
+            _valueTextLctoFixaParcelada = ' ';
+            _valueTextCategoria = ' ';
+            _valueTextTag = ' ';
+            this.idconta = 0;
+            this.idcategoria = 0;
+            this.idtag = 0;
+            this.idcartao =  i['id'];
             Navigator.pop(context, cartao);
           }
         ),
@@ -250,6 +307,14 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
         color: Colors.black,
         text: 'Todos os cartões',
         onPressed: () {
+          this.ehCartao = true;
+          _valueTextLancamento = ' ';
+          _valueTextLctoFixaParcelada = ' ';
+          _valueTextCategoria = ' ';
+          _valueTextTag = ' ';
+          this.idconta = 0;
+          this.idcategoria = 0;
+          this.idtag = 0;
           Navigator.pop(context, 'Todos os cartões');
         }
       ),
@@ -257,7 +322,6 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
     
     this.listaContasCartoes = new List.from(this.listaContas)..addAll(this.listaCartoes);
     return this.listaContasCartoes;
-
   }
 
 
@@ -272,6 +336,7 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
           color: cor,
           text: categoria,
           onPressed: () {
+            this.idcategoria = i[0]['id'];
             Navigator.pop(context, categoria);
           }
         ),
@@ -286,6 +351,7 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
               color: Theme.of(context).disabledColor,
               text: categoria2,
               onPressed: () {
+                this.idcategoria =  y['id'];
                 Navigator.pop(context, categoria2);
               }
             ),
@@ -308,6 +374,7 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
           color: cor,
           text: tag,
           onPressed: () {
+            this.idtag =  i['id'];
             Navigator.pop(context, tag);
           }
         ),
@@ -349,8 +416,8 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
                 new Container(
                   padding: new EdgeInsets.only(bottom: 8.0),
                   child: new InputDropdown3(
-                    labelText: 'Conta',
-                    valueText: _valueTextConta,
+                    labelText: 'Conta/Cartão',
+                    valueText: _valueTextContaCartao,
                     valueStyle: valueStyle,
                     //isCard: false,
                     onPressed: () {
@@ -362,15 +429,24 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
                         )
                       );
                     },
+                    onPressed2: () {
+                      setState(() {
+                        this._valueTextContaCartao = ' ';
+                        this.idconta = 0;
+                        this.idcartao = 0;
+                      });
+                    }
                   ),
                 ),
+
+                ehCartao ? new Container() : 
                 new Container(
                   padding: new EdgeInsets.only(bottom: 8.0),
-                  child: new InputDropdown2(
+                  child: new InputDropdown3(
                     labelText: 'Tipo de lançamento',
                     valueText: _valueTextLancamento,
                     valueStyle: valueStyle,
-                    isCard: false,
+                    //isCard: false,
                     onPressed: () {
                       showDialogLancamento<String>(
                         context: context,
@@ -380,16 +456,22 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
                         )
                       );
                     },
+                    onPressed2: () {
+                      setState(() {
+                        this._valueTextLancamento = ' ';
+                      });
+                    }
                   ),
                 ),
                 
+                ehCartao ? new Container() : 
                 new Container(
                   padding: new EdgeInsets.only(bottom: 8.0),
-                  child: new InputDropdown2(
+                  child: new InputDropdown3(
                     labelText: 'Lançamentos Fixos/Parcelados',
                     valueText: _valueTextLctoFixaParcelada,
                     valueStyle: valueStyle,
-                    isCard: false,
+                    //isCard: false,
                     onPressed: () {
                       showDialogLctoFixaParcelada<String>(
                         context: context,
@@ -399,11 +481,43 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
                         )
                       );
                     },
+                    onPressed2: () {
+                      setState(() {
+                        this._valueTextLctoFixaParcelada = ' ';
+                      });
+                    }
                   ),
                 ),
+
+                !ehCartao ? new Container() : 
                 new Container(
                   padding: new EdgeInsets.only(bottom: 8.0),
-                  child: new InputDropdown(
+                  child: new InputDropdown3(
+                    labelText: 'Tipos de pagamento',
+                    valueText: _valueTextPgtoCartao,
+                    valueStyle: valueStyle,
+                    //isCard: false,
+                    onPressed: () {
+                      showDialogPgtoCartao<String>(
+                        context: context,
+                        child: new SimpleDialog(
+                          title: const Text('Selecione um pgto'),
+                          children: buildListaPgtoCartao(listaPgtoCartao)
+                        )
+                      );
+                    },
+                    onPressed2: () {
+                      setState(() {
+                        this._valueTextPgtoCartao = ' ';
+                      });
+                    }
+                  ),
+                ),
+
+                ehCartao ? new Container() : 
+                new Container(
+                  padding: new EdgeInsets.only(bottom: 8.0),
+                  child: new InputDropdown3(
                     labelText: 'Categoria',
                     valueText: _valueTextCategoria,
                     valueStyle: valueStyle,
@@ -416,11 +530,19 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
                         )
                       );
                     },
+                    onPressed2: () {
+                      setState(() {
+                        this._valueTextCategoria = ' ';
+                        this.idcategoria = 0;
+                      });
+                    }
                   ),
                 ),
+
+                ehCartao ? new Container() : 
                 new Container(
                   padding: new EdgeInsets.only(bottom: 8.0),
-                  child: new InputDropdown2(
+                  child: new InputDropdown3(
                     labelText: 'Tag',
                     valueText: _valueTextTag,
                     valueStyle: valueStyle,
@@ -433,6 +555,12 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
                         )
                       );
                     },
+                    onPressed2: () {
+                      setState(() {
+                        this._valueTextTag = ' ';
+                        this.idtag = 0;
+                      });
+                    }
                   ),
                 ),
                 new Container(
@@ -449,14 +577,25 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
                           ),  
                         ),
                         onPressed: () {
-                          print([
-                            _valueTextLancamento,
-                            _valueTextConta,
-                            _valueTextCartao,
-                            _valueTextCategoria,
-                            _valueTextTag
-                          ]);
-                          Navigator.pop(context, true);
+                          
+                          if(!this.ehCartao) {
+                            Navigator.pop(context, [
+                              [_valueTextContaCartao, idconta],
+                              _valueTextLancamento,
+                              _valueTextLctoFixaParcelada,
+                              [_valueTextCategoria, this.idcategoria],
+                              [_valueTextTag, this.idtag],
+                              this.idsTodasAsContas,
+                              this.ehCartao
+                            ]);
+                          } else {
+                            Navigator.pop(context, [
+                              [_valueTextContaCartao, idcartao],
+                              _valueTextPgtoCartao,
+                              this.idsTodosOsCartoes,
+                              this.ehCartao
+                            ]);
+                          }
                         }                    
                       ),
                     ],

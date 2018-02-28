@@ -147,43 +147,63 @@ class DatabaseClient {
 class Filtro {
   Database db;
 
-  Future getFiltro(String tipo, int pago, String tiporepeticao, int idconta, int idcartao, int idcategoria, int idtag) async {
+  Future getFiltro(List lista) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
 
-    List tipoDeLancamento = await db.rawQuery('SELECT * FROM lancamento WHERE tipo = ? AND idcartao = 0', [tipo]);
-    List tipoDeLctoPagoOuNao = await db.rawQuery('SELECT * FROM lancamento WHERE tipo = ? pago = ? AND idcartao = 0', [tipo, pago]);
-    
-    List lctoFixo = await db.rawQuery('SELECT * FROM lancamento WHERE tiporepeticao = Fixa AND idcartao = 0');
-    List lctoParcelado = await db.rawQuery('SELECT * FROM lancamento WHERE tiporepeticao = Parcelada AND idcartao = 0');
-    List lctoNaoFixo = await db.rawQuery('SELECT * FROM lancamento WHERE NOT tiporepeticao = Fixa AND idcartao = 0');
-    List lctoNaoParcelado = await db.rawQuery('SELECT * FROM lancamento WHERE NOT tiporepeticao = Parcelada AND idcartao = 0');
-    List lctoNaoFixoParcelado = await db.rawQuery('SELECT * FROM lancamento WHERE NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND idcartao = 0');
-    List lctoFixoEParcelado = await db.rawQuery('SELECT * FROM lancamento WHERE tiporepeticao = Fixa AND tiporepeticao = Parcelada AND idcartao = 0');
+    int idconta;
 
-    
+    // Não é um cartão, é uma conta
+    if(!lista.last) {
 
-    //List lctoTodos = await db.rawQuery('SELECT * FROM lancamento');
+      if(lista[0][0] == ' ') {
+        idconta = lista[0][1];
 
+      } else {
+        // Todas as contas
+      }
+      
+    } else {
 
-    List lctoConta = await db.rawQuery('SELECT * FROM lancamento WHERE idconta = ?', [idconta]);
-    //List lctoContaTodas = await db.rawQuery('SELECT * FROM lancamento WHERE idconta > 0');
-
-    List lctoCartoes = await db.rawQuery('SELECT * FROM lancamento WHERE idcartao = ?', [idcartao]);
-    List lctoCartoesTodos = await db.rawQuery('SELECT * FROM lancamento WHERE idcartao > 0');
-    List lctoSemCartoes = await db.rawQuery('SELECT * FROM lancamento WHERE idcartao = 0');
-
-    List lctoCategorias = await db.rawQuery('SELECT * FROM lancamento WHERE idcategoria = ?', [idcategoria]);
-
-    List lctoTags = await db.rawQuery('SELECT * FROM lancamento WHERE idtag = ?', [idtag]);
-
-    for(var i in tipoDeLancamento) {
-      print(i);
     }
 
-    await db.close();
-    return tipoDeLancamento;
+    //import itertools
+    //l = ['A','B','C','D','E']
+    //c = 0
+    //for i in range(0, len(l)+1):
+    //  for x in itertools.combinations(l, i):
+    //    print(x)
+    //    c += 1
+    //    print(c)
+    
+    //List tipoDeLancamento = await db.rawQuery('SELECT * FROM lancamento WHERE tipo = ? AND idcartao = 0', [tipo]);
+    //List tipoDeLctoPagoOuNao = await db.rawQuery('SELECT * FROM lancamento WHERE tipo = ? pago = ? AND idcartao = 0', [tipo, pago]);
+    //
+    //List lctoFixo = await db.rawQuery('SELECT * FROM lancamento WHERE tiporepeticao = Fixa AND idcartao = 0');
+    //List lctoParcelado = await db.rawQuery('SELECT * FROM lancamento WHERE tiporepeticao = Parcelada AND idcartao = 0');
+    //List lctoNaoFixo = await db.rawQuery('SELECT * FROM lancamento WHERE NOT tiporepeticao = Fixa AND idcartao = 0');
+    //List lctoNaoParcelado = await db.rawQuery('SELECT * FROM lancamento WHERE NOT tiporepeticao = Parcelada AND idcartao = 0');
+    //List lctoNaoFixoParcelado = await db.rawQuery('SELECT * FROM lancamento WHERE NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND idcartao = 0');
+    //List lctoFixoEParcelado = await db.rawQuery('SELECT * FROM lancamento WHERE tiporepeticao = Fixa AND tiporepeticao = Parcelada AND idcartao = 0');
+
+    //List lctoConta = await db.rawQuery('SELECT * FROM lancamento WHERE idconta = ?', [idconta]);
+
+    //List lctoCartoes = await db.rawQuery('SELECT * FROM lancamento WHERE idcartao = ?', [idcartao]);
+    //List lctoCartoesTodos = await db.rawQuery('SELECT * FROM lancamento WHERE idcartao > 0');
+    //List lctoSemCartoes = await db.rawQuery('SELECT * FROM lancamento WHERE idcartao = 0');
+
+    //List lctoCategorias = await db.rawQuery('SELECT * FROM lancamento WHERE idcategoria = ?', [idcategoria]);
+
+    //List lctoTags = await db.rawQuery('SELECT * FROM lancamento WHERE idtag = ?', [idtag]);
+
+    //for(var i in tipoDeLancamento) {
+    //  print(i);
+    //}
+
+    //await db.close();
+    //return tipoDeLancamento;
+    return true;
   }
 }
 

@@ -880,7 +880,9 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                   );
                 }
               ));
-              //filtroDB.getFiltro();
+
+              print(filtro);
+              //filtroDB.getFiltro(filtro);
 
 
             }
