@@ -1,0 +1,45 @@
+A: [[Caixa , 1],  ,  , [ , 0], [ , 0], [1, 2], false]
+A: [[Todas as contas, 0],  ,  , [ , 0], [ , 0], [1, 2], false]
+B: [[ , 0], Transferências,  , [ , 0], [ , 0], [], false]
+C: [[ , 0],  , Lcto não fixos e não parc., [ , 0], [ , 0], [], false]
+D: [[ , 0],  ,  , [Piscina, 11], [ , 0], [], false]
+E: [[ , 0],  ,  , [ , 0], [Renda Fixa, 1], [], false]
+
+A,B: [[Caixa , 1], Receitas,  , [ , 0], [ , 0], [1, 2], false]
+A,C: [[Caixa , 1],  , Lcto não fixos, [ , 0], [ , 0], [1, 2], false]
+A,D: [[Caixa , 1],  ,  , [Lazer, 4], [ , 0], [1, 2], false]
+A,E: [[Itau , 2],  ,  , [ , 0], [Renda Variável, 2], [1, 2], false]
+
+
+B,C: [[ , 0], Despesas não pagas, Lcto não fixos, [ , 0], [ , 0], [], false]
+B,D: [[ , 0], Despesas,  , [Lazer, 4], [ , 0], [], false]
+B,E: [[ , 0], Receitas não recebidas,  , [ , 0], [Despesa Variável, 4], [], false]
+
+
+C,D: [[ , 0],  , Lcto fixos, [Investimento, 3], [ , 0], [], false]
+C,E: [[ , 0],  , Lcto fixos, [ , 0], [Despesa Variável, 4], [], false]
+
+D,E: [[ , 0],  ,  , [Saúde, 7], [Despesa Variável, 4], [], false]
+
+A,B,C: [[Caixa , 1], Despesas não pagas, Lcto fixos e parcelados, [ , 0], [ , 0], [1, 2], false]
+A,B,D: [[Itau , 2], Despesas não pagas,  , [Salário, 6], [ , 0], [1, 2], false]
+A,B,E: [[Itau , 2], Transferências,  , [ , 0], [Despesa Fixa, 3], [1, 2], false]
+A,C,D: [[Caixa , 1],  , Lcto não fixos, [Investimento, 3], [ , 0], [1, 2], false]
+A,C,E: [[Itau , 2],  , Lcto parcelados, [ , 0], [Renda Fixa, 1], [1, 2], false]
+A,D,E: [[Todas as contas, 0],  ,  , [Educação, 2], [Despesa Fixa, 3], [1, 2], false]
+
+B,C,D: [[ , 0], Receitas recebidas, Lcto fixos, [Telefonia, 8], [ , 0], [], false]
+B,C,E: [[ , 0], Despesas pagas, Lcto não fixos, [ , 0], [Renda Fixa, 1], [1, 2], false]
+B,D,E: [[ , 0], Despesas,  , [Investimento, 3], [Despesa Variável, 4], [], false]
+
+C,D,E: [[ , 0],  , Lcto não fixos, [Alimentação, 1], [Despesa Fixa, 3], [], false]
+
+A,B,C,D: [[Caixa , 1], Despesas pagas, Lcto não fixos, [Transporte, 9], [ , 0], [1, 2], false]
+A,B,C,E: [[Caixa , 1], Despesas, Lcto fixos, [ , 0], [Despesa Fixa, 3], [1, 2], false]
+A,B,D,E: [[Todas as contas, 0], Receitas,  , [Investimento, 3], [Despesa Fixa, 3], [1, 2], false]
+A,C,D,E: [[Caixa , 1],  , Lcto fixos, [Investimento, 3], [Despesa Variável, 4], [1, 2], false]
+
+B,C,D,E: [[ , 0], Despesas, Lcto não fixos, [Lazer, 4], [Renda Fixa, 1], [], false]
+
+A,B,C,D,E: [[Caixa , 1], Despesas pagas, Lcto fixos, [Lazer, 4], [Despesa Variável, 4], [1, 2], false]
+
