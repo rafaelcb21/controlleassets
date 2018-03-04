@@ -882,7 +882,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
               ));
 
               print(filtro);
-              //filtroDB.getFiltro(filtro);
+              filtroDB.getFiltro(filtro);
 
 
             }

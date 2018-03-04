@@ -59,8 +59,14 @@ String escolherFuncao(lista) {
     grupoA[0] == ' ' && grupoA[1] == 0 && rdt > 0 && typeLaunch > 0 && grupoD[1] > 0 && grupoE[1] > 0 ||
     grupoA[0] != ' ' && rdt > 0 && typeLaunch > 0 && grupoD[1] > 0 && grupoE[1] > 0
   ) {
-    return queryFiltroContinuacao(lista);
+    return queryFiltroContinuacaoParte2(lista);
   
+  } else if(
+    //A,B,C,E
+    grupoA[0] != ' ' && rdt > 0 && typeLaunch > 0 && grupoD[1] == 0 && grupoE[1] > 0
+  ) {
+    return queryFiltroContinuacaoParte1(lista);
+
   } else {
     return queryFiltro(lista);
   }
@@ -126,22 +132,22 @@ String queryFiltro(lista) {
   
   // A,B
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ' + grupoB;
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ?' + grupoB + ' AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ' + grupoB + ' AND pago = 1';
 
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ?' + grupoB + ' AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ' + grupoB + ' AND pago = 0';
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ' + grupoB;
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ?' + grupoB + ' AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ' + grupoB + ' AND pago = 1';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ?' + grupoB + ' AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ' + grupoB + ' AND pago = 0';
   
   // A,C
   } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
@@ -166,19 +172,19 @@ String queryFiltro(lista) {
     return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tiporepeticao = Fixa';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND tiporepeticao = Parcelada';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tiporepeticao = Parcelada';
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND NOT tiporepeticao = Fixa';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND NOT tiporepeticao = Fixa';
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND NOT tiporepeticao = Parcelada';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND NOT tiporepeticao = Parcelada';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada';
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 6 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND tiporepeticao = Fixa AND tiporepeticao = Parcelada';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tiporepeticao = Fixa AND tiporepeticao = Parcelada';
 
   // A,D
   } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {    
@@ -313,150 +319,150 @@ String queryFiltro(lista) {
   
   // A,B,C
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB;
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB;
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB;
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB;
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB;
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB;
   ///
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1';
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1';
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1';
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1';
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1';
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1';
   ///
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0';
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0';
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0';
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0';
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0';
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0';
   ///////////
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB;
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB;
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB;
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB;
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB;
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB;
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB;
   ///
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1';
   ///
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0';
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0';
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0';
   
   // A,B,D
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ?' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
 
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ?' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ?' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ?' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
   
   // A,B,E
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ?' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
 
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ?' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ?' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ?' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
   
   // A,C,D
   } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
@@ -481,19 +487,19 @@ String queryFiltro(lista) {
     return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tiporepeticao = Fixa AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND NOT tiporepeticao = Fixa AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND NOT tiporepeticao = Fixa AND idcategoria = ' + grupoD[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND NOT tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND NOT tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 6 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString();
 
   // A,C,E
   } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
@@ -518,26 +524,26 @@ String queryFiltro(lista) {
     return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tiporepeticao = Fixa AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND tiporepeticao = Parcelada AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tiporepeticao = Parcelada AND idtag = ' + grupoE[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND NOT tiporepeticao = Fixa AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND NOT tiporepeticao = Fixa AND idtag = ' + grupoE[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND NOT tiporepeticao = Parcelada AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND NOT tiporepeticao = Parcelada AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND idtag = ' + grupoE[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 6 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND idtag = ' + grupoE[1].toString();
 
   // A,D,E
   } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {    
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND idcategoria = ' + grupoD[1].toString() + 'AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND idcategoria = ' + grupoD[1].toString() + 'AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   // B,C,D
   } else if(grupoA[0] == ' ' && grupoA[1] == 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
@@ -680,285 +686,296 @@ String queryFiltro(lista) {
   
   // A,B,C,D
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   ///
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   ///
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
   ///////////
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString();
   ///
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString();
   ///
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
-  
-  // A,B,C,E
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
-  ///
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idtag = ' + grupoE[1].toString();
-  ///
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idtag = ' + grupoE[1].toString();
-  ///////////
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idtag = ' + grupoE[1].toString();
-  ///
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idtag = ' + grupoE[1].toString();
-  ///
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idtag = ' + grupoE[1].toString();
-  
-  } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idtag = ' + grupoE[1].toString();
-  
-  // A,B,D,E
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString();
+
+  //// A,B,D,E
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ?' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
 
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ?' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ?' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ?' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
-  // A,C,D,E
+  //// A,C,D,E
   } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
-
   } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
-
   } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
-
+  
   } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 6 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
-
+  
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tiporepeticao = Fixa AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] >= 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
-
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+  
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] >= 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND NOT tiporepeticao = Fixa AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
-
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND NOT tiporepeticao = Fixa AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+  
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] >= 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND NOT tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND NOT tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] >= 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
-
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+  
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 6 && grupoD[1] > 0 && grupoE[1] >= 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = > 0 AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > 0 AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
 
   } else {
     return queryEscolhida = ' ';
   }
 }
 
+String queryFiltroContinuacaoParte1(lista) {
+  String queryEscolhida;
 
-String queryFiltroContinuacao(lista) {
+  List grupoA = lista[0];
+  String grupoB = lista[1];
+  String grupoC = lista[2];
+  List grupoD = lista[3];
+  List grupoE = lista[4];
+
+  int rdt = receitaDespesaTransf(grupoB);
+  int typeLaunch = tipoLancamento(grupoC);
+
+  //A,B,C,E
+  if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+  ///
+  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+  ///
+  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+  ///////////
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idtag = ' + grupoE[1].toString();
+  ///
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idtag = ' + grupoE[1].toString();
+  ///
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+  
+  } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idtag = ' + grupoE[1].toString();
+  }
+}
+
+String queryFiltroContinuacaoParte2(lista) {
   String queryEscolhida;
 
   List grupoA = lista[0];
@@ -1027,112 +1044,112 @@ String queryFiltroContinuacao(lista) {
   
   // A,B,C,D,E
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   ///
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   ///
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   ///////////
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   ///
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 1 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   ///
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND NOT tiporepeticao = Fixa AND NOT tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
-    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ?' + grupoB + 'AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta > ' + grupoA[1].toString() + ' AND tiporepeticao = Fixa AND tiporepeticao = Parcelada AND tipo = ' + grupoB + ' AND pago = 0 AND idcategoria = ' + grupoD[1].toString() + ' AND idtag = ' + grupoE[1].toString();
   
   } else {
     return queryEscolhida = ' ';
