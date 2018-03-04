@@ -156,10 +156,10 @@ class Filtro {
     // Não é um cartão, é uma conta
     if(!lista.last) {
       String select = escolherFuncao(lista);
-      print(select);
       
     } else {
-      print('num sei');
+      String select = queryFiltroCartao(lista);
+
     }
 
     await db.close();

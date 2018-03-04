@@ -8,6 +8,7 @@ import 'package:flutter/animation.dart';
 import './lancamento.dart';
 import 'package:uuid/uuid.dart';
 import './filtro.dart';
+import '../db/querysfiltro.dart';
 
 class ConsultaLancamentoPage extends StatefulWidget {
   @override
@@ -40,6 +41,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
   int _angle = 90;
   bool _isRotated = true;
   Color corBrancaItem = new Color(0xFFFAFAFA);
+
+  String legendaFiltro = '';
 
   @override
   void initState() {
@@ -120,6 +123,20 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
           //    });
           //  }
           //);
+        });
+      }
+    });
+  }
+
+  void showDialogFiltros<T>({ BuildContext context, Widget child }) {
+    showDialog<T>(
+      context: context,
+      child: child,
+    )
+    .then<Null>((T value) {
+      if (value != null) {
+        setState(() {
+
         });
       }
     });
@@ -881,10 +898,19 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                 }
               ));
 
-              print(filtro);
-              filtroDB.getFiltro(filtro);
-
-
+              if(filtro != null) {
+                if(filtro.last == false) {
+                  filtroDB.getFiltro(filtro);
+                  setState(() {
+                    this.legendaFiltro = tratarLegendaFiltro(filtro);
+                  });
+                } else {
+                  filtroDB.getFiltro(filtro);
+                  setState(() {
+                    this.legendaFiltro = tratarLegendaFiltroCartao(filtro);
+                  });
+                }
+              }
             }
           )
         ],
@@ -907,7 +933,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                 new Container(
                   padding: new EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8.0, top: 12.0),
                   decoration: new BoxDecoration(
-                    color: this.corBrancaItem,
+                    color: this.legendaFiltro == '' ? this.corBrancaItem : Colors.amber[50],
                     border: new Border(
                       bottom: new BorderSide(
                         style: BorderStyle.solid,
@@ -917,14 +943,67 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                   ),
                   child: new Row(
                     children: <Widget>[
-                      new Text(
-                        'Filtro:  ',
-                        style: new TextStyle(
-                          fontSize: 12.0,
-                          fontFamily: 'Roboto',
-                          color: new Color(0xFF9E9E9E)
-                        ),
-                      ),
+                      new Expanded(
+                        child: new InkWell(
+                          child: new Container(                      
+                            child: new Text(                        
+                              'Filtro: ' + this.legendaFiltro,
+                              overflow: TextOverflow.ellipsis,
+                              style: new TextStyle(
+                                fontSize: 12.0,
+                                fontFamily: 'Roboto',
+                                color: new Color(0xFF9E9E9E),
+
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            this.legendaFiltro == '' ? new Container() :
+                            showDialogFiltros<String>(
+                              context: context,
+                              child: new SimpleDialog(
+                                title: new Text("Filtro"),
+                                children: <Widget>[
+                                  new Container(
+                                    padding: const EdgeInsets.all(28.0),
+                                    child: new Text(                        
+                                      this.legendaFiltro,
+                                      softWrap: true,
+                                      style: new TextStyle(
+                                        fontSize: 16.0,
+                                        fontFamily: 'Roboto',
+                                        color: new Color(0xFF9E9E9E),
+                                      ),
+                                    ),
+                                  ),
+                                  new FlatButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        this.legendaFiltro = '';
+                                        Navigator.pop(context);
+                                      });                                    
+                                    },
+                                    child: new Container(
+                                      margin: new EdgeInsets.only(right: 10.0),
+                                      child: new Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          new Text(
+                                            "Limpar filtro",
+                                            style: new TextStyle(
+                                              fontSize: 16.0
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  )
+                                ],
+                              )
+                            );
+                          },
+                        )
+                      )
                     ],
                   ),
                 ),

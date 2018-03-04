@@ -73,6 +73,89 @@ String escolherFuncao(lista) {
 
 }
 
+String tratarLegendaFiltro(lista) {
+  String legendaA = lista[0][0];
+  String legendaB = lista[1];
+  String legendaC = lista[2];
+  String legendaD = lista[3][0];
+  String legendaE = lista[4][0];
+  List listaLegendas = [];
+
+  List legendas = [legendaA, legendaB, legendaC, legendaD, legendaE];
+
+  for(String item in legendas) {
+    if(item != ' ') {
+      listaLegendas.add(item);
+    }
+  }
+
+  return listaLegendas.join(', ');   
+}
+
+String tratarLegendaFiltroCartao(lista) {
+  String legendaA = lista[0][0];
+  String legendaB = lista[1];
+  List listaLegendas = [];
+
+  List legendas = [legendaA, legendaB];
+
+  for(String item in legendas) {
+    if(item != ' ') {
+      listaLegendas.add(item);
+    }
+  }
+
+  return listaLegendas.join(', ');   
+}
+
+int cartaoPagoOuNao(String palavra) {
+
+  List palavras = palavra.split(' ');
+  if(palavra == ' '){
+    return 0;
+  } else if(palavras[1] != 'não') {
+    return 1;
+  } else {
+    return 2;
+  }
+}
+
+String queryFiltroCartao(lista) {
+  String queryEscolhida;
+
+  List grupoA = lista[0];
+  String grupoB = lista[1];
+
+  int pgto = cartaoPagoOuNao(grupoB);
+
+  if(grupoA[0] != ' ' && grupoA[1] > 0 && pgto == 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idcartao = ' + grupoA[1].toString();
+    
+  } else if(grupoA[0] != ' ' && grupoA[1] > 0 && pgto == 1 ) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idcartao = ' + grupoA[1].toString() + ' AND pago = 1'; 
+
+  } else if(grupoA[0] != ' ' && grupoA[1] > 0 && pgto == 2 ) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idcartao = ' + grupoA[1].toString() + ' AND pago = 0'; 
+
+  } else if(grupoA[0] == 'Todos os cartões' && pgto == 0) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idcartao > 0';
+    
+  } else if(grupoA[0] == 'Todos os cartões' && pgto == 1 ) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idcartao > 0 AND pago = 1';
+
+  } else if(grupoA[0] == 'Todos os cartões' && pgto == 2 ) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idcartao > 0 AND pago = 0';
+
+  } else if(grupoA[0] == ' ' && pgto == 1 ) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idcartao > 0 AND pago = 1';
+
+  } else if(grupoA[0] == ' ' && pgto == 2 ) {
+    return queryEscolhida = 'SELECT * FROM lancamento WHERE idcartao > 0 AND pago = 0';
+
+  }
+
+}
+
 String queryFiltro(lista) {
 
   String queryEscolhida;
@@ -87,7 +170,7 @@ String queryFiltro(lista) {
   int typeLaunch = tipoLancamento(grupoC);
 
   // A
-  if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {    
+  if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'SELECT * FROM lancamento WHERE idconta = ' + grupoA[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
