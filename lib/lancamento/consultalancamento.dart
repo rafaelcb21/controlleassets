@@ -898,12 +898,91 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                 }
               ));
 
+              //print(this.periodoNext); //2018-03-05 08:56:33.637471
+              //print(this.periodoFiltro); //março de 2018
+              //print(this.periodo); // mes
+              //var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true, this.periodo);
+              //print(listaFiltro); // [1 Abr 2018, 2018-04-01 00:00:00.000Z, abril de 2018]
               if(filtro != null) {
                 if(filtro.last == false) {
-                  filtroDB.getFiltro(filtro);
+                  //filtroDB.getFiltro(filtro);
+
+
+                  
+                  //setState(() {
+                  //  this.legendaFiltro = tratarLegendaFiltro(filtro);
+                  //});
+
                   setState(() {
-                    this.legendaFiltro = tratarLegendaFiltro(filtro);
-                  });
+                    //var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, false, this.periodo);
+                    //this.periodoNext = listaFiltro[1];
+
+                    //if(this.periodo == 'periodo') {
+                    //  this.from = listaFiltro[0];
+                    //  this.to = listaFiltro[1];
+                    //}
+
+                    //if(this.periodo == "hoje") {
+                    //  lancamentoDB.getLancamentoHoje(this.periodoNext).then(
+                    //    (list) {
+                    //      setState(() {
+                    //        if(list.length > 0) {
+                    //          this.listaDB = list[0];
+                    //          this.periodoFiltro = list[1][1];
+                    //          this.periodoFiltroDateTime = list[1][0][0];
+                    //        }
+                    //      });
+                    //    }
+                    //  );
+                    //} else if(this.periodo == "semana") {
+                    //  lancamentoDB.getLancamentoSemana(this.periodoNext).then(
+                    //    (list) {
+                    //      setState(() {
+                    //        if(list.length > 0) {
+                    //          this.listaDB = list[0];
+                    //          this.periodoFiltro = list[1][1];
+                    //          this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                    //          this.periodoFiltroDateTime = list[1][0][0];
+                    //        }
+                    //      });
+                    //    }
+                    //  );
+                    //} else 
+                    if(this.periodo == "mes") {
+                      filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, filtro).then(
+                        (list) {
+                          setState(() {
+                            if(list.length > 0) {
+                              this.listaDB = list[0];
+                              this.periodoFiltro = list[1][1];
+                              this.periodoFiltroResumido = this.periodoFiltro;
+                              this.periodoFiltroDateTime = list[1][0][0];
+                              this.legendaFiltro = tratarLegendaFiltro(filtro);
+                            }
+                          });
+                        }
+                      );
+                    //} else if(this.periodo == "periodo") {
+                    //  lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
+                    //    (list) {
+                    //      setState(() {
+                    //        if(list.length > 0) {
+                    //          this.listaDB = list[0];
+                    //          this.periodoFiltro = list[1][1];
+                    //          //23 Dez de 2017 à 29 Dez de 2018
+                    //          //this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);
+                    //          this.periodoFiltroResumido = //23 Dez 17 à 29 Dez 18
+                    //            list[1][1].substring(0, 7) + list[1][1].substring(12, 14)
+                    //            + " à " + 
+                    //            list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
+                    //          this.periodoFiltroDateTimeList = list[1][0][0];
+                    //        }
+                    //      });
+                    //    }
+                    //  );
+                    //}
+                  }
+                });
                 } else {
                   filtroDB.getFiltro(filtro);
                   setState(() {

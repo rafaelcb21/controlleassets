@@ -152,19 +152,119 @@ class Filtro {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
-
+    String select;
     // Não é um cartão, é uma conta
     if(!lista.last) {
-      String select = escolherFuncao(lista);
+      select = escolherFuncao(lista);
       
     } else {
-      String select = queryFiltroCartao(lista);
+      select = queryFiltroCartao(lista);
 
     }
 
     await db.close();
 
-    return true;
+    return select;
+  }
+
+  Future getLctoMesFiltroSemCartao(DateTime diaSearch, List lista) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+    String where;
+    if(!lista.last) {
+      where = escolherFuncao(lista);      
+    } else {
+      where = queryFiltroCartao(lista);
+    }
+
+    var listaPorData = [];
+
+    List listaData = await db.rawQuery("SELECT data FROM lancamento GROUP BY data");
+
+    var hojeMes = new DateFormat.yM("pt_BR").format(diaSearch); // 12/2017
+    var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(diaSearch).toString(); // dezembro de 2017
+
+
+    for(var i in listaData){
+      //List lista = await db.rawQuery("SELECT * FROM lancamento WHERE data = ?", [i['data']]);
+
+      List lista = await db.rawQuery('''
+        SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
+                l.valor, l.pago, l.hash 
+                  FROM lancamento AS l
+          LEFT JOIN categoria AS c ON l.idcategoria = c.id
+          LEFT JOIN tag ON l.idtag = tag.id
+          LEFT JOIN conta ON l.idconta = conta.id
+          LEFT JOIN cartao ON l.idcartao = cartao.id
+            WHERE l.data = ? AND 
+      ''' + where, [i['data']]);
+      
+      var data = new DateFormat("yyyy-MM-dd").parse(i['data']);
+      
+      List dataAnoMesDia = i['data'].split("-");
+      DateTime dataDateTime = new DateTime(
+        int.parse(dataAnoMesDia[0]), int.parse(dataAnoMesDia[1]), int.parse(dataAnoMesDia[2])
+      );
+
+
+      var filtro = new DateFormat.yM("pt_BR").format(data);
+
+      if(hojeMes == filtro) {
+        var dataFormatada = new DateFormat.MMMMd("pt_BR").format(data).toString();
+        
+        if(lista.length > 0) {
+          listaPorData.add([dataDateTime, dataFormatada, 'semCartao', lista]);
+        }        
+      }
+    }
+
+    
+    var dateMap = new LinkedHashMap();
+    
+    List allDate = [];
+
+
+    for(var key in listaPorData) {
+      allDate.add(key[0]); //pega todas as datas
+    }
+
+    allDate.sort();
+
+    for(var key in allDate) {
+      dateMap.putIfAbsent(key, () => []); //insere todas as datas de forma ordenada no {}
+    }
+
+    for(var lista in listaPorData) {
+      DateTime dateKey = lista[0];
+      String dateNome = lista[1];
+      String tipoLancamento = lista[2];
+      List lancamentos = lista[3];
+      
+      for(var itemLancamento in lancamentos) {
+        dateMap[dateKey].add([
+          dateKey,
+          itemLancamento['descricao'], dateNome, tipoLancamento, itemLancamento['categoria'],
+          itemLancamento['pago'], itemLancamento['hash'], itemLancamento['valor'],
+          itemLancamento['id'], itemLancamento['data'], itemLancamento['tipo']
+        ]);
+      }
+    }
+
+    List listaUnica = [];
+
+    dateMap.forEach((key, value) {
+      listaUnica.add(value);
+    });
+    
+    for(List dia in listaUnica) {
+      dia.sort((a, b) => a[1].compareTo(b[1]));
+    }
+
+    await db.close();
+    //print([listaUnica, [[diaSearch], hojeMesDescrito]]);
+    //[[[[2018-03-13 00:00:00.000, Rr, 13 de março, semCartao, Investimento, 0, ce47d3dd-0090-49ca-9047-1e99d23f764b, -0.25, 4, 2018-03-13, Despesa]]], [[2018-03-05 09:03:19.776124], março de 2018]]
+    return [listaUnica, [[diaSearch], hojeMesDescrito]];
   }
 }
 
@@ -1645,6 +1745,8 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     }
 
     await db.close();
+    print([listaUnica, [[diaSearch], hojeMesDescrito]]);
+    //[[[[2018-03-13 00:00:00.000, Rr, 13 de março, semCartao, Investimento, 0, ce47d3dd-0090-49ca-9047-1e99d23f764b, -0.25, 4, 2018-03-13, Despesa]]], [[2018-03-05 09:03:19.776124], março de 2018]]
     return [listaUnica, [[diaSearch], hojeMesDescrito]];
   }
 
