@@ -43,6 +43,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
   Color corBrancaItem = new Color(0xFFFAFAFA);
 
   String legendaFiltro = '';
+  bool filtroAtivado = false;
+  List filtroAtual = [];
 
   @override
   void initState() {
@@ -344,18 +346,38 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                 }
                               );
                             } else if(this.periodo == 'mes') {
-                              lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
-                                (list) {
-                                  this.periodo = "mes";
-                                  setState(() {                                  
-                                    if(list.length > 0) {
-                                      this.listaDB = list[0];
-                                      this.periodoFiltro = list[1][1];
-                                      this.periodoFiltroDateTime = list[1][0][0];
-                                    }            
-                                  });
+                              if(this.filtroAtivado) {
+                                  filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, this.filtroAtual).then(
+                                    (list) {
+                                      this.periodo = "mes";
+                                      setState(() {
+                                        if(list.length > 0) {
+                                          this.listaDB = list[0];
+                                          this.periodoFiltro = list[1][1];
+                                          this.periodoFiltroResumido = this.periodoFiltro;
+                                          this.periodoFiltroDateTime = list[1][0][0];
+                                          this.legendaFiltro = tratarLegendaFiltro(filtroAtual);
+                                          this.filtroAtivado = true;
+                                          this.filtroAtual = filtroAtual;
+                                        }
+                                      });
+                                    }
+                                  );
+                                } else {
+                                  lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                    (list) {
+                                      this.periodo = "mes";
+                                      setState(() {
+                                        if(list.length > 0) {
+                                          this.listaDB = list[0];
+                                          this.periodoFiltro = list[1][1];
+                                          this.periodoFiltroResumido = this.periodoFiltro;
+                                          this.periodoFiltroDateTime = list[1][0][0];
+                                        }
+                                      });
+                                    }
+                                  );
                                 }
-                              );
                             } else if(this.periodo == 'periodo') {
                               List fromToList = fromTo(this.periodoFiltro);
                               lancamentoDB.getLancamentoPeriodo(fromToList[0], fromToList[1]).then(
@@ -454,17 +476,32 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                       });
                                     }
                                   );
-                                } else if(this.periodo == "mes") {
+                                } else if(this.periodo == "mes") {                                  
                                   DateTime dataRef = lancamentoDB.dataOfDelete(this.periodoFiltro, this.periodo);
-                                  lancamentoDB.getLancamentoMes(dataRef).then(
-                                    (list) {
-                                      setState(() {
-                                        if(list.length > 0) {
-                                          Navigator.pop(context, [list]);
-                                        }
-                                      });
-                                    }
-                                  );
+                                  if(this.filtroAtivado) {
+                                    filtroDB.getLctoMesFiltroSemCartao(dataRef, this.filtroAtual).then(
+                                      (list) {
+                                        setState(() {
+                                          if(list.length > 0) {
+                                            this.filtroAtivado = true;
+                                            this.filtroAtual = filtroAtual;
+                                            Navigator.pop(context, [list]);
+                                          }
+                                        });
+                                      }
+                                    );
+                                  } else {
+                                    lancamentoDB.getLancamentoMes(dataRef).then(
+                                      (list) {
+                                        setState(() {
+                                          if(list.length > 0) {
+                                            this.filtroAtivado = false;
+                                            Navigator.pop(context, [list]);
+                                          }
+                                        });
+                                      }
+                                    );
+                                  }
                                 } else if(this.periodo == "periodo") {
                                   lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
                                     (list) {
@@ -515,15 +552,30 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                         }
                                       );
                                     } else if(this.periodo == "mes") {
-                                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                                        (list) {
-                                          setState(() {
-                                            if(list.length > 0) {
-                                              Navigator.pop(context, [list, 'mes']);
-                                            }
-                                          });
-                                        }
-                                      );
+                                      if(this.filtroAtivado) {
+                                        filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, this.filtroAtual).then(
+                                          (list) {
+                                            setState(() {
+                                              if(list.length > 0) {
+                                                this.filtroAtivado = true;
+                                                this.filtroAtual = filtroAtual;
+                                                Navigator.pop(context, [list, 'mes']);
+                                              }
+                                            });
+                                          }
+                                        );
+                                      } else {
+                                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                          (list) {
+                                            setState(() {
+                                              if(list.length > 0) {
+                                                this.filtroAtivado = false;
+                                                Navigator.pop(context, [list, 'mes']);
+                                              }
+                                            });
+                                          }
+                                        );
+                                      }
                                     } else if(this.periodo == "periodo") {
                                       lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
                                         (list) {
@@ -592,17 +644,36 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                         }
                                       );
                                     } else if(this.periodo == "mes") {
-                                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                                        (list) {
-                                          setState(() {
-                                            if(list.length > 0) {
-                                              this.listaDB = list[0];
-                                              this.periodoFiltro = list[1][1];
-                                              this.periodoFiltroDateTime = list[1][0][0];
-                                            }
-                                          });
-                                        }
-                                      );
+                                      if(this.filtroAtivado) {
+                                        filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, this.filtroAtual).then(
+                                          (list) {
+                                            setState(() {
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroResumido = this.periodoFiltro;
+                                                this.periodoFiltroDateTime = list[1][0][0];
+                                                this.legendaFiltro = tratarLegendaFiltro(filtroAtual);
+                                                this.filtroAtivado = true;
+                                                this.filtroAtual = filtroAtual;
+                                              }
+                                            });
+                                          }
+                                        );
+                                      } else {
+                                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                          (list) {
+                                            setState(() {
+                                              if(list.length > 0) {
+                                                this.listaDB = list[0];
+                                                this.periodoFiltro = list[1][1];
+                                                this.periodoFiltroResumido = this.periodoFiltro;
+                                                this.periodoFiltroDateTime = list[1][0][0];
+                                              }
+                                            });
+                                          }
+                                        );
+                                      }                                      
                                     } else if(this.periodo == "periodo") {
                                       lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
                                         (list) {
@@ -684,17 +755,36 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                         }
                       );
                     } else if(this.periodo == "mes") {
-                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                        (list) {
-                          setState(() {
-                            if(list.length > 0) {
-                              this.listaDB = list[0];
-                              this.periodoFiltro = list[1][1];
-                              this.periodoFiltroDateTime = list[1][0][0];
-                            }
-                          });
-                        }
-                      );
+                      if(this.filtroAtivado) {
+                        filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, this.filtroAtual).then(
+                          (list) {
+                            setState(() {
+                              if(list.length > 0) {
+                                this.listaDB = list[0];
+                                this.periodoFiltro = list[1][1];
+                                this.periodoFiltroResumido = this.periodoFiltro;
+                                this.periodoFiltroDateTime = list[1][0][0];
+                                this.legendaFiltro = tratarLegendaFiltro(filtroAtual);
+                                this.filtroAtivado = true;
+                                this.filtroAtual = filtroAtual;
+                              }
+                            });
+                          }
+                        );
+                      } else {
+                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                          (list) {
+                            setState(() {
+                              if(list.length > 0) {
+                                this.listaDB = list[0];
+                                this.periodoFiltro = list[1][1];
+                                this.periodoFiltroResumido = this.periodoFiltro;
+                                this.periodoFiltroDateTime = list[1][0][0];
+                              }
+                            });
+                          }
+                        );
+                      }                      
                     } else if(this.periodo == "periodo") {
                       lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
                         (list) {
@@ -792,17 +882,36 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                         }
                       );
                     } else if(this.periodo == "mes") {
-                      lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                        (list) {
-                          setState(() {
-                            if(list.length > 0) {
-                              this.listaDB = list[0];
-                              this.periodoFiltro = list[1][1];
-                              this.periodoFiltroDateTime = list[1][0][0];
-                            }
-                          });
-                        }
-                      );
+                      if(this.filtroAtivado) {
+                        filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, this.filtroAtual).then(
+                          (list) {
+                            setState(() {
+                              if(list.length > 0) {
+                                this.listaDB = list[0];
+                                this.periodoFiltro = list[1][1];
+                                this.periodoFiltroResumido = this.periodoFiltro;
+                                this.periodoFiltroDateTime = list[1][0][0];
+                                this.legendaFiltro = tratarLegendaFiltro(filtroAtual);
+                                this.filtroAtivado = true;
+                                this.filtroAtual = filtroAtual;
+                              }
+                            });
+                          }
+                        );
+                      } else {
+                        lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                          (list) {
+                            setState(() {
+                              if(list.length > 0) {
+                                this.listaDB = list[0];
+                                this.periodoFiltro = list[1][1];
+                                this.periodoFiltroResumido = this.periodoFiltro;
+                                this.periodoFiltroDateTime = list[1][0][0];
+                              }
+                            });
+                          }
+                        );
+                      }
                     } else if(this.periodo == "periodo") {
                       lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
                         (list) {
@@ -958,6 +1067,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                               this.periodoFiltroResumido = this.periodoFiltro;
                               this.periodoFiltroDateTime = list[1][0][0];
                               this.legendaFiltro = tratarLegendaFiltro(filtro);
+                              this.filtroAtivado = true;
+                              this.filtroAtual = filtro;
                             }
                           });
                         }
@@ -1059,6 +1170,23 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                     onPressed: () {
                                       setState(() {
                                         this.legendaFiltro = '';
+                                        this.filtroAtivado = false;
+                                        this.filtroAtual = [];
+
+                                        if(this.periodo == "mes") {
+                                          lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                            (list) {
+                                              setState(() {
+                                                if(list.length > 0) {
+                                                  this.listaDB = list[0];
+                                                  this.periodoFiltro = list[1][1];
+                                                  this.periodoFiltroResumido = this.periodoFiltro;
+                                                  this.periodoFiltroDateTime = list[1][0][0];
+                                                }
+                                              });
+                                            }
+                                          );
+                                        }
                                         Navigator.pop(context);
                                       });                                    
                                     },
@@ -1140,18 +1268,36 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                   }
                                 );
                               } else if(this.periodo == "mes") {
-                                lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                                  (list) {
-                                    setState(() {
-                                      if(list.length > 0) {
-                                        this.listaDB = list[0];
-                                        this.periodoFiltro = list[1][1];
-                                        this.periodoFiltroResumido = this.periodoFiltro;
-                                        this.periodoFiltroDateTime = list[1][0][0];
-                                      }
-                                    });
-                                  }
-                                );
+                                if(this.filtroAtivado) {
+                                  filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, this.filtroAtual).then(
+                                    (list) {
+                                      setState(() {
+                                        if(list.length > 0) {
+                                          this.listaDB = list[0];
+                                          this.periodoFiltro = list[1][1];
+                                          this.periodoFiltroResumido = this.periodoFiltro;
+                                          this.periodoFiltroDateTime = list[1][0][0];
+                                          this.legendaFiltro = tratarLegendaFiltro(filtroAtual);
+                                          this.filtroAtivado = true;
+                                          this.filtroAtual = filtroAtual;
+                                        }
+                                      });
+                                    }
+                                  );
+                                } else {
+                                  lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                    (list) {
+                                      setState(() {
+                                        if(list.length > 0) {
+                                          this.listaDB = list[0];
+                                          this.periodoFiltro = list[1][1];
+                                          this.periodoFiltroResumido = this.periodoFiltro;
+                                          this.periodoFiltroDateTime = list[1][0][0];
+                                        }
+                                      });
+                                    }
+                                  );
+                                }
                               } else if(this.periodo == "periodo") {
                                 lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
                                   (list) {
@@ -1240,18 +1386,38 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                       new DialogItemConsulta(
                                         text: "Este mes",
                                         onPressed: () {
-                                          lancamentoDB.getLancamentoMes(new DateTime.now()).then(
-                                            (list) {
-                                              setState(() {
+                                          if(this.filtroAtivado) {
+                                            filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, this.filtroAtual).then(
+                                              (list) {
                                                 this.periodo = "mes";
-                                                if(list.length > 0) {
-                                                  this.listaDB = list[0];
-                                                  this.periodoFiltro = list[1][1];
-                                                  this.periodoFiltroDateTime = list[1][0][0];
-                                                }
-                                              });
-                                            }
-                                          );
+                                                setState(() {
+                                                  if(list.length > 0) {
+                                                    this.listaDB = list[0];
+                                                    this.periodoFiltro = list[1][1];
+                                                    this.periodoFiltroResumido = this.periodoFiltro;
+                                                    this.periodoFiltroDateTime = list[1][0][0];
+                                                    this.legendaFiltro = tratarLegendaFiltro(filtroAtual);
+                                                    this.filtroAtivado = true;
+                                                    this.filtroAtual = filtroAtual;
+                                                  }
+                                                });
+                                              }
+                                            );
+                                          } else {
+                                            lancamentoDB.getLancamentoMes(new DateTime.now()).then(
+                                              (list) {
+                                                this.periodo = "mes";
+                                                setState(() {
+                                                  if(list.length > 0) {
+                                                    this.listaDB = list[0];
+                                                    this.periodoFiltro = list[1][1];
+                                                    this.periodoFiltroResumido = this.periodoFiltro;
+                                                    this.periodoFiltroDateTime = list[1][0][0];
+                                                  }
+                                                });
+                                              }
+                                            );
+                                          } 
                                           Navigator.pop(context, new DateTime.now());
                                         }
                                       ),
@@ -1376,18 +1542,37 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                     }
                                   );
                                 } else if(this.periodo == "mes") {
-                                  lancamentoDB.getLancamentoMes(this.periodoNext).then(
-                                    (list) {
-                                      setState(() {
-                                        if(list.length > 0) {
-                                          this.listaDB = list[0];
-                                          this.periodoFiltro = list[1][1];
-                                          this.periodoFiltroResumido = this.periodoFiltro;
-                                          this.periodoFiltroDateTime = list[1][0][0];
-                                        }
-                                      });
-                                    }
-                                  );
+                                  if(this.filtroAtivado) {
+                                    filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, this.filtroAtual).then(
+                                      (list) {
+                                        setState(() {
+                                          if(list.length > 0) {
+                                            this.listaDB = list[0];
+                                            this.periodoFiltro = list[1][1];
+                                            this.periodoFiltroResumido = this.periodoFiltro;
+                                            this.periodoFiltroDateTime = list[1][0][0];
+                                            this.legendaFiltro = tratarLegendaFiltro(filtroAtual);
+                                            this.filtroAtivado = true;
+                                            this.filtroAtual = filtroAtual;
+                                          }
+                                        });
+                                      }
+                                    );
+                                  } else {
+                                    lancamentoDB.getLancamentoMes(this.periodoNext).then(
+                                      (list) {
+                                        setState(() {
+                                          if(list.length > 0) {
+                                            this.listaDB = list[0];
+                                            this.periodoFiltro = list[1][1];
+                                            this.periodoFiltroResumido = this.periodoFiltro;
+                                            this.periodoFiltroDateTime = list[1][0][0];
+                                          }
+                                        });
+                                      }
+                                    );
+                                  }
+                                  
                                 } else if(this.periodo == "periodo") {
                                   lancamentoDB.getLancamentoPeriodo(this.from, this.to).then(
                                     (list) {
@@ -1588,20 +1773,39 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
 
                                       } else if(this.periodo == 'mes') {
                                         lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
-                                          lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
-                                            (list) {
-                                              this.periodo = "mes";
-                                              setState(() {                                  
-                                                if(list.length > 0) {
-                                                  this.listaDB = list[0];
-                                                  this.periodoFiltro = list[1][1];
-                                                  this.periodoFiltroDateTime = list[1][0][0];
-                                                }            
-                                              });
-                                            }
-                                          );
-                                        });
-                                        
+                                          if(this.filtroAtivado) {
+                                            filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, this.filtroAtual).then(
+                                              (list) {
+                                                this.periodo = "mes";
+                                                setState(() {
+                                                  if(list.length > 0) {
+                                                    this.listaDB = list[0];
+                                                    this.periodoFiltro = list[1][1];
+                                                    this.periodoFiltroResumido = this.periodoFiltro;
+                                                    this.periodoFiltroDateTime = list[1][0][0];
+                                                    this.legendaFiltro = tratarLegendaFiltro(filtroAtual);
+                                                    this.filtroAtivado = true;
+                                                    this.filtroAtual = filtroAtual;
+                                                  }
+                                                });
+                                              }
+                                            );
+                                          } else {
+                                            lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
+                                              (list) {
+                                                this.periodo = "mes";
+                                                setState(() {
+                                                  if(list.length > 0) {
+                                                    this.listaDB = list[0];
+                                                    this.periodoFiltro = list[1][1];
+                                                    this.periodoFiltroResumido = this.periodoFiltro;
+                                                    this.periodoFiltroDateTime = list[1][0][0];
+                                                  }
+                                                });
+                                              }
+                                            );
+                                          }
+                                        });                                        
                                       } else if(this.periodo == 'periodo') {
                                         List fromToList = fromTo(this.periodoFiltro);
                                         lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
@@ -1739,18 +1943,38 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                         });
                                       } else if(this.periodo == 'mes') {
                                         lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
-                                          lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
-                                            (list) {
-                                              this.periodo = "mes";
-                                              setState(() {                                  
-                                                if(list.length > 0) {
-                                                  this.listaDB = list[0];
-                                                  this.periodoFiltro = list[1][1];
-                                                  this.periodoFiltroDateTime = list[1][0][0];
-                                                }            
-                                              });
-                                            }
-                                          );
+                                          if(this.filtroAtivado) {
+                                            filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, this.filtroAtual).then(
+                                              (list) {
+                                                this.periodo = "mes";
+                                                setState(() {
+                                                  if(list.length > 0) {
+                                                    this.listaDB = list[0];
+                                                    this.periodoFiltro = list[1][1];
+                                                    this.periodoFiltroResumido = this.periodoFiltro;
+                                                    this.periodoFiltroDateTime = list[1][0][0];
+                                                    this.legendaFiltro = tratarLegendaFiltro(filtroAtual);
+                                                    this.filtroAtivado = true;
+                                                    this.filtroAtual = filtroAtual;
+                                                  }
+                                                });
+                                              }
+                                            );
+                                          } else {
+                                            lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
+                                              (list) {
+                                                this.periodo = "mes";
+                                                setState(() {
+                                                  if(list.length > 0) {
+                                                    this.listaDB = list[0];
+                                                    this.periodoFiltro = list[1][1];
+                                                    this.periodoFiltroResumido = this.periodoFiltro;
+                                                    this.periodoFiltroDateTime = list[1][0][0];
+                                                  }
+                                                });
+                                              }
+                                            );
+                                          }
                                         });
                                       } else if(this.periodo == 'periodo') {
                                         List fromToList = fromTo(this.periodoFiltro);
@@ -1887,20 +2111,41 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                           );
                                         });
                                       } else if(this.periodo == 'mes') {
-                                        lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
-                                          lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
-                                            (list) {
-                                              this.periodo = "mes";
-                                              setState(() {                                  
-                                                if(list.length > 0) {
-                                                  this.listaDB = list[0];
-                                                  this.periodoFiltro = list[1][1];
-                                                  this.periodoFiltroDateTime = list[1][0][0];
-                                                }            
-                                              });
-                                            }
-                                          );
-                                        });
+                                          if(this.filtroAtivado) {
+                                            lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
+                                              filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, this.filtroAtual).then(
+                                                (list) {
+                                                  setState(() {
+                                                    if(list.length > 0) {
+                                                      this.listaDB = list[0];
+                                                      this.periodoFiltro = list[1][1];
+                                                      this.periodoFiltroResumido = this.periodoFiltro;
+                                                      this.periodoFiltroDateTime = list[1][0][0];
+                                                      this.legendaFiltro = tratarLegendaFiltro(filtroAtual);
+                                                      this.filtroAtivado = true;
+                                                      this.filtroAtual = filtroAtual;
+                                                    }
+                                                  });
+                                                }
+                                              );
+                                            });                                            
+                                          } else {
+                                            lancamentoDB.lancamentoDeFixo(this.periodo, this.periodoFiltro).then((data) {
+                                              lancamentoDB.getLancamentoMes(this.periodoFiltroDateTime).then(
+                                                (list) {
+                                                  this.periodo = "mes";
+                                                  setState(() {                                  
+                                                    if(list.length > 0) {
+                                                      this.listaDB = list[0];
+                                                      this.periodoFiltro = list[1][1];
+                                                      this.periodoFiltroDateTime = list[1][0][0];
+                                                    }            
+                                                  });
+                                                }
+                                              );
+                                            });
+                                          }
+                                        
                                       } else if(this.periodo == 'periodo') {
 
                                         List fromToList = fromTo(this.periodoFiltro);

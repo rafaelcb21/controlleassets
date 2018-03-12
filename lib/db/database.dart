@@ -172,6 +172,7 @@ class Filtro {
     String dbPath = join(path.path, "database.db");
     Database db = await openDatabase(dbPath);
     String where;
+
     if(!lista.last) {
       where = escolherFuncao(lista);      
     } else {
@@ -1745,7 +1746,7 @@ Future getLancamentoSemana(DateTime diaDeReferencia) async {
     }
 
     await db.close();
-    print([listaUnica, [[diaSearch], hojeMesDescrito]]);
+    //print([listaUnica, [[diaSearch], hojeMesDescrito]]);
     //[[[[2018-03-13 00:00:00.000, Rr, 13 de março, semCartao, Investimento, 0, ce47d3dd-0090-49ca-9047-1e99d23f764b, -0.25, 4, 2018-03-13, Despesa]]], [[2018-03-05 09:03:19.776124], março de 2018]]
     return [listaUnica, [[diaSearch], hojeMesDescrito]];
   }
