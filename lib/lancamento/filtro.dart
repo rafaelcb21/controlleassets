@@ -577,8 +577,18 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
                           ),  
                         ),
                         onPressed: () {
-                          
                           if(!this.ehCartao) {
+                            //print(
+                            //  [
+                            //    [_valueTextContaCartao, idconta],
+                            //    _valueTextLancamento,
+                            //    _valueTextLctoFixaParcelada,
+                            //    [_valueTextCategoria, this.idcategoria],
+                            //    [_valueTextTag, this.idtag],
+                            //    this.idsTodasAsContas,
+                            //    this.ehCartao                              
+                            //  ]
+                            //);
                             Navigator.pop(context, [
                               [_valueTextContaCartao, idconta],
                               _valueTextLancamento,
@@ -586,7 +596,7 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
                               [_valueTextCategoria, this.idcategoria],
                               [_valueTextTag, this.idtag],
                               this.idsTodasAsContas,
-                              this.ehCartao
+                              this.ehCartao                              
                             ]);
                           } else {
                             Navigator.pop(context, [

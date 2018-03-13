@@ -189,7 +189,8 @@ class Filtro {
 
     for(var i in listaData){
       //List lista = await db.rawQuery("SELECT * FROM lancamento WHERE data = ?", [i['data']]);
-
+      print(where);
+      print('SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, l.valor, l.pago, l.hash FROM lancamento AS l LEFT JOIN categoria AS c ON l.idcategoria = c.id LEFT JOIN tag ON l.idtag = tag.id LEFT JOIN conta ON l.idconta = conta.id LEFT JOIN cartao ON l.idcartao = cartao.id WHERE l.data = '+ i['data'] +' AND ' + where);
       List lista = await db.rawQuery('''
         SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
                 l.valor, l.pago, l.hash 
