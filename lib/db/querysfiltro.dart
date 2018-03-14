@@ -59,15 +59,18 @@ String escolherFuncao(lista) {
     grupoA[0] == ' ' && grupoA[1] == 0 && rdt > 0 && typeLaunch > 0 && grupoD[1] > 0 && grupoE[1] > 0 ||
     grupoA[0] != ' ' && rdt > 0 && typeLaunch > 0 && grupoD[1] > 0 && grupoE[1] > 0
   ) {
+    print('rafa1');
     return queryFiltroContinuacaoParte2(lista);
   
   } else if(
     //A,B,C,E
     grupoA[0] != ' ' && rdt > 0 && typeLaunch > 0 && grupoD[1] == 0 && grupoE[1] > 0
   ) {
+    print('rafa2');
     return queryFiltroContinuacaoParte1(lista);
 
   } else {
+    print('rafa3');
     return queryFiltro(lista);
   }
 
@@ -162,13 +165,28 @@ String queryFiltro(lista) {
 
   List grupoA = lista[0];
   String grupoB = lista[1];
-  String grupoBSingular = grupoB.substring(0,grupoB.length - 1);
-  String gB = "\'" + grupoBSingular + "\'";
+  String grupoBSingular;
+  String gB;
+  int rdt;
+  //String verificar = grupoB.replaceAll(' ', '');
+
+  if(grupoB != ' ') {
+    grupoBSingular = grupoB.substring(0,grupoB.length - 1);
+    gB = "\'" + grupoBSingular + "\'";
+    rdt = receitaDespesaTransf(gB);
+  } else {
+    rdt = 0;
+  }
+  
   String grupoC = lista[2];
   List grupoD = lista[3];
   List grupoE = lista[4];
 
-  int rdt = receitaDespesaTransf(gB);
+  print(grupoB);
+  print(grupoB.length);
+  print(grupoBSingular);
+  print(gB);
+  print(rdt);
   int typeLaunch = tipoLancamento(grupoC);
 
   // A

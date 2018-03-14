@@ -174,7 +174,7 @@ class Filtro {
     String where;
 
     if(!lista.last) {
-      where = escolherFuncao(lista);      
+      where = escolherFuncao(lista);
     } else {
       where = queryFiltroCartao(lista);
     }
@@ -186,6 +186,12 @@ class Filtro {
     var hojeMes = new DateFormat.yM("pt_BR").format(diaSearch); // 12/2017
     var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(diaSearch).toString(); // dezembro de 2017
 
+    List x = await db.rawQuery('SELECT  * FROM lancamento');
+
+    for(var i in x) {
+      print(i);
+      print('=================');
+    }
 
     for(var i in listaData){
       //List lista = await db.rawQuery("SELECT * FROM lancamento WHERE data = ?", [i['data']]);
