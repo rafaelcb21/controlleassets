@@ -165,15 +165,21 @@ String queryFiltro(lista) {
 
   List grupoA = lista[0];
   String grupoB = lista[1];
-  String grupoBSingular;
   String gB;
   int rdt;
-  //String verificar = grupoB.replaceAll(' ', '');
 
   if(grupoB != ' ') {
-    grupoBSingular = grupoB.substring(0,grupoB.length - 1);
-    gB = "\'" + grupoBSingular + "\'";
-    rdt = receitaDespesaTransf(gB);
+    String letra = grupoB[0];
+
+    if(letra == 'D') {
+      gB = '\'Despesa\'';
+    } else if(letra == 'R') {
+      gB = '\'Receita\'';
+    } else if(letra == 'T') {
+      gB = '\'Transferência\'';
+    }
+    rdt = receitaDespesaTransf(grupoB);
+
   } else {
     rdt = 0;
   }

@@ -1895,7 +1895,7 @@ class FormularioState extends State<Formulario> {
                           lancamento.idcartao = lancamentoDB.idcartao;
                           lancamento.valor = lancamento.tipo == 'Despesa' ? -1*valorDivisao : valorDivisao;
                           lancamento.descricao = lancamentoDB.descricao + ' ' + (i + 1).toString() + '/' + ((lancamentoDB.quantidaderepeticao).round()).toString();
-                          lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
+                          lancamento.tiporepeticao = 'Parcelada';
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                           lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
                           lancamento.pago = i > 0 ? 0 : lancamentoDB.pago;
@@ -2152,7 +2152,7 @@ class FormularioState extends State<Formulario> {
                           lancamento.idcartao = lancamentoDB.idcartao;
                           lancamento.valor = lancamento.tipo == 'Despesa' ? -1*valorDivisao : valorDivisao;
                           lancamento.descricao = lancamentoDB.descricao + ' ' + (i + 1).toString() + '/' + ((lancamentoDB.quantidaderepeticao).round()).toString();
-                          lancamento.tiporepeticao = lancamentoDB.tiporepeticao;
+                          lancamento.tiporepeticao = 'Parcelada';
                           lancamento.quantidaderepeticao = lancamentoDB.quantidaderepeticao;
                           lancamento.periodorepeticao = lancamentoDB.periodorepeticao;
                           lancamento.pago = 0;

@@ -729,6 +729,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                   }
                 },
                 onPressed3: () {
+                 
                   lancamentoDB.updateLancamentoPago(id, pago).then((data) {
                     if(this.periodo == "hoje") {
                       lancamentoDB.getLancamentoHoje(this.periodoNext).then(
@@ -776,6 +777,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                           (list) {
                             setState(() {
                               if(list.length > 0) {
+                                print('rafaelllll');
                                 this.listaDB = list[0];
                                 this.periodoFiltro = list[1][1];
                                 this.periodoFiltroResumido = this.periodoFiltro;
@@ -2264,7 +2266,7 @@ class ItemLancamento extends StatefulWidget {
     this.hash,
     this.onPressed,
     this.onPressed2,
-    this.onPressed3,});// : super();
+    this.onPressed3});// : super();
 
   @override
   ItemLancamentoState createState() => new ItemLancamentoState();

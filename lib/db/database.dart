@@ -188,6 +188,12 @@ class Filtro {
 
     List x = await db.rawQuery('SELECT  * FROM lancamento');
 
+    //for(var i in x) {
+    //  print(i);
+    //  print('=================');
+    //}
+    //print(where);
+
     for(var i in listaData){
       List lista = await db.rawQuery('''
         SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
