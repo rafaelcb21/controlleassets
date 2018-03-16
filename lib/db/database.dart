@@ -180,7 +180,6 @@ class Filtro {
       where = queryFiltroCartao(listFiltro);
     }
 
-    List listaDeFaturas = [];
     List listaPorDataHoje = [];
     List dateMap = [];
     String diaLabelInicio = "";
@@ -246,6 +245,160 @@ class Filtro {
 
     return [listaUnica, [[hoje], anoMesDiaApresentacao]];
 
+  }
+
+  Future getLctoSemanaSemCartao(DateTime diaDeReferencia, List listFiltro) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    String where;
+    if(!listFiltro.last) {
+      where = escolherFuncao(listFiltro);
+    } else {
+      where = queryFiltroCartao(listFiltro);
+    }
+
+    DateTime inicioDaSemana;
+    DateTime fimDaSemana;
+    DateTime proximaData;
+    List listaDataSemana = [];
+    String diaLabelInicio = "";
+    String diaLabelFim = "";
+
+    var listaPorData = [];
+    var listaDeFaturas = [];
+
+    if(diaDeReferencia.weekday == 1) {      
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day);
+      fimDaSemana = inicioDaSemana.add(new Duration(days: 6));
+
+    } else if(diaDeReferencia.weekday == 2) {
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day).subtract(new Duration(days: 1));
+      fimDaSemana = inicioDaSemana.add(new Duration(days: 6));
+
+    } else if(diaDeReferencia.weekday == 3) {
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day).subtract(new Duration(days: 2));
+      fimDaSemana = inicioDaSemana.add(new Duration(days: 6));
+
+    } else if(diaDeReferencia.weekday == 4) {
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day).subtract(new Duration(days: 3));
+      fimDaSemana = inicioDaSemana.add(new Duration(days: 6));
+
+    } else if(diaDeReferencia.weekday == 5) {
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day).subtract(new Duration(days: 4));
+      fimDaSemana = inicioDaSemana.add(new Duration(days: 6));
+
+    } else if(diaDeReferencia.weekday == 6) {
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day).subtract(new Duration(days: 5));
+      fimDaSemana = inicioDaSemana.add(new Duration(days: 6));
+
+    } else if(diaDeReferencia.weekday == 7) {
+      inicioDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day).subtract(new Duration(days: 6));
+      fimDaSemana = new DateTime.utc(diaDeReferencia.year, diaDeReferencia.month, diaDeReferencia.day);
+
+    }
+    
+    proximaData = inicioDaSemana;
+    while(proximaData.compareTo(fimDaSemana) != 0) {
+      listaDataSemana.add(
+        new DateFormat("yyyy-MM-dd").format(proximaData)
+      );
+      proximaData = proximaData.add(new Duration(days: 1));
+    }
+
+    listaDataSemana.add(
+        new DateFormat("yyyy-MM-dd").format(fimDaSemana)
+      );
+
+    var anoMesDiaInicio = new DateFormat.yMMMd("pt_BR").format(inicioDaSemana); // 23 de dezembro de 2017
+    List yMMMdInicio = anoMesDiaInicio.split(' ');
+
+
+    yMMMdInicio[0].length == 1 ? diaLabelInicio = '0' + yMMMdInicio[0] : diaLabelInicio = yMMMdInicio[0];
+    String diaMesInicio = diaLabelInicio + ' ' + yMMMdInicio[2][0].toUpperCase() + yMMMdInicio[2].substring(1); // 23 Dez
+
+    var anoMesDiaFim = new DateFormat.yMMMd("pt_BR").format(fimDaSemana); // 23 de dezembro de 2017
+    List yMMMdFim = anoMesDiaFim.split(' ');
+
+    yMMMdFim[0].length == 1 ? diaLabelFim = '0' + yMMMdFim[0] : diaLabelFim = yMMMdFim[0];
+    
+    String diaMesFim = diaLabelFim + ' ' + yMMMdFim[2][0].toUpperCase() + yMMMdFim[2].substring(1); // 29 Dez
+
+    String label = diaMesInicio + " de " +  yMMMdInicio[4] + " à " + diaMesFim + " de " +  yMMMdFim[4]; // 23 Dez de 2017 à 29 Dez de 2018
+
+    for(var data in listaDataSemana) {
+      List lista = await db.rawQuery('''
+        SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
+                l.valor, l.pago, l.hash 
+                  FROM lancamento AS l
+          LEFT JOIN categoria AS c ON l.idcategoria = c.id
+          LEFT JOIN tag ON l.idtag = tag.id
+          LEFT JOIN conta ON l.idconta = conta.id
+          LEFT JOIN cartao ON l.idcartao = cartao.id
+            WHERE l.data = ? AND 
+    ''' + where, [data]);
+      
+      List dataAnoMesDia = data.split("-");
+      DateTime dataDateTime = new DateTime(
+        int.parse(dataAnoMesDia[0]), int.parse(dataAnoMesDia[1]), int.parse(dataAnoMesDia[2])
+      );
+
+      var dataFormatada = new DateFormat.MMMMd("pt_BR").format(dataDateTime).toString();
+      
+      if(lista.length > 0) {
+        listaPorData.add([dataDateTime, dataFormatada, 'semCartao', lista]);
+      }        
+      
+    }
+
+    var dateMap = new LinkedHashMap();
+    
+    List allDate = [];
+
+    for(var key in listaDeFaturas) {
+      allDate.add(key[0]); //pega todas as datas
+    }
+
+    for(var key in listaPorData) {
+      allDate.add(key[0]); //pega todas as datas
+    }
+
+    allDate.sort();
+
+    for(var key in allDate) {
+      dateMap.putIfAbsent(key, () => []); //insere todas as datas de forma ordenada no {}
+    }
+
+    for(var lista in listaPorData) {
+      DateTime dateKey = lista[0];
+      String dateNome = lista[1];
+      String tipoLancamento = lista[2];
+      List lancamentos = lista[3];
+      
+      for(var itemLancamento in lancamentos) {
+        dateMap[dateKey].add([
+          dateKey,
+          itemLancamento['descricao'], dateNome, tipoLancamento, itemLancamento['categoria'],
+          itemLancamento['pago'], itemLancamento['hash'], itemLancamento['valor'],
+          itemLancamento['id'], itemLancamento['data'], itemLancamento['tipo']
+        ]);
+      }
+    }
+
+    List listaUnica = [];
+
+    dateMap.forEach((key, value) {
+      listaUnica.add(value);
+    });
+    
+    for(List dia in listaUnica) {
+      dia.sort((a, b) => a[1].compareTo(b[1]));
+    }
+
+    await db.close();
+
+    return [listaUnica, [[diaDeReferencia], label]]; //label: 23 Dez de 2017 à 29 Dez de 2018
   }
 
   Future getLctoMesFiltroSemCartao(DateTime diaSearch, List lista) async {
