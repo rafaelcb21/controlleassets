@@ -167,6 +167,87 @@ class Filtro {
     return select;
   }
 
+  Future getLctoHojeFiltroSemCartao(DateTime hoje, List listFiltro) async {
+    Directory path = await getApplicationDocumentsDirectory();
+    String dbPath = join(path.path, "database.db");
+    Database db = await openDatabase(dbPath);
+
+    String where;
+
+    if(!listFiltro.last) {
+      where = escolherFuncao(listFiltro);
+    } else {
+      where = queryFiltroCartao(listFiltro);
+    }
+
+    List listaDeFaturas = [];
+    List listaPorDataHoje = [];
+    List dateMap = [];
+    String diaLabelInicio = "";
+
+    //String dataHoje = new DateFormat.yMd().format(hoje); // 23/12/2017
+    String dataFormatada = new DateFormat.MMMMd("pt_BR").format(hoje).toString(); // 23 de dezembro
+
+    String data = new DateFormat("yyyy-MM-dd").format(hoje); // 2017-12-23
+
+    //String dia = hoje.day.toString();
+
+    var anoMesDia = new DateFormat.yMMMd("pt_BR").format(hoje); // 23 de dez de 2017
+
+    List yMMMd = anoMesDia.split(' ');
+
+    yMMMd[0].length == 1 ? diaLabelInicio = '0' + yMMMd[0] : diaLabelInicio = yMMMd[0];
+    
+    String anoMesDiaApresentacao = diaLabelInicio + ' ' + yMMMd[2][0].toUpperCase() + yMMMd[2].substring(1) + ' ' + yMMMd[4]; // 23 Dez 2017
+
+            
+    List lista = await db.rawQuery('''
+      SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
+              l.valor, l.pago, l.hash 
+                FROM lancamento AS l
+        LEFT JOIN categoria AS c ON l.idcategoria = c.id
+        LEFT JOIN tag ON l.idtag = tag.id
+        LEFT JOIN conta ON l.idconta = conta.id
+        LEFT JOIN cartao ON l.idcartao = cartao.id
+          WHERE l.data = ? AND 
+    ''' + where, [data]);
+      
+    if(lista.length > 0) {
+      listaPorDataHoje.add([hoje, dataFormatada, 'semCartao', lista]);
+    }
+
+    for(var lista in listaPorDataHoje) {
+      DateTime dateKey = lista[0];
+      String dateNome = lista[1];
+      String tipoLancamento = lista[2];
+      List lancamentos = lista[3];
+      
+      for(var itemLancamento in lancamentos) {
+        dateMap.add([
+          dateKey,
+          itemLancamento['descricao'], dateNome, tipoLancamento, itemLancamento['categoria'],
+          itemLancamento['pago'], itemLancamento['hash'], itemLancamento['valor'],
+          itemLancamento['id'], itemLancamento['data'], itemLancamento['tipo']
+        ]);
+      }
+    }
+
+    List listaUnica = [];
+
+    if(dateMap.length > 0) {
+      listaUnica.add(dateMap);
+    }
+
+    for(List dia in listaUnica) {
+      dia.sort((a, b) => a[1].compareTo(b[1]));
+    }
+
+    await db.close();
+
+    return [listaUnica, [[hoje], anoMesDiaApresentacao]];
+
+  }
+
   Future getLctoMesFiltroSemCartao(DateTime diaSearch, List lista) async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "database.db");
@@ -225,9 +306,6 @@ class Filtro {
       }
     }
 
-    
-
-    
     var dateMap = new LinkedHashMap();
     
     List allDate = [];

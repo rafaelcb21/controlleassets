@@ -70,7 +70,6 @@ String escolherFuncao(lista) {
     return queryFiltroContinuacaoParte1(lista);
 
   } else {
-    print('rafa3');
     return queryFiltro(lista);
   }
 
