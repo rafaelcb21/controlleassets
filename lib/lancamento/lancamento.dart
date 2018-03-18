@@ -1966,6 +1966,8 @@ class FormularioState extends State<Formulario> {
                           lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
                           lancamentoFixoTable.data = lancamento.data;
                           lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
+                        } else if(lancamentoDB.tiporepeticao == null) {
+                          lancamento.tiporepeticao = '';
                         }
                         
                         lancamentoDB.upsertLancamento(lancamentoList).then(
@@ -2297,6 +2299,8 @@ class FormularioState extends State<Formulario> {
                           lancamentoFixoTable.periodorepeticao = lancamento.periodorepeticao;
                           lancamentoFixoTable.data = lancamento.data;
                           lancamentoFixoTable.insertLancamentoFixo(lancamentoFixoTable);
+                        } else if(lancamentoDB.tiporepeticao == null) {
+                          lancamento.tiporepeticao = '';
                         }
 
                         lancamentoList.add(lancamento);
