@@ -1445,7 +1445,6 @@ class Lancamento {
   }
 
   List nextPeriod(String date, bool next, String periodo) {
-
     if(periodo == 'hoje') {
       List listaMesAno = date.split(" "); //[23, Dez, 2017]
       String nomeMes = listaMesAno[1];

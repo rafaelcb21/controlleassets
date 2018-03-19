@@ -59,14 +59,12 @@ String escolherFuncao(lista) {
     grupoA[0] == ' ' && grupoA[1] == 0 && rdt > 0 && typeLaunch > 0 && grupoD[1] > 0 && grupoE[1] > 0 ||
     grupoA[0] != ' ' && rdt > 0 && typeLaunch > 0 && grupoD[1] > 0 && grupoE[1] > 0
   ) {
-    print('rafa1');
     return queryFiltroContinuacaoParte2(lista);
   
   } else if(
     //A,B,C,E
     grupoA[0] != ' ' && rdt > 0 && typeLaunch > 0 && grupoD[1] == 0 && grupoE[1] > 0
   ) {
-    print('rafa2');
     return queryFiltroContinuacaoParte1(lista);
 
   } else {
