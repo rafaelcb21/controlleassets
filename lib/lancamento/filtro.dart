@@ -5,12 +5,17 @@ import './lancamento.dart';
 import '../conta/conta.dart';
 
 class FullScreenFiltro extends StatefulWidget {
+  FullScreenFiltro(this.filtro);
+  List filtro;
+
   @override
-  FullScreenFiltroState createState() => new FullScreenFiltroState();
+  FullScreenFiltroState createState() => new FullScreenFiltroState(this.filtro);
 }
 
 class FullScreenFiltroState extends State<FullScreenFiltro> {
+  FullScreenFiltroState(this.filtro);
   Color azulAppbar = new Color(0xFF26C6DA);
+  List filtro;
   
   List listaLancamento = [
     'Despesas', 'Despesas pagas', 'Despesas não pagas',
@@ -44,17 +49,17 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
   List idsTodasAsContas = [];
   List idsTodosOsCartoes = [];
   
-  String _valueTextContaCartao = ' ';
-  String _valueTextCategoria = ' ';
-  String _valueTextTag = ' ';
-  String _valueTextLancamento = ' ';
-  String _valueTextLctoFixaParcelada = ' ';
-  String _valueTextPgtoCartao = ' ';
+  String _valueTextContaCartao;
+  String _valueTextCategoria;
+  String _valueTextTag;
+  String _valueTextLancamento;
+  String _valueTextLctoFixaParcelada;
+  String _valueTextPgtoCartao;
 
-  int idconta = 0;
-  int idcartao = 0;
-  int idcategoria = 0;
-  int idtag = 0;
+  int idconta;
+  int idcartao;
+  int idcategoria;
+  int idtag;
 
   bool ehCartao = false;
 
@@ -66,6 +71,20 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
   @override
   void initState() {
     this.cores = listaCores.cores;
+    this._valueTextContaCartao = this.filtro[0][0];
+    this._valueTextLancamento = this.filtro[1];
+    this._valueTextLctoFixaParcelada = this.filtro[2];
+    this._valueTextCategoria = this.filtro[3][0];
+    this._valueTextTag = this.filtro[4][0];
+    this._valueTextPgtoCartao = this.filtro[5];
+
+    this.idconta = this.filtro[0][1];
+    this.idcartao = this.filtro[0][1];
+    this.idcategoria = this.filtro[3][1];
+    this.idtag = this.filtro[4][1];
+
+
+
     contaDB.getAllContaAtivas().then((list) {
       setState(() {
         this.listaContasDB = list;
@@ -595,12 +614,17 @@ class FullScreenFiltroState extends State<FullScreenFiltro> {
                               _valueTextLctoFixaParcelada,
                               [_valueTextCategoria, this.idcategoria],
                               [_valueTextTag, this.idtag],
+                              _valueTextPgtoCartao,
                               this.idsTodasAsContas,
                               this.ehCartao                              
                             ]);
                           } else {
-                            Navigator.pop(context, [
+                            Navigator.pop(context, [                              
                               [_valueTextContaCartao, idcartao],
+                              _valueTextLancamento,
+                              _valueTextLctoFixaParcelada,
+                              [_valueTextCategoria, this.idcategoria],
+                              [_valueTextTag, this.idtag],
                               _valueTextPgtoCartao,
                               this.idsTodosOsCartoes,
                               this.ehCartao

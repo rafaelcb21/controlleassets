@@ -156,10 +156,8 @@ class Filtro {
     // Não é um cartão, é uma conta
     if(!lista.last) {
       select = escolherFuncao(lista);
-      
     } else {
       select = queryFiltroCartao(lista);
-
     }
 
     await db.close();
@@ -199,14 +197,15 @@ class Filtro {
     
     String anoMesDiaApresentacao = diaLabelInicio + ' ' + yMMMd[2][0].toUpperCase() + yMMMd[2].substring(1) + ' ' + yMMMd[4]; // 23 Dez 2017
 
-    List x = await db.rawQuery("SELECT  * FROM lancamento AS l WHERE l.data = ? AND NOT l.tiporepeticao = 'Parcelada' ", [data]);
+    //List x = await db.rawQuery("SELECT  * FROM lancamento AS l WHERE l.data = ? AND NOT l.tiporepeticao = 'Parcelada' ", [data]);
 
-    for(var i in x) {
-      print(i);
-      print('=================');
-    }
-    print([where, data]);
-            
+    //for(var i in x) {
+    //  print(i);
+    //  print('=================');
+    //}
+    //print([where, data]);
+
+           
     List lista = await db.rawQuery('''
       SELECT  l.id, l.data, l.descricao, l.tipo, c.categoria, 
               l.valor, l.pago, l.hash 
@@ -427,7 +426,7 @@ class Filtro {
     var hojeMes = new DateFormat.yM("pt_BR").format(diaSearch); // 12/2017
     var hojeMesDescrito = new DateFormat.yMMMM("pt_BR").format(diaSearch).toString(); // dezembro de 2017
 
-    //List x = await db.rawQuery('SELECT  * FROM lancamento');
+    List x = await db.rawQuery('SELECT  * FROM lancamento');
 
     //for(var i in x) {
     //  print(i);

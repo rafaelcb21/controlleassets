@@ -56,18 +56,22 @@ String escolherFuncao(lista) {
   int typeLaunch = tipoLancamento(grupoC);
 
   if(
+    //B,C,D,E
     grupoA[0] == ' ' && grupoA[1] == 0 && rdt > 0 && typeLaunch > 0 && grupoD[1] > 0 && grupoE[1] > 0 ||
     grupoA[0] != ' ' && rdt > 0 && typeLaunch > 0 && grupoD[1] > 0 && grupoE[1] > 0
   ) {
+    print('rafael1');
     return queryFiltroContinuacaoParte2(lista);
   
   } else if(
     //A,B,C,E
     grupoA[0] != ' ' && rdt > 0 && typeLaunch > 0 && grupoD[1] == 0 && grupoE[1] > 0
   ) {
+    print('rafael2');
     return queryFiltroContinuacaoParte1(lista);
 
   } else {
+    print('rafael3');
     return queryFiltro(lista);
   }
 
@@ -185,11 +189,6 @@ String queryFiltro(lista) {
   List grupoD = lista[3];
   List grupoE = lista[4];
 
-  //print(grupoB);
-  //print(grupoB.length);
-  //print(grupoBSingular);
-  //print(gB);
-  //print(rdt);
   int typeLaunch = tipoLancamento(grupoC);
 
   // A
@@ -962,13 +961,32 @@ String queryFiltroContinuacaoParte1(lista) {
   String queryEscolhida;
 
   List grupoA = lista[0];
-  String gB = lista[1];
+  String grupoB = lista[1];
+  String gB;
+  int rdt;
+
+  if(grupoB != ' ') {
+    String letra = grupoB[0];
+
+    if(letra == 'D') {
+      gB = '\'Despesa\'';
+    } else if(letra == 'R') {
+      gB = '\'Receita\'';
+    } else if(letra == 'T') {
+      gB = '\'Transferência\'';
+    }
+    rdt = receitaDespesaTransf(grupoB);
+
+  } else {
+    rdt = 0;
+  }
+  
   String grupoC = lista[2];
   List grupoD = lista[3];
   List grupoE = lista[4];
 
-  int rdt = receitaDespesaTransf(gB);
   int typeLaunch = tipoLancamento(grupoC);
+
 
   //A,B,C,E
   if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
@@ -1085,13 +1103,32 @@ String queryFiltroContinuacaoParte2(lista) {
   String queryEscolhida;
 
   List grupoA = lista[0];
-  String gB = lista[1];
+  String grupoB = lista[1];
+  String gB;
+  int rdt;
+
+  if(grupoB != ' ') {
+    String letra = grupoB[0];
+
+    if(letra == 'D') {
+      gB = '\'Despesa\'';
+    } else if(letra == 'R') {
+      gB = '\'Receita\'';
+    } else if(letra == 'T') {
+      gB = '\'Transferência\'';
+    }
+    rdt = receitaDespesaTransf(grupoB);
+
+  } else {
+    rdt = 0;
+  }
+  
   String grupoC = lista[2];
   List grupoD = lista[3];
   List grupoE = lista[4];
 
-  int rdt = receitaDespesaTransf(gB);
   int typeLaunch = tipoLancamento(grupoC);
+
 
   // B,C,D,E
   if(grupoA[0] == ' ' && grupoA[1] == 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {

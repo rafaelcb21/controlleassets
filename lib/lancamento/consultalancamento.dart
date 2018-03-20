@@ -32,6 +32,8 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
   DateTime to;
   String periodo = "mes";
   List total = [];
+  List filtro = [[' ', 0], ' ', ' ', [' ', 0], [' ', 0], ' '];
+
   var uuid = new Uuid();
 
   AnimationController _controller;
@@ -1314,10 +1316,10 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
             icon: const Icon(Icons.filter_list),
             color: new Color(0xFFFFFFFF),
             onPressed: () async {
-              List filtro = await Navigator.of(context).push(new PageRouteBuilder(
+              List filtroScreen = await Navigator.of(context).push(new PageRouteBuilder(
                 opaque: false,
                 pageBuilder: (BuildContext context, _, __) {
-                  return new FullScreenFiltro();
+                  return new FullScreenFiltro(this.filtro);
                 },
                 transitionsBuilder: (
                   BuildContext context,
@@ -1340,14 +1342,21 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
               //print(this.periodo); // mes
               //var listaFiltro = lancamentoDB.nextPeriod(this.periodoFiltro, true, this.periodo);
               //print(listaFiltro); // [1 Abr 2018, 2018-04-01 00:00:00.000Z, abril de 2018]
-              if(filtro != null) {
-                if(filtro.last == false) {
-                  //filtroDB.getFiltro(filtro);
+
+              //this.filtro = filtroScreen;
+
+              if(filtroScreen != null) {
+                this.filtro = filtroScreen;
+              }
+
+              if(this.filtro != null) {
+                if(this.filtro.last == false) {
+                  //filtroDB.getFiltro(this.filtro);
 
 
                   
                   //setState(() {
-                  //  this.legendaFiltro = tratarLegendaFiltro(filtro);
+                  //  this.legendaFiltro = tratarLegendaFiltro(this.filtro);
                   //});
 
                   setState(() {
@@ -1360,7 +1369,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                     //}
 
                     if(this.periodo == "hoje") {                      
-                      filtroDB.getLctoHojeFiltroSemCartao(this.periodoNext, filtro).then(
+                      filtroDB.getLctoHojeFiltroSemCartao(this.periodoNext, this.filtro).then(
                         (list) {
                           setState(() {
                             this.periodo = "hoje";
@@ -1369,16 +1378,16 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                               this.periodoFiltro = list[1][1];
                               this.periodoFiltroDateTime = list[1][0][0];
                               this.periodoFiltroResumido = this.periodoFiltro;
-                              this.legendaFiltro = tratarLegendaFiltro(filtro);
+                              this.legendaFiltro = tratarLegendaFiltro(this.filtro);
                               this.filtroAtivado = true;
-                              this.filtroAtual = filtro;
+                              this.filtroAtual = this.filtro;
                             }
                           });
                         }
                       );
 
                     } else if(this.periodo == "semana") {
-                      filtroDB.getLctoSemanaFiltroSemCartao(this.periodoNext, filtro).then(
+                      filtroDB.getLctoSemanaFiltroSemCartao(this.periodoNext, this.filtro).then(
                         (list) {
                           setState(() {
                             this.periodo = "semana";
@@ -1387,16 +1396,16 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                               this.periodoFiltro = list[1][1];
                               this.periodoFiltroDateTime = list[1][0][0];
                               this.periodoFiltroResumido = list[1][1].substring(0, 6) + " à " + list[1][1].substring(17, 24);                                        
-                              this.legendaFiltro = tratarLegendaFiltro(filtro);
+                              this.legendaFiltro = tratarLegendaFiltro(this.filtro);
                               this.filtroAtivado = true;
-                              this.filtroAtual = filtro;
+                              this.filtroAtual = this.filtro;
                             }
                           });
                         }
                       );
                     
                     } else if(this.periodo == "mes") {
-                      filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, filtro).then(
+                      filtroDB.getLctoMesFiltroSemCartao(this.periodoNext, this.filtro).then(
                         (list) {
                           setState(() {
                             if(list.length > 0) {
@@ -1404,15 +1413,15 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                               this.periodoFiltro = list[1][1];
                               this.periodoFiltroResumido = this.periodoFiltro;
                               this.periodoFiltroDateTime = list[1][0][0];
-                              this.legendaFiltro = tratarLegendaFiltro(filtro);
+                              this.legendaFiltro = tratarLegendaFiltro(this.filtro);
                               this.filtroAtivado = true;
-                              this.filtroAtual = filtro;
+                              this.filtroAtual = this.filtro;
                             }
                           });
                         }
                       );
                     } else if(this.periodo == "periodo") {
-                      filtroDB.getLctoPeriodoFiltroSemCartao(this.from, this.to, filtro).then(
+                      filtroDB.getLctoPeriodoFiltroSemCartao(this.from, this.to, this.filtro).then(
                         (list) {
                           setState(() {
                             if(list.length > 0) {
@@ -1423,9 +1432,9 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                 + " à " + 
                                 list[1][1].substring(17, 24) + list[1][1].substring(29, 31);
                               this.periodoFiltroDateTimeList = list[1][0][0];
-                              this.legendaFiltro = tratarLegendaFiltro(filtro);
+                              this.legendaFiltro = tratarLegendaFiltro(this.filtro);
                               this.filtroAtivado = true;
-                              this.filtroAtual = filtro;
+                              this.filtroAtual = this.filtro;
                             }
                           });
                         }
@@ -1433,9 +1442,9 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                     }
                   });
                 } else {
-                  filtroDB.getFiltro(filtro);
+                  filtroDB.getFiltro(this.filtro);
                   setState(() {
-                    this.legendaFiltro = tratarLegendaFiltroCartao(filtro);
+                    this.legendaFiltro = tratarLegendaFiltroCartao(this.filtro);
                   });
                 }
               }
@@ -1616,6 +1625,7 @@ class ConsultaLancamentoPageState extends State<ConsultaLancamentoPage>  with Ti
                                       this.legendaFiltro = '';
                                       this.filtroAtivado = false;
                                       this.filtroAtual = [];
+                                      this.filtro = [[' ', 0], ' ', ' ', [' ', 0], [' ',0], ' '];
 
                                       if(this.periodo == "hoje") {
                                         lancamentoDB.getLancamentoHoje(this.periodoNext).then(
