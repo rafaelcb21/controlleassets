@@ -8,6 +8,7 @@ import "categoria/categoria.dart";
 import "conta/conta.dart";
 import "cartao/cartao.dart";
 import "tag/tag.dart";
+import "configuracao/configuracao.dart";
 import 'palette/palette.dart';
 import 'package:flutter/animation.dart';
 import 'dart:ui' as ui;
@@ -489,6 +490,29 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               )
             ),
             new ListTile(
+              onTap: (){
+                Navigator.pop(context);
+                Navigator.of(context).push(new PageRouteBuilder(
+                  opaque: false,
+                  pageBuilder: (BuildContext context, _, __) {
+                    return new ConfiguracaoPage();
+                  },
+                  transitionsBuilder: (
+                      BuildContext context,
+                      Animation<double> animation,
+                      Animation<double> secondaryAnimation,
+                      Widget child,
+                  ) {
+                    return new SlideTransition(
+                      position: new Tween<Offset>(
+                        begin:  const Offset(1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    );
+                  }
+                ));
+              },
               leading: new Icon(
                 Icons.settings,
                 color: cinzaDrawer,

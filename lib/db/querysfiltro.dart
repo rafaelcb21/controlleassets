@@ -161,7 +161,6 @@ String queryFiltroCartao(lista) {
 }
 
 String queryFiltro(lista) {
-
   String queryEscolhida;
 
   List grupoA = lista[0];
@@ -192,7 +191,7 @@ String queryFiltro(lista) {
   int typeLaunch = tipoLancamento(grupoC);
 
   // A
-  if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
+  if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = ' l.idconta = ' + grupoA[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
@@ -236,13 +235,13 @@ String queryFiltro(lista) {
     return queryEscolhida = 'l.idtag = ' + grupoE[1].toString();
   
   // A,B
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tipo = ' + gB;
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tipo = ' + gB + ' AND l.pago = 1';
 
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tipo = ' + gB + ' AND l.pago = 0';
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] == 0) {
@@ -255,22 +254,22 @@ String queryFiltro(lista) {
     return queryEscolhida = 'l.idconta > 0 AND l.tipo = ' + gB + ' AND l.pago = 0';
   
   // A,C
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\'';
   
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\'';
 
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\'';
 
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\'';
   
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\')';
 
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 6 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 6 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\')';
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
@@ -292,14 +291,14 @@ String queryFiltro(lista) {
     return queryEscolhida = 'l.idconta > 0 AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\')';
 
   // A,D
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {    
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {    
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.idcategoria = ' + grupoD[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta > 0 AND l.idcategoria = ' + grupoD[1].toString();
   
   // A,E
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {    
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {    
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
@@ -423,58 +422,58 @@ String queryFiltro(lista) {
     return queryEscolhida = 'l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
   // A,B,C
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB;
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB;
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB;
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB;
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB;
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB;
   ///
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 1';
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 1';
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 1';
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 1';
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 1';
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 1';
   ///
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 0';
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 0';
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 0';
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 0';
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 0';
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 0';
   ///////////
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] == 0) {
@@ -532,13 +531,13 @@ String queryFiltro(lista) {
     return queryEscolhida = 'l.idconta > ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 0';
   
   // A,B,D
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString();
 
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] == 0) {
@@ -551,13 +550,13 @@ String queryFiltro(lista) {
     return queryEscolhida = 'l.idconta > 0 AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString();
   
   // A,B,E
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tipo = ' + gB + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idtag = ' + grupoE[1].toString();
 
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idtag = ' + grupoE[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 0 && grupoD[1] == 0 && grupoE[1] > 0) {
@@ -570,22 +569,22 @@ String queryFiltro(lista) {
     return queryEscolhida = 'l.idconta > 0 AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idtag = ' + grupoE[1].toString();
   
   // A,C,D
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.idcategoria = ' + grupoD[1].toString();
 
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.idcategoria = ' + grupoD[1].toString();
 
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.idcategoria = ' + grupoD[1].toString();
 
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 6 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 6 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.idcategoria = ' + grupoD[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
@@ -607,22 +606,22 @@ String queryFiltro(lista) {
     return queryEscolhida = 'l.idconta > 0 AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.idcategoria = ' + grupoD[1].toString();
 
   // A,C,E
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.idtag = ' + grupoE[1].toString();
 
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] >= 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.idtag = ' + grupoE[1].toString();
 
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.idtag = ' + grupoE[1].toString();
 
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 6 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 6 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.idtag = ' + grupoE[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
@@ -644,7 +643,7 @@ String queryFiltro(lista) {
     return queryEscolhida = 'l.idconta > 0 AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.idtag = ' + grupoE[1].toString();
 
   // A,D,E
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {    
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {    
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
@@ -790,58 +789,58 @@ String queryFiltro(lista) {
     return queryEscolhida = 'l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.idcartao = 0 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
   // A,B,C,D
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString();
   ///
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString();
   ///
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] == 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString();
   ///////////
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] == 0) {
@@ -899,13 +898,13 @@ String queryFiltro(lista) {
     return queryEscolhida = 'l.idconta > ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString();
 
   //// A,B,D,E
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
 
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
 
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 0 && grupoD[1] > 0 && grupoE[1] > 0) {
@@ -918,20 +917,20 @@ String queryFiltro(lista) {
     return queryEscolhida = 'l.idconta > 0 AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
   //// A,C,D,E
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] >= 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] >= 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] >= 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] >= 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] >= 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 0 && typeLaunch == 6 && grupoD[1] > 0 && grupoE[1] >= 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 0 && typeLaunch == 6 && grupoD[1] > 0 && grupoE[1] >= 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
   } else if(grupoA[0] == 'Todas as contas' && rdt == 0 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] >= 0) {
@@ -989,58 +988,58 @@ String queryFiltroContinuacaoParte1(lista) {
 
 
   //A,B,C,E
-  if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
+  if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.idtag = ' + grupoE[1].toString();
   ///
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idtag = ' + grupoE[1].toString();
   ///
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] == 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idtag = ' + grupoE[1].toString();
   ///////////
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 1 && grupoD[1] == 0 && grupoE[1] > 0) {
@@ -1186,58 +1185,58 @@ String queryFiltroContinuacaoParte2(lista) {
     return queryEscolhida = 'l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcartao = 0 AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
   // A,B,C,D,E
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 1 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   ///
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 2 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 1 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   ///
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 2 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 3 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Fixa\' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 4 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND NOT l.tiporepeticao = \'Parcelada\' AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao NOT IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   
-  } else if(grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
+  } else if(grupoA[0] != 'Todas as contas' && grupoA[1] != 0 && rdt == 3 && typeLaunch == 5 && grupoD[1] > 0 && grupoE[1] > 0) {
     return queryEscolhida = 'l.idconta = ' + grupoA[1].toString() + ' AND l.tiporepeticao IN ( \'Fixa\', \'Parcelada\') AND l.tipo = ' + gB + ' AND l.pago = 0 AND l.idcategoria = ' + grupoD[1].toString() + ' AND l.idtag = ' + grupoE[1].toString();
   ///////////
   } else if(grupoA[0] == 'Todas as contas' && rdt == 1 && typeLaunch == 1 && grupoD[1] > 0 && grupoE[1] > 0) {
